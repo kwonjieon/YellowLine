@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200)),
                 ('modify_date', models.DateTimeField(blank=True, null=True)),
-                ('image', models.ImageField(default='frontapp/media/default_img.jpg', upload_to='')),
+                ('image', models.ImageField(default='camapp/media/default_img.jpg', upload_to='')),
             ],
         ),
     ]

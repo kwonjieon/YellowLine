@@ -1,6 +1,6 @@
 # from rest_framework import serializers
 #
-# from frontapp.models import Post
+# from camapp.models import Post
 #
 #
 # class MediaImageSerializer(serializers.ModelSerializer):

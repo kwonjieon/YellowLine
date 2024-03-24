@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontapp', '0003_remove_post_title'),
+        ('camapp', '0003_remove_post_title'),
     ]
 
     operations = [

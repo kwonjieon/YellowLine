@@ -6,8 +6,8 @@ from urllib3 import request
 # Create your views here.
 from django.http import HttpResponse
 
-from frontapp import models
-from frontapp.forms import ImagePostForm
+from camapp import models
+from camapp.forms import ImagePostForm
 
 
 def testIndex(request):
@@ -16,7 +16,6 @@ def testIndex(request):
 
 # @api_view(['GET', 'POST'])
 def reqImageFile(request):
-    # return HttpResponse("Hello World!")
     if request.method == 'POST':
         form = ImagePostForm(request.POST, request.FILES)
         if form.is_valid():
@@ -26,4 +25,4 @@ def reqImageFile(request):
     else:
         form = ImagePostForm()
     context = {'form': form}
-    return render(request, 'pictureSendForm.html', context=context)
+    return render(request, 'cams/pictureSendForm.html', context=context)

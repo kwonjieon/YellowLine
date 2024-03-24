@@ -1,7 +1,7 @@
 
 from django import forms
 
-from frontapp.models import Post
+from camapp.models import Post
 
 
 class ImagePostForm(forms.ModelForm):
