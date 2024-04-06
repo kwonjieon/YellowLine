@@ -15,79 +15,20 @@ class ViewController: UIViewController {
     @IBOutlet weak var previewView: UIView!
     
     var captureSession: AVCaptureSession!
-    var photoOutput: AVCapturePhotoOutput!
+//    var photoOutput: AVCapturePhotoOutput!
+    var videoOutput: AVCaptureVideoDataOutput!
     var videoPreviewLayer: AVCaptureVideoPreviewLayer!
     
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        checkCameraAuthor()
     }
     
     override func viewDidLoad() {
         
-        captureSession = AVCaptureSession()
-        captureSession.beginConfiguration()
-        
-        let deviceTypes: [AVCaptureDevice.DeviceType] = [
-            .builtInWideAngleCamera,
-            .builtInDualCamera,
-            .builtInDualWideCamera,
-            .builtInTripleCamera
-        ]
-        
-        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes, mediaType: .video, position: .back)
-
-        
-        guard let captureDevice = AVCaptureDevice.default(for: AVMediaType.video) else { return }
-//        guard let captureDevice = discoverySession.devices.first else {
-//            return
-//        }
-        
-        do {
-            let cameraInput = try AVCaptureDeviceInput(device: captureDevice)
-//            let cameraInput = try AVCaptureDeviceInput(device: captureDevice)
-
-            photoOutput = AVCapturePhotoOutput()
-//            self.setupPhotoOutput()
-            
-            captureSession.sessionPreset = .photo
-            if captureSession.canAddInput(cameraInput) && captureSession.canAddOutput(photoOutput) {
-                captureSession.addInput(cameraInput)
-                captureSession.addOutput(photoOutput)
-                captureSession.commitConfiguration()
-            }
-            
-            videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-            videoPreviewLayer?.videoGravity = .resizeAspectFill
-            self.previewView.layer.addSublayer(videoPreviewLayer)
-            
-            // .userInitiated or .userInteractive = UI 업데이트 시
-            DispatchQueue.global(qos: .userInitiated).async {
-                
-                self.captureSession.startRunning()
-                // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
-                DispatchQueue.main.async {
-                    self.videoPreviewLayer.frame = self.previewView.bounds
-                }
-            }
-
-            
-        } catch {
-            print(error)
-        }
       
     }
-    
-
-    
-    //MARK: 사진 아웃풋 설정
-    func setupPhotoOutput() {
-        photoOutput = AVCapturePhotoOutput()
-        photoOutput.isResponsiveCaptureEnabled = true
-        photoOutput.connections.first?.videoRotationAngle =  90
-    }
-    
-
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -100,6 +41,82 @@ class ViewController: UIViewController {
 //        print("Hello")
     }
     
+}
+
+//MARK: -권한 설정 및 카메라 설정
+/**
+ camera input, camera output을 설정한다.
+ 
+ */
+extension ViewController {
+    func checkCameraAuthor() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            self.setupCamera()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
+                if granted {
+                    self.setupCamera()
+                }
+            })
+        default:
+            break
+        }
+    }
+    
+    func setupCamera() {
+        captureSession = AVCaptureSession()
+        captureSession.beginConfiguration()
+        
+        let deviceTypes: [AVCaptureDevice.DeviceType] = [
+            .builtInWideAngleCamera,
+            .builtInDualCamera,
+            .builtInDualWideCamera,
+            .builtInTripleCamera
+        ]
+        
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes, mediaType: .video, position: .back)
+        //        guard let captureDevice = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        guard let captureDevice = discoverySession.devices.first else {
+            return
+        }
+        
+        do {
+            let cameraInput = try AVCaptureDeviceInput(device: captureDevice)
+//            let cameraInput = try AVCaptureDeviceInput(device: captureDevice)
+
+//            photoOutput = AVCapturePhotoOutput()
+            videoOutput = AVCaptureVideoDataOutput()
+//            self.setupPhotoOutput()
+            
+            captureSession.sessionPreset = .photo
+            if captureSession.canAddInput(cameraInput) && captureSession.canAddOutput(videoOutput) {
+                captureSession.addInput(cameraInput)
+//                captureSession.addOutput(photoOutput)
+                captureSession.addOutput(videoOutput)
+                captureSession.commitConfiguration()
+            }
+            
+            videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+            videoPreviewLayer?.videoGravity = .resizeAspectFill
+            self.previewView.layer.addSublayer(videoPreviewLayer)
+            
+            captureSession.commitConfiguration()
+            
+            // .userInitiated or .userInteractive = UI 업데이트 시
+            DispatchQueue.global(qos: .background).async {
+                self.captureSession.startRunning()
+                // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
+
+            }
+        } catch {
+            print(error)
+        }
+        DispatchQueue.main.async {
+            self.videoPreviewLayer.frame = self.previewView.bounds
+        }
+        
+    }
 }
 
 
