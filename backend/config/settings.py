@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'camapp.apps.FrontappConfig',
+    # 'camapp.apps.FrontappConfig',
+    'rest_framework',
+    'camapp',
     'detectionImage',
-    
 ]
 
 MIDDLEWARE = [

@@ -5,6 +5,7 @@
 //  Created by 정성희 on 3/25/24.
 //
 
+import AVKit
 import UIKit
 import AVFoundation
 import Alamofire
@@ -13,12 +14,14 @@ class ViewController: UIViewController {
     
     @IBOutlet var sendBtn: UIButton!
     @IBOutlet weak var previewView: UIView!
+    @IBOutlet var imageView: UIImageView!
     
     var captureSession: AVCaptureSession!
 //    var photoOutput: AVCapturePhotoOutput!
     var videoOutput: AVCaptureVideoDataOutput!
     var videoPreviewLayer: AVCaptureVideoPreviewLayer!
     
+
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -26,7 +29,7 @@ class ViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        
+        imageRequest()
       
     }
     
@@ -37,11 +40,51 @@ class ViewController: UIViewController {
     
 
     @IBAction func postImg(_ sender: Any) {
-        upload()
+//        upload()
 //        print("Hello")
     }
     
 }
+
+//MARK: -Image Request to Server
+
+
+//MARK: -비디오를 이미지로 변환하는 작업 수행
+extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
+    func imageRequest(){
+        DispatchQueue.main.async{
+            //        DispatchQueue.main.async {
+            //            self.videoPreviewLayer.frame = self.previewView.bounds
+            //        }
+            self.videoPreviewLayer.frame = self.previewView.bounds
+        }
+    }
+    
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+//        connection.videoRotationAngle = 90
+        let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
+        guard cvImageBuffer != nil else { return  }
+
+        let attachments = CMCopyDictionaryOfAttachments(allocator: kCFAllocatorDefault, target: sampleBuffer, attachmentMode: kCMAttachmentMode_ShouldPropagate)
+        let ciImage = CIImage(cvImageBuffer: cvImageBuffer!, options: attachments as! [CIImageOption : Any] ).oriented(forExifOrientation: 6)
+
+        let image = UIImage(ciImage: ciImage)
+        
+        DispatchQueue.main.async{
+//            self.imageView = UIImageView(image: image)
+            Task{
+                await self.upload(image: image)
+            }
+//            self.imageView.image = result
+        }
+        
+    }
+    
+
+    
+}
+
+
 
 //MARK: -권한 설정 및 카메라 설정
 /**
@@ -64,8 +107,12 @@ extension ViewController {
         }
     }
     
-    func setupCamera() {
+    private func setupCamera() {
         captureSession = AVCaptureSession()
+        let queue = DispatchQueue(label: "videoQueue", qos: .userInteractive)
+        videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.setSampleBufferDelegate(self, queue: queue)
+        
         captureSession.beginConfiguration()
         
         let deviceTypes: [AVCaptureDevice.DeviceType] = [
@@ -86,7 +133,6 @@ extension ViewController {
 //            let cameraInput = try AVCaptureDeviceInput(device: captureDevice)
 
 //            photoOutput = AVCapturePhotoOutput()
-            videoOutput = AVCaptureVideoDataOutput()
 //            self.setupPhotoOutput()
             
             captureSession.sessionPreset = .photo
@@ -100,21 +146,19 @@ extension ViewController {
             videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
             videoPreviewLayer?.videoGravity = .resizeAspectFill
             self.previewView.layer.addSublayer(videoPreviewLayer)
-            
             captureSession.commitConfiguration()
             
             // .userInitiated or .userInteractive = UI 업데이트 시
-            DispatchQueue.global(qos: .background).async {
+            DispatchQueue.global(qos: .default).async {
                 self.captureSession.startRunning()
                 // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
-
             }
         } catch {
             print(error)
         }
-        DispatchQueue.main.async {
-            self.videoPreviewLayer.frame = self.previewView.bounds
-        }
+//        DispatchQueue.main.async {
+//            self.videoPreviewLayer.frame = self.previewView.bounds
+//        }
         
     }
 }
@@ -143,12 +187,10 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
 //https://github.com/Alamofire/Alamofire.git 로 패키지 추가하자.
 //http 연결 시 App transport -> exception domain -> YES로 info설정 변경해줘야함.
 extension ViewController {
-
-    func upload() {
-        print("Upload is approaching...")
-
-        
-        let stringURL = "https://4049-116-32-21-139.ngrok-free.app/yl/img"
+    
+    func upload(image: UIImage) async {
+        let result: UIImage?
+        let stringURL = "https://07cf-182-222-253-136.ngrok-free.app/yl/img"
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
 //        guard let image = UIImage(named: "chauchaudog.jpg"),
 //              let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
@@ -157,10 +199,12 @@ extension ViewController {
 //            print("이미지 또는 URL을 불러올 수 없습니다.")
 //            return
 //        }
-        
+        let nowDate = Date()
+        let dateFormat = DateFormatter()
+        dateFormat.dateFormat = "yyyy/MM/dd_HH:mm:ss"
+        let convertedDate = dateFormat.string(from: nowDate)
         AF.upload(multipartFormData: { multipartFormData in
-            guard let image = UIImage(named: "chauchaudog.jpg"),
-                  let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
+            guard let imageData = image.jpegData(compressionQuality: 0.5) ?? image.pngData(),
                   let url = URL(string: stringURL)
             else {
                 print("이미지 또는 URL을 불러올 수 없습니다.")
@@ -169,17 +213,64 @@ extension ViewController {
             multipartFormData.append(Data("user1".utf8), withName: "title")
             multipartFormData.append(imageData,
                                      withName: "image",
-                                     fileName: "chauchaudog.jpg",
+                                     fileName: "user1_\(convertedDate).jpg",
                                      mimeType: "image/jpg")
         }, to: stringURL, method: .post, headers: header)
-        .response{ response in
-            guard let statusCode = response.response?.statusCode else {return }
-                    switch statusCode{
-                    case 200: print("이미지 전송 완료")
-                    default:
-                        print("오류발생")
+        .responseData{ response in
+            switch response.result {
+            case .success(let data):
+                if let result = UIImage(data: data) {
+                    DispatchQueue.main.async{
+                        self.imageView.image = result
                     }
+                }
+                
+            case .failure(let error):
+                print("Error has occured: \(error)")
+            }
+//            guard let statusCode = response.response?.statusCode else {return }
+//                    switch statusCode{
+//                    case 200: print("이미지 전송 완료")
+//                        
+//                    default:
+//                        print("오류발생")
+//                    }
         }
+    
+//    func upload() {
+//        print("Upload is approaching...")
+//        let stringURL = "https://4049-116-32-21-139.ngrok-free.app/yl/img"
+//        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+////        guard let image = UIImage(named: "chauchaudog.jpg"),
+////              let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
+////              let url = URL(string: stringURL)
+////        else {
+////            print("이미지 또는 URL을 불러올 수 없습니다.")
+////            return
+////        }
+//        
+//        AF.upload(multipartFormData: { multipartFormData in
+//            guard let image = UIImage(named: "chauchaudog.jpg"),
+//                  let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
+//                  let url = URL(string: stringURL)
+//            else {
+//                print("이미지 또는 URL을 불러올 수 없습니다.")
+//                return
+//            }
+//            multipartFormData.append(Data("user1".utf8), withName: "title")
+//            multipartFormData.append(imageData,
+//                                     withName: "image",
+//                                     fileName: "chauchaudog.jpg",
+//                                     mimeType: "image/jpg")
+//        }, to: stringURL, method: .post, headers: header)
+//        .response{ response in
+//            guard let statusCode = response.response?.statusCode else {return }
+//                    switch statusCode{
+//                    case 200: print("이미지 전송 완료")
+//                    default:
+//                        print("오류발생")
+//                    }
+//        }
 
 
     }
@@ -191,7 +282,8 @@ extension ViewController {
 /*
  https://velog.io/@sanghwi_back/Swift-동시성-프로그래밍-2-DispatchQueue
  https://velog.io/@yy0867/Custom-Camera-정리
-
+ https://peppo.tistory.com/189 카메라 정리
+ https://liveupdate.tistory.com/445 cvpixelbuffer 등 정리
 */
 
 /*
