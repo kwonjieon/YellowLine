@@ -1,19 +1,15 @@
-from datetime import datetime
-from io import BytesIO
+import io
 
+from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 # Create your views here.
 from django.http import HttpResponse
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from camapp.forms import ImagePostForm
-from camapp.models import Post
-from camapp.serializers import PostImageSerializer
 
 
 @api_view(['GET'])
@@ -31,7 +27,7 @@ def testIndex(request):
 # @api_view(['GET', 'POST'])
 @csrf_exempt
 def reqImageFile(request):
-    last_datetime = datetime.now()
+    # last_datetime = datetime.now()
     count = 0
     if request.method == 'POST':
         form = ImagePostForm(request.POST, request.FILES)
@@ -39,22 +35,30 @@ def reqImageFile(request):
             # form.files.get('id_image').name = form.files.get('id_title')+".jpg"
             image_title = form.cleaned_data['title']
             image_file = form.cleaned_data['image']
-            product = form.save(commit=False)
+            image_bytes = image_file.read()
+            image_io = io.BytesIO(image_bytes)
+            image = Image.open(image_io).convert("RGB")
+            image.save(image_io, 'JPEG', quality=70)
+            image_io.seek(0)
+            # product = form.save(commit=False)
             # product.save()
-            print(product)
-            print(datetime.now() - last_datetime)
-            last_datetime = datetime.now()
+            # print(product)
+            # print(datetime.now() - last_datetime)
+            # last_datetime = datetime.now()
 
             in_memory_uploaded_file = InMemoryUploadedFile(
-                file=BytesIO(image_file.read()),
-                field_name=None,
+                # file= image_file
+                file=image_io,
+                field_name='image',
                 name=image_file.name,
-                content_type=image_file.content_type,
-                size=image_file.size,
-                charset=image_file.charset,
+                content_type='image/jpeg',
+                # size=image_file.size,
+                size=image_io.tell(),
+                charset=None,
             )
-        response = HttpResponse(in_memory_uploaded_file, content_type='image/jpeg')
-        response['Content-Disposition'] = f'attachment; filename="{image_title}.jpg"'
+        # response = HttpResponse(in_memory_uploaded_file, content_type='image/jpeg')
+        response = HttpResponse(image_file, content_type='image/jpeg')
+        response['Content-Disposition'] = f'attachment; filename="{image_title}.jpeg"'
         return response
     else:
         form = ImagePostForm()
