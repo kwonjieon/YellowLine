@@ -69,7 +69,6 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
             }catch{
                 print(error)
             }
-            
         })
         dataTask.resume()
     }
