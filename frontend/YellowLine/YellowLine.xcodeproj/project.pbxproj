@@ -13,6 +13,8 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
+		B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */; };
+		B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96535132BC5737E00643DC9 /* NetworkManager.swift */; };
 		B966D3F52BBE9451004F4E98 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B966D3F42BBE9451004F4E98 /* Alamofire */; };
 		B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */; };
 		B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */; };
@@ -27,6 +29,8 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
+		B96535132BC5737E00643DC9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chauchaudog.jpg; sourceTree = "<group>"; };
 		B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -71,6 +75,8 @@
 				5709DFFD2BB13E9300553A23 /* LaunchScreen.storyboard */,
 				5709E0002BB13E9300553A23 /* Info.plist */,
 				B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */,
+				B96535132BC5737E00643DC9 /* NetworkManager.swift */,
+				B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */,
 			);
 			path = YellowLine;
 			sourceTree = "<group>";
@@ -155,8 +161,10 @@
 			files = (
 				B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */,
 				5709DFF72BB13E9200553A23 /* ViewController.swift in Sources */,
+				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
+				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

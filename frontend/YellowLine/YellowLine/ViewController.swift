@@ -12,44 +12,43 @@ import Alamofire
 import Combine
 
 
-class ViewController: UIViewController {
+class ViewController: UIViewController{
     
     @IBOutlet weak var previewView: UIView!
      @IBOutlet var imageView: UIImageView!
     
-    var captureSession: AVCaptureSession!
-    var videoOutput: AVCaptureVideoDataOutput!
-    var subscriptions = Set<AnyCancellable>()
-    var videoPreviewLayer: AVCaptureVideoPreviewLayer!
+//    var captureSession: AVCaptureSession!
+//    var videoOutput: AVCaptureVideoDataOutput!
+//    var subscriptions = Set<AnyCancellable>()
+//    var videoPreviewLayer: AVCaptureVideoPreviewLayer!
     let queue = DispatchQueue(label: "videoQueue")
     
-    var isUploading = false
+//    var isUploading = false
+    
+    var cameraSession: CameraSession?
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
     
     override func viewDidLoad() {
-        
+        cameraSession = CameraSession(queue: self.queue, view: self.imageView)
         checkCameraAuthor()
-
+        self.cameraSession?.startSession()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.captureSession.stopRunning()
+        self.cameraSession?.stopSession()
+//        self.captureSession.stopRunning()
     }
     
 }
 
 
-
+/*
 //MARK: -비디오를 이미지로 변환하는 작업 수행 후 보냄
 extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
-    func imageRequest(){
-
-    }
-    
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard !self.isUploading else {
             return
@@ -60,13 +59,12 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
 
-//        let attachments = CMCopyDictionaryOfAttachments(allocator: kCFAllocatorDefault, target: sampleBuffer, attachmentMode: kCMAttachmentMode_ShouldPropagate)
-//        let ciImage = CIImage(cvImageBuffer: cvImageBuffer!, options: attachments as! [CIImageOption : Any] ).oriented(forExifOrientation: 6)
         let ciImage = CIImage(cvImageBuffer: cvImageBuffer!).oriented(forExifOrientation: 6)
-        let context = CIContext()
-        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return }
-        let image = UIImage(cgImage: cgImage)
-        
+//        let image = UIImage(ciImage:ciImage).resize(500, 800)
+                let image = UIImage(ciImage: ciImage)
+        guard let imageData = image.jpegData(compressionQuality: 0.8) ?? image.pngData() else {
+            return
+        }
         
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         print("Incoming video buffer at \(timestamp.seconds) seconds...")
@@ -75,31 +73,22 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
 //            self.imageView.image = image
 //        }
         
-        uploadWithCombine(image: image)
+        //MARK: 이미지 보내기 & UI표시하기.
+        uploadWithCombine(image: imageData)
             .sink( receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-//                    self.isUploading = false
+                    self.isUploading = false
                     break // 성공적으로 완료
                 case .failure(let error):
                     print(error.localizedDescription) // 오류 처리
                 }
             }, receiveValue: { [weak self] uploadedImage in
-                self?.isUploading = false
                 DispatchQueue.main.async {
                     self?.imageView.image = uploadedImage
                 }
             })
             .store(in: &subscriptions)
-        //MARK: 이미지 보내기 & UI표시하기.
-//        DispatchQueue.main.async{
-////            self.imageView = UIImageView(image: image)
-//            Task{
-//                await self.upload(image: image)
-//            }
-////            self.imageView.image = result
-//        }
-//        upload(image: image)
     }
     
     
@@ -128,31 +117,67 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
         
         return body as Data
     }
-    
 }
 
+//extension UIImage {
+////    func resized(to size: CGSize) -> UIImage {
+////        return UIGraphicsImageRenderer(size: size).image { _ in
+////            draw(in: CGRect(origin: .zero, size: size))
+////        }
+////    }
+//    
+//    func resize(_ width: Int, _ height: Int) -> UIImage {
+//        // Keep aspect ratio
+//        let maxSize = CGSize(width: width, height: height)
+//
+//        let availableRect = AVFoundation.AVMakeRect(
+//            aspectRatio: self.size,
+//            insideRect: .init(origin: .zero, size: maxSize)
+//        )
+//        let targetSize = availableRect.size
+//
+//        // Set scale of renderer so that 1pt == 1px
+//        let format = UIGraphicsImageRendererFormat()
+//        format.scale = 1
+//        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+//
+//        // Resize the image
+//        let resized = renderer.image { _ in
+//            self.draw(in: CGRect(origin: .zero, size: targetSize))
+//        }
+////        print("화면 배율: \(UIScreen.main.scale)")// 배수
+////        print("origin: \(self), resize: \(resized)")
+//        return resized
+//    }
+//    
+//}
 
+*/
 
 //MARK: -권한 설정 및 카메라 설정
 /**
  camera input, camera output을 설정한다.
  */
+
 extension ViewController {
     func checkCameraAuthor() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            self.setupCamera()
+            guard (self.cameraSession != nil) else { return }
+            self.cameraSession?.setupCameraSession()
+            //            self.setupCamera()
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
                 if granted {
-                    self.setupCamera()
+                    self.cameraSession?.setupCameraSession()
+//                    self.setupCamera()
                 }
             })
         default:
             break
         }
     }
-    
+/*
     private func setupCamera() {
         captureSession = AVCaptureSession()
         videoOutput = AVCaptureVideoDataOutput()
@@ -172,16 +197,16 @@ extension ViewController {
             return
         }
 
-        do {
-            try captureDevice.lockForConfiguration()
-            
-            captureDevice.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(5))
-            captureDevice.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(5))
-            
-            captureDevice.unlockForConfiguration()
-        } catch {
-            print(error)
-        }
+//        do {
+//            try captureDevice.lockForConfiguration()
+//            
+//            captureDevice.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(5))
+//            captureDevice.activeVideoMaxFrameDuration = CMTimeMake(value: 1, timescale: Int32(5))
+//            
+//            captureDevice.unlockForConfiguration()
+//        } catch {
+//            print(error)
+//        }
         
         do {
             let cameraInput = try AVCaptureDeviceInput(device: captureDevice)
@@ -200,7 +225,7 @@ extension ViewController {
         } catch {
             print(error)
         }
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global(qos: .userInteractive).async {
             self.captureSession.startRunning()
                 // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
         }
@@ -209,49 +234,32 @@ extension ViewController {
 //        }
         
     }
+*/
 }
 
-
-//MARK: -이미지 캡처
-extension ViewController: AVCapturePhotoCaptureDelegate {
-    /*
-    @IBAction func takePhoto(_ sender: Any) {
-        photoOutput?.capturePhoto(with: AVCapturePhotoSettings(), delegate: self as AVCapturePhotoCaptureDelegate)
-    }
-    */
-    /*
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard let imageData = photo.fileDataRepresentation() else { return }
-        let image = UIImage(data: imageData)
-        // 이미지뷰에 이미지 설정
-    }
-     */
-    
-//    DispatchQueue.global(qos: .userInteractive).async { // [weak var] in
-        
-}
-
-//MARK: -버튼식 파일보내기. Alamofire패키지 깃허브에 따와야함
+/*
+//MARK: -combine + alamofire 파일보내기
 //https://github.com/Alamofire/Alamofire.git 로 패키지 추가하자.
 //http 연결 시 App transport -> exception domain -> YES로 info설정 변경해줘야함.
 extension ViewController {
-    func uploadWithCombine(image: UIImage) -> AnyPublisher<UIImage?, Error>{
-        guard let imageData = image.jpegData(compressionQuality: 0.7) ?? image.pngData() else {
-            return Fail(error: NSError(domain: "com.example.error", code: -1, userInfo: nil)).eraseToAnyPublisher()
-        }
+    func uploadWithCombine(image: Data?) -> AnyPublisher<UIImage?, Error>{
+//        guard let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData() else {
+//            return Fail(error: NSError(domain: "com.example.error", code: -1, userInfo: nil)).eraseToAnyPublisher()
+////            return
+//        }
         
-        let stringURL = "https://5be8-182-222-253-136.ngrok-free.app/yl/img"
+        let stringURL = "https://145b-182-222-253-136.ngrok-free.app/yl/img"
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         
         let nowDate = Date()
         let dateFormat = DateFormatter()
-        dateFormat.dateFormat = "yyyy/MM/dd_HH:mm:ss"
+        dateFormat.dateFormat = "H:mm:ss.SSSS"
         let convertedDate = dateFormat.string(from: nowDate)
         
         return Future<UIImage?, Error> { promise in
             AF.upload(multipartFormData: { multipartFormData in
                 multipartFormData.append(Data("user1".utf8), withName: "title")
-                multipartFormData.append(imageData,
+                multipartFormData.append(image!,
                                          withName: "image",
                                          fileName: "user1_\(convertedDate).jpeg",
                                          mimeType: "image/jpeg")
@@ -259,10 +267,10 @@ extension ViewController {
             .responseData{ response in
                 switch response.result {
                 case .success(let data):
-                    self.isUploading = false
                     let result = UIImage(data: data)
                     promise(.success(result))
                 case .failure(let error):
+                    print("Fail...!")
                     promise(.failure(error))
                 }
             }
@@ -351,7 +359,7 @@ extension ViewController {
                                      withName: "image",
                                      fileName: "user1_\(convertedDate).jpg",
                                      mimeType: "image/jpg")
-        }, to: stringURL, method: .post, headers: header)
+        }, to: url, method: .post, headers: header)
         .responseData{ response in
             switch response.result {
             case .success(let data):
@@ -370,7 +378,7 @@ extension ViewController {
 
 }
 
-
+*/
 
 /*
  https://velog.io/@sanghwi_back/Swift-동시성-프로그래밍-2-DispatchQueue
