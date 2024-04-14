@@ -16,7 +16,7 @@ class WebSocketManager {
     }
     
     func connect() {
-        guard let url = URL(string: "ws://0.tcp.jp.ngrok.io:15046/yl/ws/") else {return}
+        guard let url = URL(string: "ws://0.tcp.jp.ngrok.io:10961/yl/ws/") else {return}
         let urlSession = URLSession(configuration: .default)
         webSocketTask = urlSession.webSocketTask(with: url)
         webSocketTask?.resume()

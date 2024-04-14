@@ -17,29 +17,48 @@ class CameraSession: NSObject {
     var queue: DispatchQueue?
     var _image: UIImage?
     var _imageView: UIImageView?
-    var subscriptions = Set<AnyCancellable>()
-    var imageBuffer: [Data] = []
-
+//    var subscriptions = Set<AnyCancellable>()
+    
     var deviceFormat: AVCaptureDevice.Format?
+    
 //    var preferredOutputPixelFormat = FourCharCode("BGRA")
     var preferredOutputPixelFormat: FourCharCode = 0
 
-    let _networkManager = NetworkManager(url : URL(string: "ws://0.tcp.jp.ngrok.io:15046/yl/ws/"))
+    //networkmanager는 websocket을 사용하기 때문에 현재 사용안함. 나중에 추가로 서버와 통신할 때 간단한 통신작업만 추가할예정.
+//    let _networkManager = NetworkManager(url : URL(string: "ws://0.tcp.jp.ngrok.io:15046/yl/ws/"))
     let socketManager: WebSocketManager?
     
     
     var isUploaded = false
     
     init(queue: DispatchQueue, view: UIImageView?){
+        //url도 websocket 주소로 바꿀계획.
         self.imgUrl = "https://145b-182-222-253-136.ngrok-free.app/yl/img"
         self.captureSession = .init()
         self.videoOutput = .init()
         self.queue = queue
+        // 뷰를 빈으로 등록해(ex:@State 같은 어노테이션) 나중에 이와같은 코드를 없애버리자.
         self._imageView = view
+        
+        //run websocket
         self.socketManager = WebSocketManager(view: self._imageView!)
         self.socketManager?.connect()
     }
     
+    func checkCameraAuthor() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            self.setupCameraSession()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
+                if granted {
+                    self.setupCameraSession()
+                }
+            })
+        default:
+            break
+        }
+    }
     
     
     
@@ -48,9 +67,13 @@ class CameraSession: NSObject {
         self.captureSession.beginConfiguration()
         self.captureSession.sessionPreset = .photo
         
+        // input setting
         let _device = setupInput(w: 640, h:860)
+        
+        //output setting
         setupOutput()
         
+        //add input and output
         do {
             let cameraInput = try AVCaptureDeviceInput(device: _device!)
             if captureSession.canAddInput(cameraInput) && captureSession.canAddOutput(videoOutput) {
@@ -64,6 +87,7 @@ class CameraSession: NSObject {
         captureSession.commitConfiguration()
     }
     
+    // input setting method
     private func setupInput(w: Int32, h: Int32) -> AVCaptureDevice?{
         let deviceTypes: [AVCaptureDevice.DeviceType] = [
             .builtInWideAngleCamera,
@@ -100,7 +124,8 @@ class CameraSession: NSObject {
            maxFrameRate = fmax(maxFrameRate, fpsRange.maxFrameRate)
         }
 
-        let fps = Int(maxFrameRate)
+//        let fps = Int(maxFrameRate)
+        let fps = 10
         print("fps is \(fps)")
         do {
             try device.lockForConfiguration()
@@ -113,6 +138,7 @@ class CameraSession: NSObject {
         return device
     }
     
+    //output setting method
     private func setupOutput() {
         let pixelFormats: Set<OSType> = Set([kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,
                                                                 kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,
@@ -145,13 +171,14 @@ class CameraSession: NSObject {
         self.videoOutput.setSampleBufferDelegate(self, queue: self.queue)
     }
     
+    
     func startSession() {
         DispatchQueue.global(qos: .default).async {
             self.captureSession.startRunning()
                 // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
         }
         
-        self._networkManager.runUploadImageSession()
+//        self._networkManager.runUploadImageSession()
     }
     
     func stopSession() {
@@ -178,9 +205,6 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         
         self.socketManager?.send(image: imageData)
         
-//        DispatchQueue.main.async {
-//            self._imageView?.image = image
-//        }
         
 //        queue!.async { [self] in
 //            self.imageBuffer.append(imageData)
