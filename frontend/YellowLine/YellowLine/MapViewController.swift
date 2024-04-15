@@ -8,6 +8,7 @@
 import UIKit
 import TMapSDK
 import CoreLocation
+import CoreMotion
 
 // 지도 뷰 로드
 
@@ -22,6 +23,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
     var locationManager = CLLocationManager()
     var markers:Array<TMapMarker> = []
+    let motionManager = CMMotionManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +38,11 @@ class MapViewController: UIViewController, TMapViewDelegate {
         locationManager.delegate = self  // 델리게이트 설정
         locationManager.desiredAccuracy = kCLLocationAccuracyBest  // 거리 정확도 설정
         
+        // 위치 정보 허용 확인
         checkAuthorizationStatus()
+        
+        // 방향 감지
+        directionDetection()
     }
     
     // 위치 정보 허용 확인
@@ -122,23 +128,46 @@ class MapViewController: UIViewController, TMapViewDelegate {
         }
     }
     
-    
-    func currentPositionMarker() {
+    // 현재 위치 마커 표시
+    func currentPositionMarker(currentLongitude: CLLocationDegrees, currentLatitude: CLLocationDegrees) {
+        
         let position = self.mapView?.getCenter()
+        let marker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLongitude, longitude: currentLatitude))
+        marker.title = "제목없음"
+        
+        //오류
+        marker.map = self.mapView
+        self.markers.append(marker)
+        
         if let position = position {
-            let marker = TMapMarker(position: position)
-            marker.title = "제목없음"
-            marker.subTitle = "내용없음"
-            marker.draggable = true
-            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 50))
-            label.text = "좌측"
-            marker.leftCalloutView = label
-            let label2 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 50))
-            label2.text = "우측"
-            marker.rightCalloutView = label2
-            
-            marker.map = self.mapView
-            self.markers.append(marker)
+            DispatchQueue.main.async{
+                
+            }
+        }
+    }
+    
+    // 디바이스 방향 감지
+    func directionDetection() {
+        if motionManager.isDeviceMotionAvailable {
+            motionManager.deviceMotionUpdateInterval = 0.2 // 업데이트 간격 설정 (초 단위)
+            motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (data, error) in
+                guard let data = data else { return }
+                
+                // 디바이스의 방향 데이터 추출
+                let attitude = data.attitude
+                
+                // 방향 데이터를 사용하여 각도를 계산
+                let pitch = attitude.pitch * 180.0 / Double.pi
+                let roll = attitude.roll * 180.0 / Double.pi
+                let yaw = attitude.yaw * 180.0 / Double.pi
+                
+                // 화면에 방향 데이터 출력
+                print("Pitch: \(pitch) degrees")
+                print("Roll: \(roll) degrees")
+                print("Yaw: \(yaw) degrees")
+            }
+        } else {
+            print("Device motion is not available")
         }
     }
 }
@@ -163,9 +192,10 @@ extension MapViewController: CLLocationManagerDelegate {
             //self.txtLatitude.text = String(latitude)
         }
         
-        getAddress()
+        //getAddress()
         //locationManager.stopUpdatingLocation()
         
+        currentPositionMarker(currentLongitude: longitude, currentLatitude: latitude)
     }
     
     
