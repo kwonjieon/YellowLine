@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Uploaded Image</title>
+  <title>Object Detection Result</title>
 </head>
 <body>
-  <img src="{% url 'outputImage' %}" alt="Uploaded Image">
+  <h1>Object Detection Result</h1>
+  <img src="data:image/jpeg;base64,{{ img_with_boxes }}" alt="Object Detection Result">
 </body>
 </html>
