@@ -23,7 +23,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
     var locationManager = CLLocationManager()
     var markers:Array<TMapMarker> = []
+    var currentMarker:TMapMarker?
+    var polylines:Array<TMapPolyline> = []
     let motionManager = CMMotionManager()
+    
+    var longitude:Double = 0.0
+    var latitude:Double = 0.0
+    
+    var startCheckLocation:Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,11 +45,50 @@ class MapViewController: UIViewController, TMapViewDelegate {
         locationManager.delegate = self  // 델리게이트 설정
         locationManager.desiredAccuracy = kCLLocationAccuracyBest  // 거리 정확도 설정
         
+        //locationManager.distanceFilter = 5.0 // 미터 단위
+
+        
         // 위치 정보 허용 확인
         checkAuthorizationStatus()
         
+        // 확대 레벨 기본 설정
+        self.mapView?.setZoom(18)
+        
         // 방향 감지
-        directionDetection()
+        //directionDetection()
+        
+        // GPS 위치 탐지 시작
+        locationManager.startUpdatingLocation()
+    }
+    
+    // 맵 로드 이후 ui 표시
+    override func viewDidAppear(_ animated: Bool) {
+        // 맵 로드 이후 마커 표기 시작하게 하는 flag
+        startCheckLocation = true
+        
+        // 현재위치~목적지 경로 루트 표시
+        showDestinationRoute()
+        
+        //
+        //updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
+        self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+        
+    }
+    
+    // 마커 초기화
+    func clearMarkers() {
+        for marker in self.markers {
+            marker.map = nil
+        }
+        self.markers.removeAll()
+    }
+    
+    // 경로 초기화
+    func clearPolylines() {
+        for polyline in self.polylines {
+            polyline.map = nil
+        }
+        self.polylines.removeAll()
     }
     
     // 위치 정보 허용 확인
@@ -72,78 +118,15 @@ class MapViewController: UIViewController, TMapViewDelegate {
         }
     }
     
-
-    // 현재 위치 주소 가져오기
-    func getAddress() {
-        print("CLLocationManagerDelegate >> getAddress() ")
-        locationManager.delegate = self
-        locationManager.distanceFilter = kCLDistanceFilterNone
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
-        
-        let geocoder = CLGeocoder.init()
-        
-        let location = self.locationManager.location
-        
-        if location != nil {
-            geocoder.reverseGeocodeLocation(location!) { (placemarks, error) in
-                if error != nil {
-                    return
-                }
-                if let placemark = placemarks?.first {
-                    var address = ""
-                    
-                    if let administrativeArea = placemark.administrativeArea {
-                        print("== [시/도] administrativeArea : \(administrativeArea)")  //서울특별시, 경기도
-                        address = "\(address) \(administrativeArea) "
-                    }
-                    
-                    if let locality = placemark.locality {
-                        print("== [도시] locality : \(locality)") //서울시, 성남시, 수원시
-                        address = "\(address) \(locality) "
-                    }
-                    
-                    if let subLocality = placemark.subLocality {
-                        print("== [추가 도시] subLocality : \(subLocality)") //강남구
-                        address = "\(address) \(subLocality) "
-                    }
-                    
-                    if let thoroughfare = placemark.thoroughfare {
-                        print("== [상세주소] thoroughfare : \(thoroughfare)") //강남대로106길, 봉은사로2길
-                        address = "\(address) \(thoroughfare) "
-                    }
-                    
-                    if let subThoroughfare = placemark.subThoroughfare {
-                        print("== [추가 거리 정보] subThoroughfare : \(subThoroughfare)") //272-13
-                        address = "\(address) \(subThoroughfare)"
-                    }
-                    
-                    print("CLLocationManagerDelegate >> getAddress() - address : \(address)")  // 서울특별시 광진구 중곡동 272-13
-                    
-                    //self.txtAddress.text = address
-                    print(address)
-                }
-            }
+    // 현재 위치 마커 업데이트
+    func updateCurrentPositionMarker(currentLatitude: CLLocationDegrees, currentLongitude: CLLocationDegrees) {
+        // 실시간 위치표기를 위한 기존 현재위치 마커 초기화
+        if let existingMarker = currentMarker {
+            existingMarker.map = nil
         }
-    }
-    
-    // 현재 위치 마커 표시
-    func currentPositionMarker(currentLongitude: CLLocationDegrees, currentLatitude: CLLocationDegrees) {
-        
-        let position = self.mapView?.getCenter()
-        let marker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLongitude, longitude: currentLatitude))
-        marker.title = "제목없음"
-        
-        //오류
-        marker.map = self.mapView
-        self.markers.append(marker)
-        
-        if let position = position {
-            DispatchQueue.main.async{
-                
-            }
-        }
+        // 새로운 위치에 마커 생성 및 추가
+        currentMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLatitude, longitude: currentLongitude))
+        currentMarker?.map = mapView
     }
     
     // 디바이스 방향 감지
@@ -170,6 +153,36 @@ class MapViewController: UIViewController, TMapViewDelegate {
             print("Device motion is not available")
         }
     }
+    
+    // 지도에 경로 표기
+    func showDestinationRoute() {
+        clearPolylines()
+        
+        let pathData = TMapPathData()
+        let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let endPoint = CLLocationCoordinate2D(latitude: 37.403049, longitude: 127.103318)
+        pathData.findPathDataWithType(.PEDESTRIAN_PATH, startPoint: startPoint, endPoint: endPoint) { (result, error)->Void in
+            let polyline = result
+            
+            print("line: \(polyline?.path)")
+            
+            DispatchQueue.main.async {
+                let marker1 = TMapMarker(position: startPoint)
+                marker1.map = self.mapView
+                marker1.title = "출발지"
+                self.markers.append(marker1)
+                
+                let marker2 = TMapMarker(position: endPoint)
+                marker2.map = self.mapView
+                marker2.title = "목적지"
+                self.markers.append(marker2)
+                
+                polyline?.map = self.mapView
+                self.polylines.append(polyline!)
+                self.mapView?.fitMapBoundsWithPolylines(self.polylines)
+            }
+        }
+    }
 }
 
 extension MapViewController: CLLocationManagerDelegate {
@@ -177,25 +190,28 @@ extension MapViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print("locationManager >> didUpdateLocations 🐥 ")
         
-        var longitude = CLLocationDegrees()
-        var latitude = CLLocationDegrees()
-        
+        latitude = CLLocationDegrees()
+        longitude = CLLocationDegrees()
+
         if let location = locations.first {
+            latitude = location.coordinate.latitude
+            longitude = location.coordinate.longitude
+            
             print("위도: \(location.coordinate.latitude)")
             print("경도: \(location.coordinate.longitude)")
-            longitude = location.coordinate.latitude
-            latitude = location.coordinate.longitude
-            
-            print("longitude: \(String(longitude))")
-            print("latitude: \(String(latitude))")
-            //self.txtLongitude.text = String(longitude)
-            //self.txtLatitude.text = String(latitude)
         }
         
-        //getAddress()
-        //locationManager.stopUpdatingLocation()
-        
-        currentPositionMarker(currentLongitude: longitude, currentLatitude: latitude)
+        // ui에 그려지는 건 viewDidAppear 이후에 작동
+        if startCheckLocation == true {
+            // 현재위치 마커 표기
+            updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
+            
+            // 현재위치 중심 지도 위치 변경
+            self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+            
+            // 확대 레벨 기본 설정
+            self.mapView?.setZoom(18)
+        }
     }
     
     
@@ -204,9 +220,7 @@ extension MapViewController: CLLocationManagerDelegate {
         locationManager.startUpdatingLocation()  //위치 정보 받아오기 start
     }
     
-    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("locationManager >> didFailWithError 🐥 ")
     }
-    
 }

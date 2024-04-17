@@ -13,8 +13,8 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
-		57FC78492BC3B0F400C81CA1 /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57FC78472BC3B0EE00C81CA1 /* TMapSDK.framework */; };
-		57FC784A2BC3B0F400C81CA1 /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 57FC78472BC3B0EE00C81CA1 /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5761D8E02BCCC6070071C0EB /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; };
+		5761D8E12BCCC6070071C0EB /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */; };
 		57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */; };
 		57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */; };
@@ -28,7 +28,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				57FC784A2BC3B0F400C81CA1 /* TMapSDK.framework in Embed Frameworks */,
+				5761D8E12BCCC6070071C0EB /* TMapSDK.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -44,7 +44,7 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		57FC78472BC3B0EE00C81CA1 /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TMapSDK.framework; path = ../../../../../TMapSDK.framework; sourceTree = "<group>"; };
+		5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TMapSDK.framework; path = ../../../../../TMapSDK.framework; sourceTree = "<group>"; };
 		57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationViewController.swift; sourceTree = "<group>"; };
 		57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDataModel.swift; sourceTree = "<group>"; };
 		57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationModel.swift; sourceTree = "<group>"; };
@@ -56,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57FC78492BC3B0F400C81CA1 /* TMapSDK.framework in Frameworks */,
+				5761D8E02BCCC6070071C0EB /* TMapSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 		5709DFF12BB13E9200553A23 /* YellowLine */ = {
 			isa = PBXGroup;
 			children = (
-				57FC78472BC3B0EE00C81CA1 /* TMapSDK.framework */,
+				5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */,
 				5709DFF22BB13E9200553A23 /* AppDelegate.swift */,
 				5709DFF42BB13E9200553A23 /* SceneDelegate.swift */,
 				5709DFF62BB13E9200553A23 /* ViewController.swift */,
@@ -350,7 +350,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -385,7 +385,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
