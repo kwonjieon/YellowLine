@@ -24,7 +24,6 @@ protocol WebRTCClientDelegate: AnyObject {
  */
 
 class WebRTCClient: NSObject{
-    
 
     static let factory: RTCPeerConnectionFactory = {
         RTCInitializeSSL()
@@ -45,7 +44,7 @@ class WebRTCClient: NSObject{
     private var videoCapturer : RTCVideoCapturer?
     
     weak var rtcDelegate : WebRTCClientDelegate?
-    //Datachannels
+    //Data channels
     private var localDataChannel: RTCDataChannel?
     private var remoteDataChannel: RTCDataChannel?
     
@@ -199,6 +198,7 @@ extension WebRTCClient {
     }
     
     //offer를 받고 answer SDP를 생성하는 메서드
+    //피보호자가 영상을 보내야 하기 때문에 디바이스 세팅.
     func answer(offerSdp sdp: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
         if self.peerConnection == nil {
             print("offer received, create peerConnection")
@@ -207,7 +207,7 @@ extension WebRTCClient {
             self.peerConnection = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: self)
             
             setupMediaSender()
-            //            startCaptureLocalVideo(cameraDevice: device)
+            startCaptureLocalVideo(cameraDevice: device)
         }
         print("=receiveOffer")
         print("\tset remote sdp")

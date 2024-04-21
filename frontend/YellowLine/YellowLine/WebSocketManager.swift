@@ -32,7 +32,6 @@ class WebSocketManager {
         webSocketTask = urlSession.webSocketTask(with: url)
         
         webSocketTask?.resume()
-        self.sendInitialInfo()
         receiveMessage()
         self.sendInitialInfo()
     }
@@ -41,18 +40,20 @@ class WebSocketManager {
         webSocketTask?.cancel(with: .goingAway, reason: nil)
     }
     
+    //네비게이션을 시작하는 유저정보 전달하는 함수
     func sendInitialInfo() {
         print("===sendInitialInfo()")
         let date:Date = Date()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let dateString = dateFormatter.string(from: date)
-        
+        //접속 유저정보를 담고 있는 codable 모델 생성
         let _ylUser = YLUser(clientId: "YLUser01", connDate: dateString)
+        
         do {
             print("gogogo")
-            let ylUser = try JSONEncoder().encode(_ylUser)
-            webSocketTask?.send(.data(ylUser)) { error in
+            let ylUser = try String(data: JSONEncoder().encode(_ylUser), encoding: .utf8)!
+            webSocketTask?.send(.string(ylUser)) { error in
                 if let error = error {
                     print("error...")
                     debugPrint(error)

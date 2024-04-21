@@ -205,7 +205,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
 //        DispatchQueue.main.async{
 //            self._imageView?.image = image
 //        }
-        self.socketManager?.send(image: imageData)
+//        self.socketManager?.send(image: imageData)
 //        self.isUploaded = isUpload
 //        print(self.isUploaded)
         
