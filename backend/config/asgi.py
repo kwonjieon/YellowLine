@@ -13,7 +13,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.urls import path
 
-from camapp.consumers import MyConsumer
+from camapp.consumers import MyConsumer, YLConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
@@ -22,13 +22,13 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": URLRouter([
-        path('yl/ws/', MyConsumer.as_asgi())
+        path('yl/ws/', MyConsumer.as_asgi()),
+        path('yl/ws/sock/', YLConsumer.as_asgi()),
     ])
 })
 
 """
-comein > ws://localhost:8001/yl/ws/  -> {"userId": user_id, "image": image_data}
-response > [ ws://localhost:8001/yl/ws/{user_id}, ws://localhost:8001/yl/ws/ ] -> {"image":image_data}
+localhost:8001/yl/ws/sock/ = 보호자-피보호자 실시간 카메라 통신 기능을 위한 signaling server url
 
 
 """

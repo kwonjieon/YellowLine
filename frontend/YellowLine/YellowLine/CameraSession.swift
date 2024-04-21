@@ -28,8 +28,7 @@ class CameraSession: NSObject {
 //    let _networkManager = NetworkManager(url : URL(string: "ws://0.tcp.jp.ngrok.io:15046/yl/ws/"))
     let socketManager: WebSocketManager?
     
-    
-    var isUploaded = false
+    static var isUploaded = false
     
     init(queue: DispatchQueue, view: UIImageView?){
         //url도 websocket 주소로 바꿀계획.
@@ -39,7 +38,6 @@ class CameraSession: NSObject {
         self.queue = queue
         // 뷰를 빈으로 등록해(ex:@State 같은 어노테이션) 나중에 이와같은 코드를 없애버리자.
         self._imageView = view
-        
         //run websocket
         self.socketManager = WebSocketManager(view: self._imageView!)
         self.socketManager?.connect()
@@ -65,10 +63,10 @@ class CameraSession: NSObject {
     //MARK: -세팅:카메라 세션
     func setupCameraSession() {
         self.captureSession.beginConfiguration()
-        self.captureSession.sessionPreset = .photo
+        self.captureSession.sessionPreset = .high
         
         // input setting
-        let _device = setupInput(w: 640, h:860)
+        let _device = setupInput(w: 320, h:240)
         
         //output setting
         setupOutput()
@@ -189,8 +187,9 @@ class CameraSession: NSObject {
 //MARK: -captureOutput 설정
 extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-//        guard !self.isUploaded else { return }
-//        self.isUploaded = true
+        guard !CameraSession.isUploaded else { return }
+    
+        CameraSession.isUploaded = true
         
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
@@ -201,10 +200,14 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-        print("Incoming video buffer at \(timestamp.seconds) seconds...")
+//        print("Incoming video buffer at \(timestamp.seconds) seconds...")
         
+//        DispatchQueue.main.async{
+//            self._imageView?.image = image
+//        }
         self.socketManager?.send(image: imageData)
-        
+//        self.isUploaded = isUpload
+//        print(self.isUploaded)
         
 //        queue!.async { [self] in
 //            self.imageBuffer.append(imageData)

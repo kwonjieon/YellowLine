@@ -14,8 +14,8 @@
             filePath = "YellowLine/CameraSession.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "143"
-            endingLineNumber = "143"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "setupOutput()"
             landmarkType = "7">
          </BreakpointContent>

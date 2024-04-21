@@ -1,5 +1,5 @@
 {
-  "originHash" : "e8f130fe30ac6cdc940ef06ee1e8535e9f46ffee6aeead1722b9525562f6ce08",
+  "originHash" : "6f57af8e968fa0baa06cba6664e511cf7fc5994e877bbca062035fbfebb435f2",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,24 @@
       "state" : {
         "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
         "version" : "5.9.1"
+      }
+    },
+    {
+      "identity" : "starscream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daltoniam/Starscream.git",
+      "state" : {
+        "revision" : "c6bfd1af48efcc9a9ad203665db12375ba6b145a",
+        "version" : "4.0.8"
+      }
+    },
+    {
+      "identity" : "webrtc-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ant-media/WebRTC-iOS-SDK.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "b8d0814a458ce8454ce219cb26f7af4d99283fdd"
       }
     }
   ],
