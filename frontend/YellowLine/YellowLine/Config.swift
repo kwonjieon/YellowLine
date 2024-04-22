@@ -7,7 +7,7 @@
 
 import Foundation
 
-fileprivate let defaultSignalingServerUrl = URL(string: "ws://localhost:8001/yl/ws/")
+//fileprivate let defaultSignalingServerUrl = URL(string: "ws://localhost:8001/yl/ws/sock/")
 
 fileprivate let defaultIceServers = ["stun:stun.l.google.com:19302",
                                      "stun:stun1.l.google.com:19302",

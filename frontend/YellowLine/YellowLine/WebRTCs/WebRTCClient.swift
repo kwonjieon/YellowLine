@@ -11,9 +11,14 @@ import WebRTC
 protocol WebRTCClientDelegate: AnyObject {
     func webRTCClient(_ client: WebRTCClient, sendData data: Data)
     func didOpenDataChanel()
+    func didGenerateCandidate(iceCandidate: RTCIceCandidate)
 }
 
 /**
+ 보호자 : VideoTrack (x)
+ 피보호자: VideoTrack (o)
+ 
+ 
  WebRTC를 하려면 먼저 절차가 필요하다.
  OFFER : 보호자 , ANSWER : 피보호자
  
@@ -35,6 +40,9 @@ class WebRTCClient: NSObject{
     private let mediaConstraints = [kRTCMediaConstraintsOfferToReceiveVideo: kRTCMediaConstraintsValueTrue]
     private var localCandidates = [RTCIceCandidate]()
     private var peerConnection : RTCPeerConnection?
+    //local media stream
+    private var localStream: RTCMediaStream?
+    private var remoteStream: RTCMediaStream?
     //local Tracks
     private var localVideoSource : RTCVideoSource?
     private var localVideoTrack : RTCVideoTrack?
@@ -44,9 +52,15 @@ class WebRTCClient: NSObject{
     private var videoCapturer : RTCVideoCapturer?
     
     weak var rtcDelegate : WebRTCClientDelegate?
+    
     //Data channels
     private var localDataChannel: RTCDataChannel?
     private var remoteDataChannel: RTCDataChannel?
+    
+    
+    //View
+    private var remoteRenderView: RTCEAGLVideoView?
+    private var remoteView: UIView!
     
     //DI
 //    private let remoteSinks: [RTCVideoRenderer]
@@ -66,15 +80,19 @@ class WebRTCClient: NSObject{
     }
     
     func setup(_ device: AVCaptureDevice) {
-        let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : "true"])
+        let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : kRTCMediaConstraintsValueTrue])
         let config = generateConfig()
-        
 //        peerConnection = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: self)
         peerConnection = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: nil)
         self.peerConnection?.delegate = self
         setupMediaSender()
         startCaptureLocalVideo(cameraDevice: device)
     }
+    
+    func setupRemoteViewFrame(frame: CGRect){
+         remoteView.frame = frame
+         remoteRenderView?.frame = remoteView.frame
+     }
     
     //webrtc에 인식시킬 카메라 세팅
     private func startCaptureLocalVideo(cameraDevice: AVCaptureDevice?/*, videoFormat: [AVCaptureDevice.Format?]*/) {
@@ -121,9 +139,13 @@ class WebRTCClient: NSObject{
 extension WebRTCClient {
     private func generateConfig() -> RTCConfiguration {
         let config = RTCConfiguration()
+        //7200초 = 12분유지
         let wcert = RTCCertificate.generate(withParams: ["expires": NSNumber(value: 7200),
                                                          "name": "RSASSA-PKCS1-v1_5"])
         config.iceServers = [RTCIceServer(urlStrings: Config.default.webRTCServers)]
+        config.iceTransportPolicy = .all
+        config.rtcpMuxPolicy = .negotiate
+        
         config.sdpSemantics = RTCSdpSemantics.unifiedPlan
         config.certificate = wcert
         
@@ -137,15 +159,25 @@ extension WebRTCClient {
             return
         }
         
-        // local video track, source setting.
-        let constraints = RTCMediaConstraints(mandatoryConstraints: [:], optionalConstraints: nil)
+        //미디어 스트림 생성
+        self.localStream = WebRTCClient.factory.mediaStream(withStreamId: "media")
+        
+        // 카메라 캡처 세팅
+        // 로컬 비디오 트랙, 로컬 비디오 소스 세팅
         let videoSource = WebRTCClient.factory.videoSource()
         self.localVideoSource = videoSource
         let videoTrack = WebRTCClient.factory.videoTrack(with: videoSource, trackId: "YUSERv0")
         self.localVideoTrack = videoTrack
         
-        // camera capture 인식 등록
+       // 카메라 캡처 등록
         videoCapturer = RTCCameraVideoCapturer(delegate: videoSource)
+        
+        
+        // local view 생성
+
+        
+        // 미디어 스트림에 로컬 트랙 추가
+        self.localStream?.addVideoTrack(self.localVideoTrack!)
         
         peerConnection.add(videoTrack, streamIds: ["YUSER"])
         
@@ -173,11 +205,17 @@ extension WebRTCClient {
 //SDP 교환 단계
 extension WebRTCClient {
     //offer를 생성하는 메서드
-    func offer(onSuccess: @escaping (RTCSessionDescription) -> Void) {
-        guard let peerConnection = peerConnection else { return }
+    func receiveOffer(onSuccess: @escaping (RTCSessionDescription) -> Void) {
         print("=offer called")
-        //offer 생성
-        peerConnection.offer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: nil), completionHandler: { [weak self](sdp, error) in
+        
+        if self.peerConnection == nil {
+            print("offer received, create peer connection.")
+            self.peerConnection = setup
+        }
+    }
+    
+    func makeOffer(onSuccess: @escaping (RTCSessionDescription) -> Void) {
+        self.peerConnection?.offer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: nil), completionHandler: { [weak self](sdp, error) in
             guard let self = self else {return}
             if let error = error {
                 print("error ! ")
@@ -199,7 +237,7 @@ extension WebRTCClient {
     
     //offer를 받고 answer SDP를 생성하는 메서드
     //피보호자가 영상을 보내야 하기 때문에 디바이스 세팅.
-    func answer(offerSdp sdp: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
+    func receiveAnswer(offerSdp sdp: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
         if self.peerConnection == nil {
             print("offer received, create peerConnection")
             let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : "true"])
@@ -262,6 +300,7 @@ extension WebRTCClient {
             
             //시각장애인에게 전송해야하는 코드를 추가해야함.
             //signaling서버 구현에 따라 시그널링 코드가 달라진다.
+            
         })
     }
     
@@ -315,11 +354,16 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     }
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
-        
+        print("did add stream")
+        self.remoteStream = stream
+        if let track = stream.videoTracks.first {
+            print("video track found!")
+            track.add(remoteRenderView!)
+        }
     }
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream) {
-        
+        print("did remove stream")
     }
     
     func peerConnectionShouldNegotiate(_ peerConnection: RTCPeerConnection) {
@@ -336,6 +380,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
        //send message(video)
+        self.rtcDelegate?.didGenerateCandidate(iceCandidate: candidate)
     }
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
@@ -349,8 +394,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     
     private func onConnect() {
         self.isConnected = true
-        DispatchQueue.main.async {
-        }
+
     }
     
 }

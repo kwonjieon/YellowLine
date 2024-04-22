@@ -19,6 +19,7 @@
 		B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96535132BC5737E00643DC9 /* NetworkManager.swift */; };
 		B966D3F52BBE9451004F4E98 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B966D3F42BBE9451004F4E98 /* Alamofire */; };
 		B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */; };
+		B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */; };
 		B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */; };
 		B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */; };
 		B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101F2BCFD87F00F61AD2 /* Config.swift */; };
@@ -37,6 +38,7 @@
 		B956CA062BCEA7C800188A09 /* WebRtcManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRtcManager.swift; sourceTree = "<group>"; };
 		B96535132BC5737E00643DC9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chauchaudog.jpg; sourceTree = "<group>"; };
+		B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingMessage.swift; sourceTree = "<group>"; };
 		B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
 		B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCClient.swift; sourceTree = "<group>"; };
 		B9D2101F2BCFD87F00F61AD2 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 			children = (
 				B956CA062BCEA7C800188A09 /* WebRtcManager.swift */,
 				B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */,
+				B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */,
 			);
 			path = WebRTCs;
 			sourceTree = "<group>";
@@ -196,6 +199,7 @@
 				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
+				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
 				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -37,6 +37,7 @@ def findParents(clientId):
 class YLConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
+        print(f'channel name is {self.channel_name}')
         await self.channel_layer.group_add(
             self.room_name,
             self.channel_name
@@ -57,6 +58,7 @@ class YLConsumer(AsyncWebsocketConsumer):
             print(len(bytes_data))
             self.send(bytes_data=bytes_data)
         else:
+            print(f'text data is {text_data}')
             text_data_json = json.loads(text_data)
             parentId = findParents(text_data_json['clientId'])
             if parentId not in connected_users:
@@ -74,7 +76,8 @@ class YLConsumer(AsyncWebsocketConsumer):
                 self.room_name,
                 {
                     'type': 'chat_message',
-                    'message': message
+                    'message': message,
+                    'sender_name': self.channel_name
                 }
             )
 
@@ -82,10 +85,10 @@ class YLConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         print("chat_message is running!")
         message = event['message']
-
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        if self.channel_name != event['sender_name']:
+            await self.send(text_data=json.dumps({
+                'message': message
+            }))
 
 
 """
