@@ -11,7 +11,8 @@ import WebRTC
 
 
 
-class WebSocketManager {
+class WebSocketManager : WebRTCClientDelegate{
+
     private var webSocketTask: URLSessionWebSocketTask?
     private var rtcWebSocketTask: URLSessionWebSocketTask?
     
@@ -19,7 +20,7 @@ class WebSocketManager {
     
     var webRtcClient = WebRTCClient()
     
-    private let ipAddress: String = "ws://localhost:8001"
+    private let ipAddress: String = "ws://0.tcp.jp.ngrok.io:18305"
     
     init(view: UIImageView){
         self.imageView = view
@@ -27,40 +28,49 @@ class WebSocketManager {
         self.connect()
     }
     
+    //MARK: - RTC 부분
     func disconnectRtc() {
         rtcWebSocketTask?.cancel(with: .goingAway, reason: nil)
+        webRtcClient.disconnect()
     }
     
     // 네비게이션을 시작하는 유저정보 전달하는 함수
     // RTC 웹 소켓도 같이 시작함.
-    func sendInitialInfo(_ clientId: String) {
+    func connectRtc(_ clientId: String) {
         print("===sendInitialInfo(), start RTC Websocket.")
+        let localAddressIp = "\(ipAddress)/yl/ws/sock/\(clientId)/"
+        print(localAddressIp)
         guard let rtcUrl = URL(string: "\(ipAddress)/yl/ws/sock/\(clientId)/") else { return }
         rtcWebSocketTask = URLSession(configuration: .default).webSocketTask(with: rtcUrl)
         rtcWebSocketTask?.resume()
+        self.rtcReceiveMessage()
         
-        print("====start sending initial info of th client.")
-        let date:Date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateString = dateFormatter.string(from: date)
-        //접속 유저정보를 담고 있는 codable 모델 생성
-        let _ylUser = YLUser(clientId: "YLUser01", message: "", connDate: dateString)
+//        print("====start sending initial info of th client.")
+//        let date:Date = Date()
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+//        let dateString = dateFormatter.string(from: date)
+//        //접속 유저정보를 담고 있는 codable 모델 생성
+//        let _ylUser = YLUser(clientId: "YLUser01", message: "", connDate: dateString)
+//        
+//        do {
+//            print("gogogo")
+//            let ylUser = try String(data: JSONEncoder().encode(_ylUser), encoding: .utf8)!
+//            rtcWebSocketTask?.send(.string(ylUser)) { error in
+//                if let error = error {
+//                    print("error...")
+//                    debugPrint(error)
+//                    return
+//                }
+//            }
+//        } catch {
+//            print(error)
+//        }
+//        print("===")
         
-        do {
-            print("gogogo")
-            let ylUser = try String(data: JSONEncoder().encode(_ylUser), encoding: .utf8)!
-            rtcWebSocketTask?.send(.string(ylUser)) { error in
-                if let error = error {
-                    print("error...")
-                    debugPrint(error)
-                    return
-                }
-            }
-        } catch {
-            print(error)
-        }
-        print("===")
+        webRtcClient.connect(onSuccess: {(offerSDP: RTCSessionDescription) -> Void in
+            self.sendSDP(offerSDP)
+        })
     }
     
     func sendSDP(_ sessionDescription: RTCSessionDescription) {
@@ -107,6 +117,29 @@ class WebSocketManager {
         
     }
     
+    private func rtcReceiveMessage() {
+        rtcWebSocketTask?.receive { [weak self] result in
+            switch result {
+            case .failure(let error):
+                print("Error in receiving message: \(error)")
+            case .success(let message):
+                switch message {
+                case .string(let text):
+                    print("Received string: \(text)")
+                    // Answer SDP를 받았을 때 처리하는 코드를 추가한다.
+                    
+                case .data(let data):
+                    print("Received data type")
+                @unknown default:
+                    fatalError()
+                }
+                
+                // Continue receiving messages
+                self?.receiveMessage()
+            }
+        }
+        
+    }
 
     
 
@@ -117,7 +150,9 @@ extension WebSocketManager {
     func didGenerateCandidate(iceCandidate: RTCIceCandidate) {
         self.sendCandidate(iceCandidate: iceCandidate)
     }
-    
+    func didOpenDataChanel() {
+        
+    }
 }
 
 //MARK: - 영상 보내는 부분
@@ -125,7 +160,7 @@ extension WebSocketManager {
     
     func connect() {
         //img 보내는 소켓서버 url
-        guard let url = URL(string: "\(ipAddress)/yl/ws/sock/") else {return}
+        guard let url = URL(string: "\(ipAddress)/yl/ws/") else {return}
         let urlSession = URLSession(configuration: .default)
         webSocketTask = urlSession.webSocketTask(with: url)
         webSocketTask?.resume()

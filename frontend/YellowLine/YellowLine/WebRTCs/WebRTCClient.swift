@@ -9,7 +9,6 @@ import Foundation
 import WebRTC
 
 protocol WebRTCClientDelegate: AnyObject {
-    func webRTCClient(_ client: WebRTCClient, sendData data: Data)
     func didOpenDataChanel()
     func didGenerateCandidate(iceCandidate: RTCIceCandidate)
 }
@@ -80,12 +79,9 @@ class WebRTCClient: NSObject{
     }
     
     func setup(_ device: AVCaptureDevice) {
-        let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : kRTCMediaConstraintsValueTrue])
-        let config = generateConfig()
 //        peerConnection = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: self)
-        peerConnection = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: nil)
-        self.peerConnection?.delegate = self
-        setupMediaSender()
+
+//        setupMediaSender()
         startCaptureLocalVideo(cameraDevice: device)
     }
     
@@ -105,9 +101,9 @@ class WebRTCClient: NSObject{
                     let description = format.formatDescription as CMFormatDescription
                     let dimensions = CMVideoFormatDescriptionGetDimensions(description)
                     print("Width: \(dimensions.width), Height: \(dimensions.height)")
-                    if dimensions.width ==  640 && dimensions.height == (860) {
+                    if dimensions.width ==  320 && dimensions.height == 240 {
                         targetFormat = format
-                    } else if dimensions.width == 640 {
+                    } else if dimensions.width == 320 {
                         targetFormat = format
                     }
                 }
@@ -115,19 +111,68 @@ class WebRTCClient: NSObject{
             
             videoCapturer.startCapture(with: cameraDevice!, format: targetFormat!, fps: 10)
         }
-
     }
     
-    //MARK: Connection
-    //부모가 생성해야할 것. answer는 시각장애인이 해야한다.
+    //MARK: - setup Connection( peerConnection, )
     func connect(onSuccess: @escaping (RTCSessionDescription) -> Void){
-        offer(onSuccess: onSuccess)
+        self.peerConnection = setupPeerConnection()
+        self.peerConnection?.delegate = self
+        
+        setupLocalTrack()
+        makeOffer(onSuccess: onSuccess)
+    }
+    
+    // peerConnection
+    private func setupPeerConnection() -> RTCPeerConnection? {
+        let config = generateConfig()
+        let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : kRTCMediaConstraintsValueTrue])
+        let pc = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: nil)
+        
+        return pc
+    }
+    
+    private func setupMediaSender() {
+
+//        self.remoteVideoTrack = peerConnection.transceivers.first { $0.mediaType == .video }?.receiver.track as? RTCVideoTrack
+        
+        // dataChannel생성은 지금 굳이 필요 없을듯 하다. 비디오 외 데이터 전송 시 이용하자.
+        if let dataChannel = createDataChannel() {
+            dataChannel.delegate = self
+            self.localDataChannel = dataChannel
+        }
+    }
+    
+    func setupLocalTrack() {
+        debugPrint("call setupLocalTrack")
+        guard let pc = self.peerConnection else {
+            print("setupMediaSender is error")
+            return
+        }
+        
+        //미디어 스트림 생성
+        self.localStream = WebRTCClient.factory.mediaStream(withStreamId: "media")
+        
+        // 카메라 캡처 세팅
+        // 로컬 비디오 트랙, 로컬 비디오 소스 세팅
+        let videoSource = WebRTCClient.factory.videoSource()
+        self.localVideoSource = videoSource
+        let videoTrack = WebRTCClient.factory.videoTrack(with: videoSource, trackId: "YUSERv0")
+        self.localVideoTrack = videoTrack
+        
+        // 카메라 캡처 등록
+         videoCapturer = RTCCameraVideoCapturer(delegate: videoSource)
+        
+        // local view 등록, 다른 곳에 정의해도 될 듯 하다.
+        
+        // 미디어 스트림에 로컬 트랙 추가
+        self.localStream?.addVideoTrack(self.localVideoTrack!)
+        pc.add(videoTrack, streamIds: ["YUSER"])
     }
 
+    
     func disconnect() {
         hasReceivedSDP = false
         peerConnection?.close()
-        
         peerConnection = nil
         localVideoTrack = nil
         localVideoSource = nil
@@ -152,43 +197,6 @@ extension WebRTCClient {
         return config
     }
     
-    private func setupMediaSender() {
-        print("call setupMediaSender")
-        guard let peerConnection = peerConnection else {
-            print("setupMediaSender is error")
-            return
-        }
-        
-        //미디어 스트림 생성
-        self.localStream = WebRTCClient.factory.mediaStream(withStreamId: "media")
-        
-        // 카메라 캡처 세팅
-        // 로컬 비디오 트랙, 로컬 비디오 소스 세팅
-        let videoSource = WebRTCClient.factory.videoSource()
-        self.localVideoSource = videoSource
-        let videoTrack = WebRTCClient.factory.videoTrack(with: videoSource, trackId: "YUSERv0")
-        self.localVideoTrack = videoTrack
-        
-       // 카메라 캡처 등록
-        videoCapturer = RTCCameraVideoCapturer(delegate: videoSource)
-        
-        
-        // local view 생성
-
-        
-        // 미디어 스트림에 로컬 트랙 추가
-        self.localStream?.addVideoTrack(self.localVideoTrack!)
-        
-        peerConnection.add(videoTrack, streamIds: ["YUSER"])
-        
-        self.remoteVideoTrack = peerConnection.transceivers.first { $0.mediaType == .video }?.receiver.track as? RTCVideoTrack
-        
-        if let dataChannel = createDataChannel() {
-            dataChannel.delegate = self
-            self.localDataChannel = dataChannel
-        }
-    }
-    
     func createDataChannel() -> RTCDataChannel?{
         let config = RTCDataChannelConfiguration()
         
@@ -201,19 +209,10 @@ extension WebRTCClient {
 
 }
 
-//MARK: - SDP, RTCIceCandidate
+//MARK: - make and receive SDP, RTCIceCandidate
 //SDP 교환 단계
 extension WebRTCClient {
     //offer를 생성하는 메서드
-    func receiveOffer(onSuccess: @escaping (RTCSessionDescription) -> Void) {
-        print("=offer called")
-        
-        if self.peerConnection == nil {
-            print("offer received, create peer connection.")
-            self.peerConnection = setup
-        }
-    }
-    
     func makeOffer(onSuccess: @escaping (RTCSessionDescription) -> Void) {
         self.peerConnection?.offer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: nil), completionHandler: { [weak self](sdp, error) in
             guard let self = self else {return}
@@ -235,28 +234,42 @@ extension WebRTCClient {
         })
     }
     
+    func receiveOffer(srcOffer: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
+        print("=receive Offer called")
+        
+        if self.peerConnection == nil {
+            print("offer received, create peer connection.")
+            self.peerConnection = setupPeerConnection()
+            self.peerConnection?.delegate = self
+            
+            setupLocalTrack()
+        }
+        
+        debugPrint("set remote description.")
+        self.peerConnection?.setRemoteDescription(srcOffer) { error in
+            if let error = error {
+                debugPrint("Oh, receiveOffer has been problem.")
+                debugPrint(error)
+                return
+            }
+            
+            print("success set remote sdp")
+            self.makeAnswerSdp(onSuccess: onSuccess)
+        }
+    }
+    
     //offer를 받고 answer SDP를 생성하는 메서드
     //피보호자가 영상을 보내야 하기 때문에 디바이스 세팅.
-    func receiveAnswer(offerSdp sdp: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
-        if self.peerConnection == nil {
-            print("offer received, create peerConnection")
-            let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : "true"])
-            let config = generateConfig()
-            self.peerConnection = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: self)
-            
-            setupMediaSender()
-            startCaptureLocalVideo(cameraDevice: device)
-        }
+    func receiveAnswer(descSdp sdp: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
         print("=receiveOffer")
-        print("\tset remote sdp")
         self.peerConnection?.setRemoteDescription(sdp) { (error) in
             if let error = error {
                 print("failed to set remote offer sdp")
                 print(error)
                 return
             }
-            print("Success to set remote offer sdp")
-            self.makeAnswerSdp(onSuccess: onSuccess)
+//            print("Success to set remote offer sdp")
+//            self.makeAnswerSdp(onSuccess: onSuccess)
         }
     }
    
@@ -270,7 +283,7 @@ extension WebRTCClient {
                 return
             }
             
-            print("success to create local answer sdp")
+            print("success to create local answer sdp.")
             if let answerSDP = rsdp {
                 self.peerConnection?.setLocalDescription(answerSDP, completionHandler: { (err) in
                     if let error = err {
@@ -300,6 +313,7 @@ extension WebRTCClient {
             
             //시각장애인에게 전송해야하는 코드를 추가해야함.
             //signaling서버 구현에 따라 시그널링 코드가 달라진다.
+            // 다른 곳에 정의해도 될 듯 하다.
             
         })
     }
@@ -308,16 +322,14 @@ extension WebRTCClient {
     func renderRemoteVideo(to renderer: RTCVideoRenderer) {
         self.remoteVideoTrack?.add(renderer)
     }
-}
-
-extension WebRTCClient {
+    
     func receiveCandidate(candidate: RTCIceCandidate) {
-        self.peerConnection!.add(candidate, completionHandler: { (error) in
+        self.peerConnection!.add(candidate) { error in
             if let error = error {
-                print("-ReceiveCandidate error")
-                print(error)
+                debugPrint(error)
+                return
             }
-        })
+        }
     }
 }
 

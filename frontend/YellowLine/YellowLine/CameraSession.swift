@@ -30,6 +30,8 @@ class CameraSession: NSObject {
     
     static var isUploaded = false
     
+    let clientId = "YLUser01"
+    
     init(queue: DispatchQueue, view: UIImageView?){
         //url도 websocket 주소로 바꿀계획.
         self.imgUrl = "https://145b-182-222-253-136.ngrok-free.app/yl/img"
@@ -40,7 +42,7 @@ class CameraSession: NSObject {
         self._imageView = view
         //run websocket
         self.socketManager = WebSocketManager(view: self._imageView!)
-        self.socketManager?.connect()
+
     }
     
     func checkCameraAuthor() {
@@ -82,7 +84,12 @@ class CameraSession: NSObject {
         } catch {
             print(error)
         }
+        setupRTCCameraDevice(_device)
         captureSession.commitConfiguration()
+    }
+    
+    private func setupRTCCameraDevice(_ device: AVCaptureDevice?) {
+        socketManager?.webRtcClient.setupDevice(device!)
     }
     
     // input setting method
@@ -176,10 +183,16 @@ class CameraSession: NSObject {
                 // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
         }
         
+        // websocket 통신 시작
+        self.socketManager?.connect()
+        self.socketManager?.connectRtc(clientId)
+        
 //        self._networkManager.runUploadImageSession()
     }
     
     func stopSession() {
+        self.socketManager?.disconnect()
+        self.socketManager?.disconnectRtc()
         self.captureSession.stopRunning()
     }
 }
@@ -189,7 +202,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard !CameraSession.isUploaded else { return }
     
-        CameraSession.isUploaded = true
+        CameraSession.isUploaded = false
         
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
@@ -202,52 +215,12 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
 //        print("Incoming video buffer at \(timestamp.seconds) seconds...")
         
-//        DispatchQueue.main.async{
-//            self._imageView?.image = image
-//        }
+        DispatchQueue.main.async{
+            self._imageView?.image = image
+        }
 //        self.socketManager?.send(image: imageData)
 //        self.isUploaded = isUpload
-//        print(self.isUploaded)
         
-//        queue!.async { [self] in
-//            self.imageBuffer.append(imageData)
-//            if self.imageBuffer.count >= 10 {
-//                self._networkManager.runUploadImages(images: self.imageBuffer)
-//                    .sink(receiveCompletion: { completion in
-//                        switch completion {
-//                        case .finished:
-//                            self.isUploaded = false
-//                            print("완료!")
-//                            break // 성공적으로 완료
-//                        case .failure(let error):
-//                            print(error.localizedDescription) // 오류 처리
-//                        }
-//                    }, receiveValue: { [weak self] uploadedImage in
-//                        DispatchQueue.main.async {
-//                            self?._imageView!.image = uploadedImage
-//                        }
-//                    }).store(in: &subscriptions)
-//                    
-//            }
-//        }
-//        self._networkManager.runUploadImageSession()
-        
-//        self._networkManager.runUploadImage(image: imageData)
-//            .sink( receiveCompletion: { completion in
-//                        switch completion {
-//                        case .finished:
-//                            self.isUploaded = false
-//                            print("완료!")
-//                            break // 성공적으로 완료
-//                        case .failure(let error):
-//                            print(error.localizedDescription) // 오류 처리
-//                        }
-//                    }, receiveValue: { [weak self] uploadedImage in
-//                        DispatchQueue.main.async {
-//                            self?._imageView?.image = uploadedImage
-//                        }
-//                    }).store(in: &subscriptions)
-
     }
 }
 

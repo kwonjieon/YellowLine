@@ -55,22 +55,26 @@ class YLConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
 
         if bytes_data:
+            print('bytes data가 도착 하였습니다.')
             print(len(bytes_data))
             self.send(bytes_data=bytes_data)
         else:
             print(f'text data is {text_data}')
+            self.send(text_data=text_data)
             text_data_json = json.loads(text_data)
-            parentId = findParents(text_data_json['clientId'])
-            if parentId not in connected_users:
-                connected_users[parentId] = set()
-                connected_users[parentId].add(text_data_json['clientId'])
-            else:
-                connected_users[parentId].add(text_data_json['clientId'])
+            # print(f'json data is {text_data_json}')
+            # parentId = findParents(text_data_json['clientId'])
+            # if parentId not in connected_users:
+            #     connected_users[parentId] = set()
+            #     connected_users[parentId].add(text_data_json['clientId'])
+            # else:
+            #     connected_users[parentId].add(text_data_json['clientId'])
 
             # print(text_data_json)
             # print(f'=> {connected_users}')
-            message = text_data_json['message']
-            userName = text_data_json['clientId']
+            # message = text_data_json['message']
+            message = text_data_json
+            # userName = text_data_json['clientId']
 
             await self.channel_layer.group_send(
                 self.room_name,
@@ -85,10 +89,10 @@ class YLConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         print("chat_message is running!")
         message = event['message']
-        if self.channel_name != event['sender_name']:
-            await self.send(text_data=json.dumps({
-                'message': message
-            }))
+        # if self.channel_name != event['sender_name']:
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))
 
 
 """

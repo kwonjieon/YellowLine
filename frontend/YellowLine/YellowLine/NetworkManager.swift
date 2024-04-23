@@ -66,18 +66,6 @@ class NetworkManager : NSObject{
         let url = "https://35cf-182-222-253-136.ngrok-free.app/yl/img"
         let pub = uploadWithCombine(image: image, url: url)
         return pub
-//        subscriptions = pub.sink( receiveCompletion: { completion in
-//            switch completion {
-//            case .finished:
-//                break // 성공적으로 완료
-//            case .failure(let error):
-//                print(error.localizedDescription) // 오류 처리
-//            }
-//        }, receiveValue: { [weak self] uploadedImage in
-//            DispatchQueue.main.sync {
-//                imageView.image = uploadedImage
-//            }
-//        })
     }
     
     func uploadWithCombine(image: Data?, url stringURL: String) -> AnyPublisher<UIImage?, Error>{
