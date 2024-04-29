@@ -26,9 +26,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var currentMarker:TMapMarker?
     var polylines:Array<TMapPolyline> = []
     let motionManager = CMMotionManager()
+    var polyline:TMapPolyline?
+    var LocationPT:Int = 0
     
     var longitude:Double = 0.0
     var latitude:Double = 0.0
+    
     
     var startCheckLocation:Bool = false
     
@@ -59,6 +62,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         // GPS 위치 탐지 시작
         locationManager.startUpdatingLocation()
+        
+        
     }
     
     // 맵 로드 이후 ui 표시
@@ -68,7 +73,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         // 현재위치~목적지 경로 루트 표시
         showDestinationRoute()
-        
+    
         //
         //updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
@@ -159,12 +164,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
         clearPolylines()
         
         let pathData = TMapPathData()
-        let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let endPoint = CLLocationCoordinate2D(latitude: 37.403049, longitude: 127.103318)
+        //let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let startPoint = CLLocationCoordinate2D(latitude: 37.55104708427455, longitude: 127.07377389269101)
+        let endPoint = CLLocationCoordinate2D(latitude: 37.55093876107976, longitude: 127.07363779704937)
         pathData.findPathDataWithType(.PEDESTRIAN_PATH, startPoint: startPoint, endPoint: endPoint) { (result, error)->Void in
-            let polyline = result
+            self.polyline = result
             
-            print("line: \(polyline?.path)")
+            print("line: \(self.polyline?.path)")
             
             DispatchQueue.main.async {
                 let marker1 = TMapMarker(position: startPoint)
@@ -177,10 +183,55 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 marker2.title = "목적지"
                 self.markers.append(marker2)
                 
-                polyline?.map = self.mapView
-                self.polylines.append(polyline!)
+                self.polyline?.map = self.mapView
+                self.polylines.append(self.polyline!)
                 self.mapView?.fitMapBoundsWithPolylines(self.polylines)
             }
+        }
+    }
+    // 네비게이션 경로 범위 내 위치인지 확인
+    func checkNavigationDistance() {
+        var isOffCourse: Bool = false
+        var differenceLati: Double
+        var differenceLong: Double
+        var leastDifferenceSum: Double
+        // 현재 위치와 가장 가까운 경로 포인트
+        var proximatePoint: Int = LocationPT
+        
+        guard let naviPointList = polyline?.path else {
+            return
+        }
+        // 경로 이탈 판단
+        // 경로 안내 시작한 직후를 제외하고 판단
+        if (LocationPT != 0 && LocationPT != naviPointList.count - 1) {
+            //가장 적은값의 오차 비교값 초기 세팅
+            leastDifferenceSum = (naviPointList[LocationPT].latitude - latitude) + (naviPointList[LocationPT].longitude - longitude)
+            
+            for i in LocationPT - 1...LocationPT + 1 {
+                differenceLati = naviPointList[i].latitude - latitude
+                differenceLong = naviPointList[i].longitude - longitude
+                
+                // 경로 이탈 여부 확인
+                if  differenceLati < 0.0001739 && differenceLong < 0.0001739  {
+                    // 현재 위치 포인터 수정 여부 확인
+                    // 경로포인터-1 보다 지금의 경로포인터가 더 현재와 근접하다면 포인터 현재 위치로 변경
+                    if leastDifferenceSum > differenceLati + differenceLong {
+                        proximatePoint = i
+                        leastDifferenceSum = differenceLati + differenceLong
+                    }
+                }
+                else {
+                    isOffCourse = true
+                    print("경로 이탈")
+                    break
+                }
+            }
+            print("경로 안내중")
+            print("LocationPT: \(LocationPT)")
+            LocationPT = proximatePoint
+        }
+        else {
+            LocationPT = 1
         }
     }
 }
@@ -211,6 +262,9 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // 확대 레벨 기본 설정
             self.mapView?.setZoom(18)
+            
+            // 경로 안내
+            checkNavigationDistance()
         }
     }
     
