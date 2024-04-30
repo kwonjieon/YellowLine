@@ -12,12 +12,20 @@ import CoreMotion
 
 // 지도 뷰 로드
 
+
+
 class MapViewController: UIViewController, TMapViewDelegate {
     
     @IBOutlet weak var mapContainerView: UIView!
     @IBAction func backBtn(_ sender: Any) {
         dismiss(animated: true)
     }
+
+    @IBOutlet weak var offTrackText: UILabel!
+    @IBOutlet weak var latitudeText: UILabel!
+    @IBOutlet weak var longitudeText: UILabel!
+    @IBOutlet weak var latitudeGapLabel: UILabel!
+    @IBOutlet weak var longitudeGapLabel: UILabel!
     
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
@@ -48,7 +56,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         locationManager.delegate = self  // 델리게이트 설정
         locationManager.desiredAccuracy = kCLLocationAccuracyBest  // 거리 정확도 설정
         
-        //locationManager.distanceFilter = 5.0 // 미터 단위
+        locationManager.distanceFilter = 5.0 // 미터 단위
 
         
         // 위치 정보 허용 확인
@@ -61,7 +69,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         //directionDetection()
         
         // GPS 위치 탐지 시작
-        locationManager.startUpdatingLocation()
+        //locationManager.startUpdatingLocation()
         
         
     }
@@ -165,7 +173,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         let pathData = TMapPathData()
         //let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let startPoint = CLLocationCoordinate2D(latitude: 37.55104708427455, longitude: 127.07377389269101)
+        let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         let endPoint = CLLocationCoordinate2D(latitude: 37.55093876107976, longitude: 127.07363779704937)
         pathData.findPathDataWithType(.PEDESTRIAN_PATH, startPoint: startPoint, endPoint: endPoint) { (result, error)->Void in
             self.polyline = result
@@ -211,8 +219,21 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 differenceLati = naviPointList[i].latitude - latitude
                 differenceLong = naviPointList[i].longitude - longitude
                 
+                // 절대값으로 변환
+                if differenceLati < 0 {
+                    differenceLati = -differenceLati
+                }
+                if differenceLong < 0 {
+                    differenceLong = -differenceLong
+                }
+                print ("위도 차이 : \(differenceLati)")
+                print ("경도 차이 : \(differenceLong)")
+                
+                latitudeGapLabel.text = String(differenceLati)
+                longitudeGapLabel.text = String(differenceLong)
+                
                 // 경로 이탈 여부 확인
-                if  differenceLati < 0.0001739 && differenceLong < 0.0001739  {
+                if  differenceLati < 0.00018 && differenceLong < 0.00018 {
                     // 현재 위치 포인터 수정 여부 확인
                     // 경로포인터-1 보다 지금의 경로포인터가 더 현재와 근접하다면 포인터 현재 위치로 변경
                     if leastDifferenceSum > differenceLati + differenceLong {
@@ -223,12 +244,21 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 else {
                     isOffCourse = true
                     print("경로 이탈")
+                    DispatchQueue.main.async {
+                        self.offTrackText.text = "경로 이탈!"
+                    }
                     break
                 }
             }
-            print("경로 안내중")
-            print("LocationPT: \(LocationPT)")
-            LocationPT = proximatePoint
+            
+            if isOffCourse == false {
+                print("경로 범위 이내")
+                DispatchQueue.main.async {
+                    self.offTrackText.text = "경로 범위 이내!"
+                }
+                print("LocationPT: \(LocationPT)")
+                LocationPT = proximatePoint
+            }
         }
         else {
             LocationPT = 1
@@ -254,6 +284,9 @@ extension MapViewController: CLLocationManagerDelegate {
         
         // ui에 그려지는 건 viewDidAppear 이후에 작동
         if startCheckLocation == true {
+            latitudeText.text = String(latitude)
+            longitudeText.text = String(longitude)
+            
             // 현재위치 마커 표기
             updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
             
@@ -278,3 +311,4 @@ extension MapViewController: CLLocationManagerDelegate {
         print("locationManager >> didFailWithError 🐥 ")
     }
 }
+
