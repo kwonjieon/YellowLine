@@ -89,10 +89,15 @@ class YLConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         print("chat_message is running!")
         message = event['message']
-        # if self.channel_name != event['sender_name']:
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+
+
+        if self.channel_name != event['sender_name']:
+            await self.send(text_data=json.dumps({
+                # 'type': message['type'],
+                # 'sessionDescription': message['sessionDescription'],
+                # 'candidate': message['candidate']
+                'message': message
+            }))
 
 
 """

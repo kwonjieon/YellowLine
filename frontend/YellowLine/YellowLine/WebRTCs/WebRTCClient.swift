@@ -260,7 +260,7 @@ extension WebRTCClient {
     
     //offer를 받고 answer SDP를 생성하는 메서드
     //피보호자가 영상을 보내야 하기 때문에 디바이스 세팅.
-    func receiveAnswer(descSdp sdp: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
+    func receiveAnswer(descSdp sdp: RTCSessionDescription) {
         print("=receiveOffer")
         self.peerConnection?.setRemoteDescription(sdp) { (error) in
             if let error = error {
