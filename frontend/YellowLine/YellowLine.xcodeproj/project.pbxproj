@@ -13,6 +13,7 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
+		B94880202BE52CDA00CD08E2 /* bus.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B948801F2BE52CDA00CD08E2 /* bus.jpg */; };
 		B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */; };
 		B956CA032BCE70AA00188A09 /* WebRTCiOSSDK in Frameworks */ = {isa = PBXBuildFile; productRef = B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */; };
 		B956CA072BCEA7C800188A09 /* WebRtcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B956CA062BCEA7C800188A09 /* WebRtcManager.swift */; };
@@ -34,6 +35,7 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B948801F2BE52CDA00CD08E2 /* bus.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bus.jpg; sourceTree = "<group>"; };
 		B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
 		B956CA062BCEA7C800188A09 /* WebRtcManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRtcManager.swift; sourceTree = "<group>"; };
 		B96535132BC5737E00643DC9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 		5709DFF12BB13E9200553A23 /* YellowLine */ = {
 			isa = PBXGroup;
 			children = (
+				B948801F2BE52CDA00CD08E2 /* bus.jpg */,
 				B9D2101C2BCFD10F00F61AD2 /* WebRTCs */,
 				B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */,
 				5709DFF22BB13E9200553A23 /* AppDelegate.swift */,
@@ -177,6 +180,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B94880202BE52CDA00CD08E2 /* bus.jpg in Resources */,
 				5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */,
 				5709DFFF2BB13E9300553A23 /* Base in Resources */,
 				B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */,

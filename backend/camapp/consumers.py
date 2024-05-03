@@ -36,6 +36,28 @@ class MyConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         if bytes_data:
+            if not isinstance(bytes_data, bytes):
+                raise TypeError(f"Expected 'content' to be bytes, received: {type(bytes_data)}")
+
+            # print(type(bytes_data)) #class<'bytes'>
+
+            # data_io = io.BytesIO(bytes_data)
+            # print(f'data io type {type(data_io)}') #<class '_io.BytesIO'>
+
+            #    bytes to numpy array
+            decoded = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), -1)
+            #print(f'decoded io type {type(decoded)}') # <class 'numpy.ndarray'>
+            #print(decoded)
+
+            #    numpy array to 'class bytes'
+            _, encode_data = cv2.imencode('.jpg', decoded)
+            #    'class bytes', ndarray
+            print(type(encode_data.tobytes()), type(encode_data))
+
+            self.send(bytes_data=encode_data.tobytes())
+
+
+            """
             # 모델 로드
             # camapp/yolov7안에 croswalk_3.pt를 넣어둠.
             current_dir = os.getcwd()
@@ -56,20 +78,27 @@ class MyConsumer(WebsocketConsumer):
             #     data = f.read()
             print(f'data : {bytes_data[:20]}')
             print('*' * 10)
+            # try:
             # 이미지의 바이트를 읽음.
-            nparr = np.fromstring(bytes_data, np.uint8)
+            nparr = np.frombuffer(bytes_data, np.uint8)
             print(f'data: {nparr[:20]}')
             print('*' * 10)
             # byte 데이터를 image로 바꾸는 과정.
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            fname = './media/chauchau.png'
+            original = cv2.imread(fname, cv2.IMREAD_COLOR)
             print(img.shape)
             #1920, 1080크기의 이미지로 들어와서 640으로 강제조절
             image_resized = cv2.resize(img, (640, 640))
             image_rgb = cv2.cvtColor(image_resized, cv2.COLOR_BGR2RGB)
+            cv2.imshow('imagergb', original)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
             print(f'image_rgb shape: {image_rgb.shape}')
             print('*' * 10)
             tensor_image = torch.from_numpy(image_rgb).div(255.0)
-            """.div(255.0)"""  # Normalize [0, 255] -> [0.0, 1.0]
+            #.div(255.0)   # Normalize [0, 255] -> [0.0, 1.0]
 
             tensor_image = tensor_image.permute(2, 0, 1).unsqueeze(0)  # CHW, Batch 차원 추가
             tensor_image = tensor_image.float()
@@ -94,11 +123,11 @@ class MyConsumer(WebsocketConsumer):
             buffered = io.BytesIO()
             print(f"results : {results}")
 
-            self.send(bytes_data=results)
+            # self.send(bytes_data=results)
             # except:
             #     self.send(bytes_data=bytes_data)
-
-            # self.send(bytes_data=bytes_data)
+            self.send(bytes_data=bytes_data)
+            """
         else:
             self.send(text_data=text_data)
 

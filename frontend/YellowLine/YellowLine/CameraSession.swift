@@ -9,7 +9,7 @@ import Foundation
 import AVFoundation
 import UIKit
 import Combine
-import Alamofire
+//import Alamofire
 
 class CameraSession: NSObject {
     var captureSession: AVCaptureSession
@@ -203,7 +203,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard !CameraSession.isUploaded else { return }
     
-        CameraSession.isUploaded = true
+//        CameraSession.isUploaded = true
         
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
@@ -214,7 +214,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-        print("Incoming video buffer at \(timestamp.seconds) seconds...")
+//        print("Incoming video buffer at \(timestamp.seconds) seconds...")
         
 //        DispatchQueue.main.async{
 //            self._imageView?.image = image
@@ -222,44 +222,44 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
 //        self.socketManager?.send(image: imageData)
 //        self.isUploaded = isUpload
         
-        print("Upload is approaching...")
+//        print("Upload is approaching...")
 
         
         let stringURL = "https://4049-116-32-21-139.ngrok-free.app/yl/img"
-        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+//        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         
-        AF.upload(multipartFormData: { multipartFormData in
-                    guard let image = UIImage(named: "chauchaudog.jpg"),
-                          let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
-                          let url = URL(string: stringURL)
-                    else {
-                        print("이미지 또는 URL을 불러올 수 없습니다.")
-                        return
-                    }
-                    multipartFormData.append(Data("user1".utf8), withName: "title")
-                    multipartFormData.append(imageData,
-                                             withName: "image",
-                                             fileName: "chauchaudog.jpg",
-                                             mimeType: "image/jpg")
-                }, to: stringURL, method: .post, headers: header)
-                .response{ response in
-                    guard let statusCode = response.response?.statusCode else {return }
-                            switch statusCode{
-                            case 200: 
-                                CameraSession.isUploaded = false
-                                /*
-                                DispatchQueue.main.async{
-                                    self._imageView?.image = image
-                                }
-                                 */
-                                print("이미지 전송 완료")
-                            default:
-                                print("오류발생")
-                            }
-                }
-
-
-            }
+//        AF.upload(multipartFormData: { multipartFormData in
+//                    guard let image = UIImage(named: "chauchaudog.jpg"),
+//                          let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
+//                          let url = URL(string: stringURL)
+//                    else {
+//                        print("이미지 또는 URL을 불러올 수 없습니다.")
+//                        return
+//                    }
+//                    multipartFormData.append(Data("user1".utf8), withName: "title")
+//                    multipartFormData.append(imageData,
+//                                             withName: "image",
+//                                             fileName: "chauchaudog.jpg",
+//                                             mimeType: "image/jpg")
+//                }, to: stringURL, method: .post, headers: header)
+//                .response{ response in
+//                    guard let statusCode = response.response?.statusCode else {return }
+//                            switch statusCode{
+//                            case 200: 
+//                                CameraSession.isUploaded = false
+//                                /*
+//                                DispatchQueue.main.async{
+//                                    self._imageView?.image = image
+//                                }
+//                                 */
+//                                print("이미지 전송 완료")
+//                            default:
+//                                print("오류발생")
+//                            }
+//                }
+//
+//
+//            }
     
         
     }
