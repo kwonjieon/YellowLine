@@ -14,6 +14,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.generic.websocket import WebsocketConsumer
 
 from torchvision import transforms
+
 # from camapp.yolov7.hubconf import custom
 
 """
@@ -39,35 +40,39 @@ class MyConsumer(WebsocketConsumer):
             yolov7_path = os.path.join(current_dir, "camapp/yolov7")
             yolov7_pt_path = os.path.join(yolov7_path, "croswalk_3.pt")
             sys.path.append(yolov7_path)
-
-            """
+            loaded_model = torch.load(yolov7_pt_path)
+            model = loaded_model['model'].to(torch.float)
+            print('type: ', type(model))
             # model = torch.hub.load('camapp/yolov7', 'custom', path='yolov7/croswalk_3.pt', source='local')
             # # model = torch.hub.load('WongKinYiu/yolov7', 'yolov7', 'croswalk_3.pt',
             # #                        force_reload=True, trust_repo=True)
 
-            nparr = np.frombuffer(bytes_data, np.uint8)
+            print('*' * 10)
+            # try:
+            # with open(bytes_data, 'rb') as f:
+            #     data = f.read()
+
+            print(f'data : {bytes_data[:20]}')
+            print('*' * 10)
+            nparr = np.fromstring(bytes_data, np.uint8)
+            print(f'data: {nparr[:20]}')
+            print('*' * 10)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            image_resized = cv2.resize(img, (320, 320))
+            print(img.shape)
+            image_resized = cv2.resize(img, (640, 640))
             image_rgb = cv2.cvtColor(image_resized, cv2.COLOR_BGR2RGB)
-
-            tensor_image = torch.from_numpy(image_rgb).float().div(255.0)  # Normalize [0, 255] -> [0.0, 1.0]
-            tensor_image = tensor_image.permute(2, 0, 1).unsqueeze(0)  # CHW, Batch 차원 추가
-
-            # img0 = cv2.imread(bytes_data)
-            # transform = transforms.Compose([
-            #     transforms.Resize(256),  # 모델에 따라 적절한 사이즈 조정 필요
-            #     transforms.CenterCrop(224),  # 모델에 따라 적절한 크롭 사이즈 조정 필요
-            #     transforms.ToTensor(),
-            #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            # ])
-            # _image = Image.open(io.BytesIO(bytes_data))
-            # image = transform(_image).unsqueeze(0)
-
-            model = torch.load(yolov7_pt_path)
-            print('type: ', type(model))
-            print(img)
-            # results = model(img)
+            print(f'image_rgb shape: {image_rgb.shape}')
+            print('*' * 10)
+            tensor_image = torch.from_numpy(image_rgb).div(255.0)
+            """.div(255.0)"""  # Normalize [0, 255] -> [0.0, 1.0]
             
+            tensor_image = tensor_image.permute(2, 0, 1).unsqueeze(0)  # CHW, Batch 차원 추가
+            tensor_image = tensor_image.float()
+
+            print(f'dtype = {tensor_image.dtype}')
+
+            results = model(tensor_image)
+            print(f'result type : {type(results)}, result dtype:')
             # # model = custom(path_or_model='yolov7.pt')  # custom example
             # # model.load_state_dict(loaded['model_state_dict'])
             # # model = custom(path_or_model='croswalk_3.pt')
@@ -80,9 +85,16 @@ class MyConsumer(WebsocketConsumer):
 
             # WebSocket을 통해 클라이언트에게 결과 전송
             # self.send(text_data=detections)
-            # self.send(bytes_data=results)
-            """
-            self.send(bytes_data=bytes_data)
+            buffered = io.BytesIO()
+            print(f"results : {results}")
+
+            self.send(bytes_data=results)
+            # except:
+            #     self.send(bytes_data=bytes_data)
+
+            # self.send(bytes_data=bytes_data)
+        else:
+            self.send(text_data=text_data)
 
 
 connected_users = {'YLParent01': set(['YLUser03'])}

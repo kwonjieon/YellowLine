@@ -16,6 +16,7 @@ def inputImage(request):
         if form.is_valid():
             file = request.FILES['file']
             temp_file = tempfile.NamedTemporaryFile(delete=False)
+
             with open(temp_file.name, 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
@@ -52,3 +53,10 @@ def outputImage(request):
             response['Content-Disposition'] = 'inline; filename=upload.jpg'
             return response
     return HttpResponse("No image found")
+
+"""
+
+https://yhkim4504.tistory.com/13
+
+
+"""
