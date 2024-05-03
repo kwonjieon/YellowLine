@@ -65,7 +65,7 @@ class MyConsumer(WebsocketConsumer):
             print('*' * 10)
             tensor_image = torch.from_numpy(image_rgb).div(255.0)
             """.div(255.0)"""  # Normalize [0, 255] -> [0.0, 1.0]
-            
+
             tensor_image = tensor_image.permute(2, 0, 1).unsqueeze(0)  # CHW, Batch 차원 추가
             tensor_image = tensor_image.float()
 
