@@ -202,7 +202,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard !CameraSession.isUploaded else { return }
     
-        CameraSession.isUploaded = false
+        CameraSession.isUploaded = true
         
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
@@ -213,12 +213,12 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-//        print("Incoming video buffer at \(timestamp.seconds) seconds...")
+        print("Incoming video buffer at \(timestamp.seconds) seconds...")
         
-        DispatchQueue.main.async{
-            self._imageView?.image = image
-        }
-//        self.socketManager?.send(image: imageData)
+//        DispatchQueue.main.async{
+//            self._imageView?.image = image
+//        }
+        self.socketManager?.send(image: imageData)
 //        self.isUploaded = isUpload
         
     }

@@ -20,7 +20,7 @@ class WebSocketManager : WebRTCClientDelegate{
     
     var webRtcClient = WebRTCClient()
     
-    private let ipAddress: String = "ws://0.tcp.jp.ngrok.io:11599"
+    private let ipAddress: String = "ws://0.tcp.jp.ngrok.io:19203"
     
     init(view: UIImageView){
         self.imageView = view
