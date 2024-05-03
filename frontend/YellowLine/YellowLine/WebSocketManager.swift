@@ -20,7 +20,7 @@ class WebSocketManager : WebRTCClientDelegate{
     
     var webRtcClient = WebRTCClient()
     
-    private let ipAddress: String = "ws://0.tcp.jp.ngrok.io:18305"
+    private let ipAddress: String = "ws://0.tcp.jp.ngrok.io:19203"
     
     init(view: UIImageView){
         self.imageView = view
@@ -75,7 +75,7 @@ class WebSocketManager : WebRTCClientDelegate{
     
     func sendSDP(_ sessionDescription: RTCSessionDescription) {
         var type = ""
-        if sessionDescription.type == .offer {
+        if sessionDescription.type == .offer{
             type = "offer"
         }else if sessionDescription.type == .answer {
             type = "answer"
@@ -89,11 +89,13 @@ class WebSocketManager : WebRTCClientDelegate{
             if self.rtcWebSocketTask?.state == .running {
                 self.rtcWebSocketTask?.send(.string(message)) { error in
                     if let error = error {
+                        print("92: ERROR 발생!")
                         print(error)
                     }
                 }
             }
         } catch {
+            print("98: ERROR 발생!")
             print(error)
         }
         
@@ -107,18 +109,20 @@ class WebSocketManager : WebRTCClientDelegate{
             if self.rtcWebSocketTask?.state == .running {
                 self.rtcWebSocketTask?.send(.string(message)) { error in
                     if let error = error {
+                        print("112: ERROR 발생!")
                         print(error)
                     }
                 }
             }
         } catch {
+            print("118: ERROR 발생!")
             print(error)
         }
         
     }
     
     private func rtcReceiveMessage() {
-        rtcWebSocketTask?.receive { [weak self] result in
+        self.rtcWebSocketTask?.receive { [weak self] result in
             switch result {
             case .failure(let error):
                 print("Error in receiving message: \(error)")
@@ -127,7 +131,27 @@ class WebSocketManager : WebRTCClientDelegate{
                 case .string(let text):
                     print("Received string: \(text)")
                     // Answer SDP를 받았을 때 처리하는 코드를 추가한다.
-                    
+                    do {
+                        let _signalingMessage = try JSONDecoder().decode(Message.self, from: text.data(using: .utf8)!)
+                        let signalingMessage = _signalingMessage.message!
+                        
+                        switch signalingMessage.type {
+                        case "offer":
+                            self?.webRtcClient.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) -> Void in
+                                self?.sendSDP(answerSDP)
+                            })
+                            print("receive and offer SDP Complete!")
+                        case "answer":
+                            self?.webRtcClient.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
+                        case "candidate":
+                            let candidate = signalingMessage.candidate!
+                            self?.webRtcClient.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
+                        default:
+                            print("No types in here")
+                        }
+                    } catch {
+                        print(error)
+                    }
                 case .data(let data):
                     print("Received data type")
                 @unknown default:

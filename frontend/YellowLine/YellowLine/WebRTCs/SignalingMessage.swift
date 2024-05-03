@@ -18,6 +18,10 @@ struct YLUser:Codable {
     
 }
 
+struct Message: Codable {
+    let message: SignalingMessage?
+}
+
 struct SignalingMessage: Codable {
     let type: String
     let sessionDescription: SDP?

@@ -13,6 +13,16 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
+		B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */; };
+		B956CA032BCE70AA00188A09 /* WebRTCiOSSDK in Frameworks */ = {isa = PBXBuildFile; productRef = B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */; };
+		B956CA072BCEA7C800188A09 /* WebRtcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B956CA062BCEA7C800188A09 /* WebRtcManager.swift */; };
+		B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96535132BC5737E00643DC9 /* NetworkManager.swift */; };
+		B966D3F52BBE9451004F4E98 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B966D3F42BBE9451004F4E98 /* Alamofire */; };
+		B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */; };
+		B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */; };
+		B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */; };
+		B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */; };
+		B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101F2BCFD87F00F61AD2 /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +34,14 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
+		B956CA062BCEA7C800188A09 /* WebRtcManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRtcManager.swift; sourceTree = "<group>"; };
+		B96535132BC5737E00643DC9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chauchaudog.jpg; sourceTree = "<group>"; };
+		B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingMessage.swift; sourceTree = "<group>"; };
+		B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
+		B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCClient.swift; sourceTree = "<group>"; };
+		B9D2101F2BCFD87F00F61AD2 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +49,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B956CA032BCE70AA00188A09 /* WebRTCiOSSDK in Frameworks */,
+				B966D3F52BBE9451004F4E98 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +62,7 @@
 			children = (
 				5709DFF12BB13E9200553A23 /* YellowLine */,
 				5709DFF02BB13E9200553A23 /* Products */,
+				B956C9FE2BCE709700188A09 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,6 +77,8 @@
 		5709DFF12BB13E9200553A23 /* YellowLine */ = {
 			isa = PBXGroup;
 			children = (
+				B9D2101C2BCFD10F00F61AD2 /* WebRTCs */,
+				B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */,
 				5709DFF22BB13E9200553A23 /* AppDelegate.swift */,
 				5709DFF42BB13E9200553A23 /* SceneDelegate.swift */,
 				5709DFF62BB13E9200553A23 /* ViewController.swift */,
@@ -63,8 +86,29 @@
 				5709DFFB2BB13E9300553A23 /* Assets.xcassets */,
 				5709DFFD2BB13E9300553A23 /* LaunchScreen.storyboard */,
 				5709E0002BB13E9300553A23 /* Info.plist */,
+				B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */,
+				B96535132BC5737E00643DC9 /* NetworkManager.swift */,
+				B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */,
+				B9D2101F2BCFD87F00F61AD2 /* Config.swift */,
 			);
 			path = YellowLine;
+			sourceTree = "<group>";
+		};
+		B956C9FE2BCE709700188A09 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B9D2101C2BCFD10F00F61AD2 /* WebRTCs */ = {
+			isa = PBXGroup;
+			children = (
+				B956CA062BCEA7C800188A09 /* WebRtcManager.swift */,
+				B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */,
+				B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */,
+			);
+			path = WebRTCs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -83,6 +127,10 @@
 			dependencies = (
 			);
 			name = YellowLine;
+			packageProductDependencies = (
+				B966D3F42BBE9451004F4E98 /* Alamofire */,
+				B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */,
+			);
 			productName = YellowLine;
 			productReference = 5709DFEF2BB13E9200553A23 /* YellowLine.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +159,10 @@
 				Base,
 			);
 			mainGroup = 5709DFE62BB13E9200553A23;
+			packageReferences = (
+				B966D3F32BBE9451004F4E98 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				B956CA012BCE70AA00188A09 /* XCRemoteSwiftPackageReference "WebRTC-iOS-SDK" */,
+			);
 			productRefGroup = 5709DFF02BB13E9200553A23 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -127,6 +179,7 @@
 			files = (
 				5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */,
 				5709DFFF2BB13E9300553A23 /* Base in Resources */,
+				B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */,
 				5709DFFA2BB13E9200553A23 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,9 +191,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */,
 				5709DFF72BB13E9200553A23 /* ViewController.swift in Sources */,
+				B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */,
+				B956CA072BCEA7C800188A09 /* WebRtcManager.swift in Sources */,
+				B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */,
+				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
+				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
+				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,9 +352,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CX8QXFQAMZ;
+				DEVELOPMENT_TEAM = LLKYF9URAK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YellowLine/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "카메라접근 허용";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -321,9 +382,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CX8QXFQAMZ;
+				DEVELOPMENT_TEAM = LLKYF9URAK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YellowLine/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "카메라접근 허용";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -365,6 +427,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B956CA012BCE70AA00188A09 /* XCRemoteSwiftPackageReference "WebRTC-iOS-SDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ant-media/WebRTC-iOS-SDK.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		B966D3F32BBE9451004F4E98 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B956CA012BCE70AA00188A09 /* XCRemoteSwiftPackageReference "WebRTC-iOS-SDK" */;
+			productName = WebRTCiOSSDK;
+		};
+		B966D3F42BBE9451004F4E98 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B966D3F32BBE9451004F4E98 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5709DFE72BB13E9200553A23 /* Project object */;
 }
