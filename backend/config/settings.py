@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'camapp',
     'detectionImage',
-    'channels',
+    # 'channels',
+    'daphne',
 ]
 
 MIDDLEWARE = [
