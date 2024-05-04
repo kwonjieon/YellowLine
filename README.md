@@ -1,4 +1,7 @@
 서버는 임시로 ngrok 사용합니다. 매번 url주소가 바뀝니다.
+> git checkout -b "feature/이름" develop
+> 를 이용해 develop에서 브랜치를 따기 메모
+
 ---
 ## 프론트
 
