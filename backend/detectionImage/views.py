@@ -32,7 +32,6 @@ def inputImage(request):
             buffered = BytesIO()
             img_with_boxes.save(buffered, format="JPEG")
             img_str = base64.b64encode(buffered.getvalue()).decode()
-            print(sys.path)
             
             # HTML 템플릿에 전달할 때 Base64로 인코딩된 이미지 데이터 전달
             return render(request, 'imageOutput.html', {'img_with_boxes': img_str})
