@@ -1,5 +1,3 @@
-# Google utils: https://cloud.google.com/storage/docs/reference/libraries
-
 import os
 import platform
 import subprocess
@@ -23,9 +21,10 @@ def attempt_download(file, repo='WongKinYiu/yolov7'):
     if not file.exists():
         try:
             response = requests.get(f'https://api.github.com/repos/{repo}/releases/latest').json()  # github api
-            assets = [x['name'] for x in response['assets']]  # release assets
-            tag = response['tag_name']  # i.e. 'v1.0'
-        except:  # fallback plan
+            assets = [x['name'] for x in response.get('assets', [])]  # release assets
+            tag = response.get('tag_name', '')  # i.e. 'v1.0'
+        except Exception as e:  # fallback plan
+            print(f'Error fetching assets from GitHub API: {e}')
             assets = ['yolov7.pt', 'yolov7-tiny.pt', 'yolov7x.pt', 'yolov7-d6.pt', 'yolov7-e6.pt', 
                       'yolov7-e6e.pt', 'yolov7-w6.pt']
             tag = subprocess.check_output('git tag', shell=True).decode().split()[-1]
@@ -94,30 +93,3 @@ def get_token(cookie="./cookie"):
             if "download" in line:
                 return line.split()[-1]
     return ""
-
-# def upload_blob(bucket_name, source_file_name, destination_blob_name):
-#     # Uploads a file to a bucket
-#     # https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-python
-#
-#     storage_client = storage.Client()
-#     bucket = storage_client.get_bucket(bucket_name)
-#     blob = bucket.blob(destination_blob_name)
-#
-#     blob.upload_from_filename(source_file_name)
-#
-#     print('File {} uploaded to {}.'.format(
-#         source_file_name,
-#         destination_blob_name))
-#
-#
-# def download_blob(bucket_name, source_blob_name, destination_file_name):
-#     # Uploads a blob from a bucket
-#     storage_client = storage.Client()
-#     bucket = storage_client.get_bucket(bucket_name)
-#     blob = bucket.blob(source_blob_name)
-#
-#     blob.download_to_filename(destination_file_name)
-#
-#     print('Blob {} downloaded to {}.'.format(
-#         source_blob_name,
-#         destination_file_name))

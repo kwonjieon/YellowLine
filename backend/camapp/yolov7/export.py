@@ -3,7 +3,7 @@ import sys
 import time
 import warnings
 
-sys.path.append('/')  # to run '$ python *.py' files in subdirectories
+sys.path.append('./')  # to run '$ python *.py' files in subdirectories
 
 import torch
 import torch.nn as nn

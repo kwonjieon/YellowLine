@@ -203,12 +203,13 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard !CameraSession.isUploaded else { return }
     
-//        CameraSession.isUploaded = true
+        CameraSession.isUploaded = true
         
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
         let ciImage = CIImage(cvImageBuffer: cvImageBuffer!).oriented(forExifOrientation: 6)
-        let image = UIImage(ciImage: ciImage)
+        var image = UIImage(ciImage: ciImage).resize(640, 640)
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8)/* ?? image.pngData() */ else {
             return
         }
@@ -219,7 +220,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
 //        DispatchQueue.main.async{
 //            self._imageView?.image = image
 //        }
-//        self.socketManager?.send(image: imageData)
+        self.socketManager?.send(image: imageData)
 //        self.isUploaded = isUpload
         
 //        print("Upload is approaching...")

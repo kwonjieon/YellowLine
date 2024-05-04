@@ -15,6 +15,8 @@ from channels.generic.websocket import WebsocketConsumer
 
 from torchvision import transforms
 
+from camapp.yolov7.learning import outimage
+
 # from camapp.yolov7.hubconf import custom
 
 """
@@ -29,6 +31,10 @@ YLConsumer : signaling 을 위한 전송 (text_data)
 
 class MyConsumer(WebsocketConsumer):
     def connect(self):
+        current_dir = os.getcwd()
+        yolov7_path = os.path.join(current_dir, "camapp/yolov7")
+        # yolov7_pt_path = os.path.join(yolov7_path, "croswalk_3.pt")
+        sys.path.append(yolov7_path)
         self.accept()
 
     def disconnect(self, code):
@@ -41,19 +47,18 @@ class MyConsumer(WebsocketConsumer):
 
             # print(type(bytes_data)) #class<'bytes'>
 
+            #    <class '_io.BytesIO'>
             # data_io = io.BytesIO(bytes_data)
-            # print(f'data io type {type(data_io)}') #<class '_io.BytesIO'>
 
-            #    bytes to numpy array
+            #    bytes to numpy array : <class 'numpy.ndarray'>
             decoded = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), -1)
-            #print(f'decoded io type {type(decoded)}') # <class 'numpy.ndarray'>
-            #print(decoded)
+            #    이미지 처리 완료
+            outimage(decoded)
 
             #    numpy array to 'class bytes'
             _, encode_data = cv2.imencode('.jpg', decoded)
             #    'class bytes', ndarray
             print(type(encode_data.tobytes()), type(encode_data))
-
             self.send(bytes_data=encode_data.tobytes())
 
 

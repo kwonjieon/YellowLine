@@ -3,8 +3,8 @@ import random
 import torch
 import torch.nn as nn
 
-from models.common import Conv, DWConv
-from utils.google_utils import attempt_download
+from detectionImage.yolov7.models.common import Conv, DWConv
+from detectionImage.yolov7.utils.google_utils import attempt_download
 
 
 class CrossConv(nn.Module):

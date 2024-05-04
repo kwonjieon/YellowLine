@@ -8,7 +8,8 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 """
 
 import os
-
+import django
+from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.urls import path, re_path
@@ -16,6 +17,7 @@ from django.urls import path, re_path
 from camapp.consumers import MyConsumer, YLConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
 # application = get_asgi_application()
 
@@ -26,6 +28,13 @@ application = ProtocolTypeRouter({
         # path('yl/ws/sock/', YLConsumer.as_asgi()),
         re_path(r'yl/ws/sock/(?P<room_name>\w+)/$', YLConsumer.as_asgi())
     ])
+    # "websocket": AuthMiddlewareStack({
+    #     URLRouter(
+    #         path('yl/ws/', MyConsumer.as_asgi()),
+    #         # path('yl/ws/sock/', YLConsumer.as_asgi()),
+    #         re_path(r'yl/ws/sock/(?P<room_name>\w+)/$', YLConsumer.as_asgi())
+    #     )
+    # })
 })
 
 """
