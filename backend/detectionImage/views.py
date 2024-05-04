@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from . yolov7.learning import outimage
 from detectionImage.forms import UploadFileForm
-import os
 import sys
 from PIL import Image
 
@@ -21,9 +20,6 @@ def inputImage(request):
                     destination.write(chunk)
             
             img0 = cv2.imread(temp_file.name)
-            current_dir = os.getcwd()
-            yolov7_path = os.path.join(current_dir, "detectionImage\\yolov7")
-            sys.path.append(yolov7_path)
 
             # outimage 함수에서 생성된 넘파이 배열을 PIL 이미지로 변환
             img_with_boxes = Image.fromarray(outimage(img0))
@@ -36,7 +32,7 @@ def inputImage(request):
             buffered = BytesIO()
             img_with_boxes.save(buffered, format="JPEG")
             img_str = base64.b64encode(buffered.getvalue()).decode()
-
+            
             # HTML 템플릿에 전달할 때 Base64로 인코딩된 이미지 데이터 전달
             return render(request, 'imageOutput.html', {'img_with_boxes': img_str})
     else:
