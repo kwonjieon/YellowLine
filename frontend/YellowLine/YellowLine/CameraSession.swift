@@ -9,6 +9,7 @@ import Foundation
 import AVFoundation
 import UIKit
 import Combine
+//import Alamofire
 
 class CameraSession: NSObject {
     var captureSession: AVCaptureSession
@@ -28,8 +29,9 @@ class CameraSession: NSObject {
 //    let _networkManager = NetworkManager(url : URL(string: "ws://0.tcp.jp.ngrok.io:15046/yl/ws/"))
     let socketManager: WebSocketManager?
     
+    static var isUploaded = false
     
-    var isUploaded = false
+    let clientId = "YLUser01"
     
     init(queue: DispatchQueue, view: UIImageView?){
         //url도 websocket 주소로 바꿀계획.
@@ -39,10 +41,9 @@ class CameraSession: NSObject {
         self.queue = queue
         // 뷰를 빈으로 등록해(ex:@State 같은 어노테이션) 나중에 이와같은 코드를 없애버리자.
         self._imageView = view
-        
         //run websocket
         self.socketManager = WebSocketManager(view: self._imageView!)
-        self.socketManager?.connect()
+
     }
     
     func checkCameraAuthor() {
@@ -65,10 +66,10 @@ class CameraSession: NSObject {
     //MARK: -세팅:카메라 세션
     func setupCameraSession() {
         self.captureSession.beginConfiguration()
-        self.captureSession.sessionPreset = .photo
+        self.captureSession.sessionPreset = .high
         
         // input setting
-        let _device = setupInput(w: 640, h:860)
+        let _device = setupInput(w: 320, h:240)
         
         //output setting
         setupOutput()
@@ -84,7 +85,12 @@ class CameraSession: NSObject {
         } catch {
             print(error)
         }
+        setupRTCCameraDevice(_device)
         captureSession.commitConfiguration()
+    }
+    
+    private func setupRTCCameraDevice(_ device: AVCaptureDevice?) {
+        socketManager?.webRtcClient.setupDevice(device!)
     }
     
     // input setting method
@@ -178,10 +184,16 @@ class CameraSession: NSObject {
                 // qos : .utility = 이미지 전송,수송 시 사용. 꽤 긴 처리시간을 갖을 때 사용한다.
         }
         
+        // websocket 통신 시작
+        self.socketManager?.connect()
+        self.socketManager?.connectRtc(clientId)
+        
 //        self._networkManager.runUploadImageSession()
     }
     
     func stopSession() {
+        self.socketManager?.disconnect()
+        self.socketManager?.disconnectRtc()
         self.captureSession.stopRunning()
     }
 }
@@ -189,62 +201,68 @@ class CameraSession: NSObject {
 //MARK: -captureOutput 설정
 extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-//        guard !self.isUploaded else { return }
-//        self.isUploaded = true
+        guard !CameraSession.isUploaded else { return }
+    
+        CameraSession.isUploaded = true
         
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         guard cvImageBuffer != nil else { return }
         let ciImage = CIImage(cvImageBuffer: cvImageBuffer!).oriented(forExifOrientation: 6)
-        let image = UIImage(ciImage: ciImage)
+        var image = UIImage(ciImage: ciImage).resize(640, 640)
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8)/* ?? image.pngData() */ else {
             return
         }
         
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-        print("Incoming video buffer at \(timestamp.seconds) seconds...")
+//        print("Incoming video buffer at \(timestamp.seconds) seconds...")
         
-        self.socketManager?.send(image: imageData)
-        
-        
-//        queue!.async { [self] in
-//            self.imageBuffer.append(imageData)
-//            if self.imageBuffer.count >= 10 {
-//                self._networkManager.runUploadImages(images: self.imageBuffer)
-//                    .sink(receiveCompletion: { completion in
-//                        switch completion {
-//                        case .finished:
-//                            self.isUploaded = false
-//                            print("완료!")
-//                            break // 성공적으로 완료
-//                        case .failure(let error):
-//                            print(error.localizedDescription) // 오류 처리
-//                        }
-//                    }, receiveValue: { [weak self] uploadedImage in
-//                        DispatchQueue.main.async {
-//                            self?._imageView!.image = uploadedImage
-//                        }
-//                    }).store(in: &subscriptions)
-//                    
-//            }
+//        DispatchQueue.main.async{
+//            self._imageView?.image = image
 //        }
-//        self._networkManager.runUploadImageSession()
+        self.socketManager?.send(image: imageData)
+//        self.isUploaded = isUpload
         
-//        self._networkManager.runUploadImage(image: imageData)
-//            .sink( receiveCompletion: { completion in
-//                        switch completion {
-//                        case .finished:
-//                            self.isUploaded = false
-//                            print("완료!")
-//                            break // 성공적으로 완료
-//                        case .failure(let error):
-//                            print(error.localizedDescription) // 오류 처리
-//                        }
-//                    }, receiveValue: { [weak self] uploadedImage in
-//                        DispatchQueue.main.async {
-//                            self?._imageView?.image = uploadedImage
-//                        }
-//                    }).store(in: &subscriptions)
+//        print("Upload is approaching...")
 
+        
+        let stringURL = "https://4049-116-32-21-139.ngrok-free.app/yl/img"
+//        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        
+//        AF.upload(multipartFormData: { multipartFormData in
+//                    guard let image = UIImage(named: "chauchaudog.jpg"),
+//                          let imageData = image.jpegData(compressionQuality: 1) ?? image.pngData(),
+//                          let url = URL(string: stringURL)
+//                    else {
+//                        print("이미지 또는 URL을 불러올 수 없습니다.")
+//                        return
+//                    }
+//                    multipartFormData.append(Data("user1".utf8), withName: "title")
+//                    multipartFormData.append(imageData,
+//                                             withName: "image",
+//                                             fileName: "chauchaudog.jpg",
+//                                             mimeType: "image/jpg")
+//                }, to: stringURL, method: .post, headers: header)
+//                .response{ response in
+//                    guard let statusCode = response.response?.statusCode else {return }
+//                            switch statusCode{
+//                            case 200: 
+//                                CameraSession.isUploaded = false
+//                                /*
+//                                DispatchQueue.main.async{
+//                                    self._imageView?.image = image
+//                                }
+//                                 */
+//                                print("이미지 전송 완료")
+//                            default:
+//                                print("오류발생")
+//                            }
+//                }
+//
+//
+//            }
+    
+        
     }
 }
 
