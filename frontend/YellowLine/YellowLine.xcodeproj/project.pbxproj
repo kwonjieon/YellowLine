@@ -13,6 +13,13 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
+		B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */; };
+		B931A2852BE8C1D6005DBE6F /* NaviCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */; };
+		B931A2872BE8C1EF005DBE6F /* CameraOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */; };
+		B931A28B2BE90D4D005DBE6F /* ParentModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A28A2BE90D4D005DBE6F /* ParentModeView.swift */; };
+		B931A2902BE91874005DBE6F /* mock.json in Resources */ = {isa = PBXBuildFile; fileRef = B931A28E2BE91874005DBE6F /* mock.json */; };
+		B931A2922BE91965005DBE6F /* ChildsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2912BE91965005DBE6F /* ChildsData.swift */; };
+		B931A2942BE91EC5005DBE6F /* ParentModeDataPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */; };
 		B94880202BE52CDA00CD08E2 /* bus.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B948801F2BE52CDA00CD08E2 /* bus.jpg */; };
 		B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */; };
 		B956CA032BCE70AA00188A09 /* WebRTCiOSSDK in Frameworks */ = {isa = PBXBuildFile; productRef = B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */; };
@@ -35,6 +42,13 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientModeView.swift; sourceTree = "<group>"; };
+		B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NaviCameraView.swift; sourceTree = "<group>"; };
+		B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOnlyView.swift; sourceTree = "<group>"; };
+		B931A28A2BE90D4D005DBE6F /* ParentModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentModeView.swift; sourceTree = "<group>"; };
+		B931A28F2BE91874005DBE6F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = en; path = en.lproj/mock.json; sourceTree = "<group>"; };
+		B931A2912BE91965005DBE6F /* ChildsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildsData.swift; sourceTree = "<group>"; };
+		B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentModeDataPreview.swift; sourceTree = "<group>"; };
 		B948801F2BE52CDA00CD08E2 /* bus.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bus.jpg; sourceTree = "<group>"; };
 		B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
 		B956CA062BCEA7C800188A09 /* WebRtcManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRtcManager.swift; sourceTree = "<group>"; };
@@ -93,6 +107,13 @@
 				B96535132BC5737E00643DC9 /* NetworkManager.swift */,
 				B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */,
 				B9D2101F2BCFD87F00F61AD2 /* Config.swift */,
+				B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */,
+				B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */,
+				B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */,
+				B931A28A2BE90D4D005DBE6F /* ParentModeView.swift */,
+				B931A28E2BE91874005DBE6F /* mock.json */,
+				B931A2912BE91965005DBE6F /* ChildsData.swift */,
+				B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */,
 			);
 			path = YellowLine;
 			sourceTree = "<group>";
@@ -185,6 +206,7 @@
 				5709DFFF2BB13E9300553A23 /* Base in Resources */,
 				B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */,
 				5709DFFA2BB13E9200553A23 /* Base in Resources */,
+				B931A2902BE91874005DBE6F /* mock.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,13 +218,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */,
+				B931A2942BE91EC5005DBE6F /* ParentModeDataPreview.swift in Sources */,
+				B931A2872BE8C1EF005DBE6F /* CameraOnlyView.swift in Sources */,
 				5709DFF72BB13E9200553A23 /* ViewController.swift in Sources */,
 				B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */,
 				B956CA072BCEA7C800188A09 /* WebRtcManager.swift in Sources */,
+				B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */,
 				B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */,
+				B931A28B2BE90D4D005DBE6F /* ParentModeView.swift in Sources */,
 				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
+				B931A2852BE8C1D6005DBE6F /* NaviCameraView.swift in Sources */,
+				B931A2922BE91965005DBE6F /* ChildsData.swift in Sources */,
 				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
 				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,
 			);
@@ -225,6 +253,14 @@
 				5709DFFE2BB13E9300553A23 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		B931A28E2BE91874005DBE6F /* mock.json */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B931A28F2BE91874005DBE6F /* en */,
+			);
+			name = mock.json;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
