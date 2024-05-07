@@ -8,6 +8,7 @@
 import AVKit
 import UIKit
 
+
 /**
  
  메인 뷰에서 카메라캡처를 위해 필요한 준비물
@@ -20,6 +21,8 @@ class ViewController: UIViewController{
     @IBOutlet weak var previewView: UIView!
      @IBOutlet var imageView: UIImageView!
 
+    @IBOutlet var btns: UIButton!
+    
     let queue = DispatchQueue(label: "videoQueue")
     
     
@@ -35,9 +38,15 @@ class ViewController: UIViewController{
         self.cameraSession?.startSession()
     }
     
+    @IBAction func btnclick(_ sender: Any) {
+        guard let image = UIImage(named: "bus.jpg"),
+              let imageData = image.jpegData(compressionQuality: 0.8) else { return }
+        cameraSession?.socketManager?.send(image: imageData)
+    }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.cameraSession?.stopSession()
+        
     }
     
 	@IBAction func moveToSearch(_ sender: Any) {
