@@ -215,7 +215,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-//        print("Incoming video buffer at \(timestamp.seconds) seconds...")
+        print("Incoming video buffer at \(timestamp.seconds) seconds...")
         
 //        DispatchQueue.main.async{
 //            self._imageView?.image = image

@@ -101,7 +101,7 @@ class WebRTCClient: NSObject{
                     let description = format.formatDescription as CMFormatDescription
                     let dimensions = CMVideoFormatDescriptionGetDimensions(description)
                     print("Width: \(dimensions.width), Height: \(dimensions.height)")
-                    if dimensions.width ==  320 && dimensions.height == 240 {
+                    if dimensions.width ==  1280 && dimensions.height == 720 {
                         targetFormat = format
                     } else if dimensions.width == 320 {
                         targetFormat = format
