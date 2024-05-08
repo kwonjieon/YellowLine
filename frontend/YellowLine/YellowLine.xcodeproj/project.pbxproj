@@ -13,6 +13,8 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
+		B91A0CEA2BEB7BB600743ACE /* TTSModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91A0CE92BEB7BB600743ACE /* TTSModule.swift */; };
+		B91A0CED2BEB814E00743ACE /* TTSController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91A0CEC2BEB814E00743ACE /* TTSController.swift */; };
 		B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */; };
 		B931A2852BE8C1D6005DBE6F /* NaviCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */; };
 		B931A2872BE8C1EF005DBE6F /* CameraOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */; };
@@ -42,6 +44,8 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B91A0CE92BEB7BB600743ACE /* TTSModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSModule.swift; sourceTree = "<group>"; };
+		B91A0CEC2BEB814E00743ACE /* TTSController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSController.swift; sourceTree = "<group>"; };
 		B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientModeView.swift; sourceTree = "<group>"; };
 		B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NaviCameraView.swift; sourceTree = "<group>"; };
 		B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOnlyView.swift; sourceTree = "<group>"; };
@@ -93,6 +97,7 @@
 		5709DFF12BB13E9200553A23 /* YellowLine */ = {
 			isa = PBXGroup;
 			children = (
+				B91A0CEB2BEB7EEC00743ACE /* TTS */,
 				B948801F2BE52CDA00CD08E2 /* bus.jpg */,
 				B9D2101C2BCFD10F00F61AD2 /* WebRTCs */,
 				B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */,
@@ -116,6 +121,15 @@
 				B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */,
 			);
 			path = YellowLine;
+			sourceTree = "<group>";
+		};
+		B91A0CEB2BEB7EEC00743ACE /* TTS */ = {
+			isa = PBXGroup;
+			children = (
+				B91A0CEC2BEB814E00743ACE /* TTSController.swift */,
+				B91A0CE92BEB7BB600743ACE /* TTSModule.swift */,
+			);
+			path = TTS;
 			sourceTree = "<group>";
 		};
 		B956C9FE2BCE709700188A09 /* Frameworks */ = {
@@ -226,8 +240,10 @@
 				B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */,
 				B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */,
 				B931A28B2BE90D4D005DBE6F /* ParentModeView.swift in Sources */,
+				B91A0CED2BEB814E00743ACE /* TTSController.swift in Sources */,
 				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
+				B91A0CEA2BEB7BB600743ACE /* TTSModule.swift in Sources */,
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
 				B931A2852BE8C1D6005DBE6F /* NaviCameraView.swift in Sources */,
 				B931A2922BE91965005DBE6F /* ChildsData.swift in Sources */,
@@ -390,6 +406,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LLKYF9URAK;
@@ -407,8 +424,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.YellowLine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -420,6 +438,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LLKYF9URAK;
@@ -437,8 +456,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.YellowLine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
