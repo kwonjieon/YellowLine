@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'camapp',
     'detectionImage',
     'channels',
+    'DB',
 ]
 
 MIDDLEWARE = [
