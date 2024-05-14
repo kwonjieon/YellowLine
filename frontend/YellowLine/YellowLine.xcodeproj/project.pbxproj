@@ -13,6 +13,13 @@
 		5709DFFA2BB13E9200553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFF92BB13E9200553A23 /* Base */; };
 		5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFB2BB13E9300553A23 /* Assets.xcassets */; };
 		5709DFFF2BB13E9300553A23 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 5709DFFE2BB13E9300553A23 /* Base */; };
+		5761D8E02BCCC6070071C0EB /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; };
+		5761D8E12BCCC6070071C0EB /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BB2BF347230013D6CF /* LocationData.swift */; };
+		57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */; };
+		57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */; };
+		57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */; };
+		57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC78512BC7CED500C81CA1 /* MapViewController.swift */; };
 		B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */; };
 		B931A2852BE8C1D6005DBE6F /* NaviCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */; };
 		B931A2872BE8C1EF005DBE6F /* CameraOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */; };
@@ -31,12 +38,6 @@
 		B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */; };
 		B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */; };
 		B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101F2BCFD87F00F61AD2 /* Config.swift */; };
-		5761D8E02BCCC6070071C0EB /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; };
-		5761D8E12BCCC6070071C0EB /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */; };
-		57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */; };
-		57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */; };
-		57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC78512BC7CED500C81CA1 /* MapViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,6 +63,12 @@
 		5709DFFB2BB13E9300553A23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5709DFFE2BB13E9300553A23 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5709E0002BB13E9300553A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TMapSDK.framework; path = ../../../../../TMapSDK.framework; sourceTree = "<group>"; };
+		5788A8BB2BF347230013D6CF /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
+		57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationViewController.swift; sourceTree = "<group>"; };
+		57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDataModel.swift; sourceTree = "<group>"; };
+		57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationModel.swift; sourceTree = "<group>"; };
+		57FC78512BC7CED500C81CA1 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		B931A2822BE8B6DF005DBE6F /* ClientModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientModeView.swift; sourceTree = "<group>"; };
 		B931A2842BE8C1D6005DBE6F /* NaviCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NaviCameraView.swift; sourceTree = "<group>"; };
 		B931A2862BE8C1EF005DBE6F /* CameraOnlyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOnlyView.swift; sourceTree = "<group>"; };
@@ -78,11 +85,6 @@
 		B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
 		B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCClient.swift; sourceTree = "<group>"; };
 		B9D2101F2BCFD87F00F61AD2 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TMapSDK.framework; path = ../../../../../TMapSDK.framework; sourceTree = "<group>"; };
-		57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationViewController.swift; sourceTree = "<group>"; };
-		57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDataModel.swift; sourceTree = "<group>"; };
-		57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationModel.swift; sourceTree = "<group>"; };
-		57FC78512BC7CED500C81CA1 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */,
 				57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */,
 				57FC78512BC7CED500C81CA1 /* MapViewController.swift */,
+				5788A8BB2BF347230013D6CF /* LocationData.swift */,
 			);
 			path = YellowLine;
 			sourceTree = "<group>";
@@ -267,6 +270,7 @@
 				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
 				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,
 				57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */,
+				5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */,
 				57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */,
 				57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */,
 			);
@@ -438,18 +442,20 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YellowLine/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "카메라접근 허용";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -474,18 +480,20 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YellowLine/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "카메라접근 허용";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
