@@ -28,6 +28,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
     @IBOutlet weak var changedLatitude: UILabel!
     @IBOutlet weak var changedLongitude: UILabel!
     
+    @IBOutlet weak var twoPointsDistance: UILabel!
+    
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
     var locationManager = CLLocationManager()
@@ -175,15 +177,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
         let pathData = TMapPathData()
         //let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         let startPoint = CLLocationCoordinate2D(latitude: 37.551447232646765, longitude: 127.07412355017871) // 도서관 입구
-        let endPoint = CLLocationCoordinate2D(latitude: 37.54633818154831, longitude: 127.07570314407349) // 목적지 : 가츠시 건대점
+        let endPoint = CLLocationCoordinate2D(latitude: 37.54885914948882, longitude: 127.07501188046824) // 목적지 : 가츠시 건대점
         
         //let endPoint = CLLocationCoordinate2D(latitude: 37.54748588, longitude: 127.07295740) // 목적지 : 써브웨이 어린이대공원점
         
         pathData.findPathDataWithType(.PEDESTRIAN_PATH, startPoint: startPoint, endPoint: endPoint) { (result, error)->Void in
             self.polyline = result
-            
-            print("line: \(self.polyline?.path)")
-            
+    
             DispatchQueue.main.async {
                 let marker1 = TMapMarker(position: startPoint)
                 marker1.map = self.mapView
@@ -268,6 +268,26 @@ class MapViewController: UIViewController, TMapViewDelegate {
             LocationPT = 1
         }
     }
+    
+    //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
+    func checkCurrentLoactionRotate() {
+        for location in SearchDestinationViewController.pointerDataList {
+            var distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
+            if distance < 0.00003428 {
+                twoPointsDistance.text = String(distance)
+                routineInform.text = location.direction
+                print("가야하는 방향: \(location.direction)")
+            }
+        }
+    }
+    
+    // 두 점 사이의 거리
+    func distanceBetweenPoints(x1: Double, y1: Double, x2: Double, y2: Double) -> Double {
+        let deltaX = x2 - x1
+        let deltaY = y2 - y1
+        let distance = sqrt(deltaX * deltaX + deltaY * deltaY)
+        return distance
+    }
 }
 
 extension MapViewController: CLLocationManagerDelegate {
@@ -305,6 +325,7 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // 길 안내
             // 포인트 지역에 접근했다면 좌, 우회전 출력
+            /*
             let currentPositionRangeChange = searchDestinationViewController.pointRangeChange(latitude: latitude, longitude: longitude)
             let coordinate : String = String(currentPositionRangeChange.latitude) + String(currentPositionRangeChange.longitude)
             let condition: ((String, String)) -> Bool = {
@@ -312,16 +333,16 @@ extension MapViewController: CLLocationManagerDelegate {
             }
             
             print("범위 수정된 내위치 : \(currentPositionRangeChange.latitude), \(currentPositionRangeChange.longitude)")
+            */
             
             // ui 테스트 표기
+            /*
             changedLatitude.text = String(currentPositionRangeChange.latitude)
             changedLongitude.text = String(currentPositionRangeChange.longitude)
+            */
             
-            // 내 위치가 포인트 dict에 존재한다면 안내 출력
-            if SearchDestinationViewController.pointDict.contains(where: condition) {
-                print (SearchDestinationViewController.pointDict[coordinate])
-                routineInform.text = SearchDestinationViewController.pointDict[coordinate]
-            }
+            // 각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
+            checkCurrentLoactionRotate();
         }
     }
     

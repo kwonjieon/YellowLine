@@ -23,6 +23,7 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     var naviDestinationList: [String] = [] // 목적지
     var naviPointList : [String] = [] // 경로 중 좌, 우회전 해야하는 경/위도 리스트
     static var pointDict: [String: String] = [:] // 좌/우회전 해야하는 위치 포인트 딕셔너리, 범위 조정이 된 상태임
+    static var pointerDataList: [LocationData] = []
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBAction func getTMapAPINavigationInformBtn(_ sender: Any) {
@@ -92,13 +93,14 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
             // 학정 입구 127.07412355017871,37.551447232646765
             // 가츠시 127.07570314407349 37.54633818154831
             // 알바 37.54089617063285 127.22094921007677
+            // 어대공 6번출구 37.54885914948882, 127.07501188046824
             "startX": 127.07412355017871,
             "startY": 37.551447232646765,
             "angle": 20,
             "speed": 30,
             "endPoiId": "10001",
-            "endX": 127.07570314407349,
-            "endY": 37.54633818154831,
+            "endX": 127.07501188046824,
+            "endY": 37.54885914948882,
             "reqCoordType": "WGS84GEO",
             "startName": "%EC%B6%9C%EB%B0%9C",
             "endName": "%EB%8F%84%EC%B0%A9",
@@ -146,25 +148,26 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
                             // 좌회전 또는 우회전 단어가 포함된 description만 좌/우 방향회전 장소 포인트이므로 단어 포함 확인
                             if description.contains("좌회전") || description.contains("우회전") {
                                 self.navigationList.append(self.navigationDataModel!.features[i].properties.description!)
-                                let rangeChangedValue = self.pointRangeChange(latitude: array[1], longitude: array[0])
                                 
-                                let coordinate : String = String(rangeChangedValue.latitude) + String(rangeChangedValue.longitude)
+                                // 위치 및 방향 데이터 객체 생성 및 삽입
+                                var inputData: LocationData = LocationData()
+                                inputData.latitude = array[1]
+                                inputData.longitude = array[0]
+                                inputData.name = self.navigationDataModel!.features[i].properties.nearPoiName!
                                 
-                                print ("pointer: \(rangeChangedValue.latitude) , \(rangeChangedValue.longitude)")
                                 if description.contains("좌회전") {
-                                    SearchDestinationViewController.pointDict[coordinate] = "좌회전"
+                                    inputData.direction = "좌회전"
                                 }
                                 else {
-                                    SearchDestinationViewController.pointDict[coordinate] = "우회전"
+                                    inputData.direction = "우회전"
                                 }
+                                SearchDestinationViewController.pointerDataList.append(inputData)
                             }
                         case .twoDimensional(let array): break
                         }
                     }
                     print(self.navigationList)
                     print(self.naviDestinationList)
-                    print(SearchDestinationViewController.pointDict)
-                    print("test point : \(SearchDestinationViewController.pointDict["37.5513127.0743"])")
                 }catch{
                     print(error)
                 }
