@@ -11,9 +11,6 @@ import CoreLocation
 import CoreMotion
 
 // 지도 뷰 로드
-
-
-
 class MapViewController: UIViewController, TMapViewDelegate {
     
     @IBOutlet weak var mapContainerView: UIView!
@@ -26,6 +23,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
     @IBOutlet weak var longitudeText: UILabel!
     @IBOutlet weak var latitudeGapLabel: UILabel!
     @IBOutlet weak var longitudeGapLabel: UILabel!
+    @IBOutlet weak var routineInform: UILabel!
+    
+    @IBOutlet weak var changedLatitude: UILabel!
+    @IBOutlet weak var changedLongitude: UILabel!
     
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
@@ -40,12 +41,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var longitude:Double = 0.0
     var latitude:Double = 0.0
     
-    
     var startCheckLocation:Bool = false
+    
+    var searchDestinationViewController: SearchDestinationViewController = .init()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // 맵 화면에 로드
         self.mapView = TMapView(frame: mapContainerView.frame)
         self.mapView?.delegate = self
@@ -173,8 +174,11 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         let pathData = TMapPathData()
         //let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let endPoint = CLLocationCoordinate2D(latitude: 37.55093876107976, longitude: 127.07363779704937)
+        let startPoint = CLLocationCoordinate2D(latitude: 37.551447232646765, longitude: 127.07412355017871) // 도서관 입구
+        let endPoint = CLLocationCoordinate2D(latitude: 37.54633818154831, longitude: 127.07570314407349) // 목적지 : 가츠시 건대점
+        
+        //let endPoint = CLLocationCoordinate2D(latitude: 37.54748588, longitude: 127.07295740) // 목적지 : 써브웨이 어린이대공원점
+        
         pathData.findPathDataWithType(.PEDESTRIAN_PATH, startPoint: startPoint, endPoint: endPoint) { (result, error)->Void in
             self.polyline = result
             
@@ -298,6 +302,26 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // 경로 안내
             checkNavigationDistance()
+            
+            // 길 안내
+            // 포인트 지역에 접근했다면 좌, 우회전 출력
+            let currentPositionRangeChange = searchDestinationViewController.pointRangeChange(latitude: latitude, longitude: longitude)
+            let coordinate : String = String(currentPositionRangeChange.latitude) + String(currentPositionRangeChange.longitude)
+            let condition: ((String, String)) -> Bool = {
+                $0.0.contains(coordinate)
+            }
+            
+            print("범위 수정된 내위치 : \(currentPositionRangeChange.latitude), \(currentPositionRangeChange.longitude)")
+            
+            // ui 테스트 표기
+            changedLatitude.text = String(currentPositionRangeChange.latitude)
+            changedLongitude.text = String(currentPositionRangeChange.longitude)
+            
+            // 내 위치가 포인트 dict에 존재한다면 안내 출력
+            if SearchDestinationViewController.pointDict.contains(where: condition) {
+                print (SearchDestinationViewController.pointDict[coordinate])
+                routineInform.text = SearchDestinationViewController.pointDict[coordinate]
+            }
         }
     }
     
