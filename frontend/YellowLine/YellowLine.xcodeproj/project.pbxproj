@@ -27,13 +27,14 @@
 		B931A2902BE91874005DBE6F /* mock.json in Resources */ = {isa = PBXBuildFile; fileRef = B931A28E2BE91874005DBE6F /* mock.json */; };
 		B931A2922BE91965005DBE6F /* ChildsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2912BE91965005DBE6F /* ChildsData.swift */; };
 		B931A2942BE91EC5005DBE6F /* ParentModeDataPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */; };
-		B94880202BE52CDA00CD08E2 /* bus.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B948801F2BE52CDA00CD08E2 /* bus.jpg */; };
 		B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */; };
 		B956CA032BCE70AA00188A09 /* WebRTCiOSSDK in Frameworks */ = {isa = PBXBuildFile; productRef = B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */; };
-		B956CA072BCEA7C800188A09 /* WebRtcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B956CA062BCEA7C800188A09 /* WebRtcManager.swift */; };
+		B956CA072BCEA7C800188A09 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B956CA062BCEA7C800188A09 /* WebRTCManager.swift */; };
 		B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96535132BC5737E00643DC9 /* NetworkManager.swift */; };
+		B96673032BF4A78400E7A0D6 /* BoundingBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96673002BF4A78400E7A0D6 /* BoundingBoxView.swift */; };
+		B96673042BF4A78400E7A0D6 /* ThresholdProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96673012BF4A78400E7A0D6 /* ThresholdProvider.swift */; };
+		B96673092BF4A78F00E7A0D6 /* yolov7-tiny.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B96673062BF4A78F00E7A0D6 /* yolov7-tiny.mlmodel */; };
 		B966D3F52BBE9451004F4E98 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = B966D3F42BBE9451004F4E98 /* Alamofire */; };
-		B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */; };
 		B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */; };
 		B9CFB5EC2BC3C10C00637685 /* CameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */; };
 		B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */; };
@@ -76,11 +77,12 @@
 		B931A28F2BE91874005DBE6F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = en; path = en.lproj/mock.json; sourceTree = "<group>"; };
 		B931A2912BE91965005DBE6F /* ChildsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildsData.swift; sourceTree = "<group>"; };
 		B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentModeDataPreview.swift; sourceTree = "<group>"; };
-		B948801F2BE52CDA00CD08E2 /* bus.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bus.jpg; sourceTree = "<group>"; };
 		B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
-		B956CA062BCEA7C800188A09 /* WebRtcManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRtcManager.swift; sourceTree = "<group>"; };
+		B956CA062BCEA7C800188A09 /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
 		B96535132BC5737E00643DC9 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = chauchaudog.jpg; sourceTree = "<group>"; };
+		B96673002BF4A78400E7A0D6 /* BoundingBoxView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoundingBoxView.swift; sourceTree = "<group>"; };
+		B96673012BF4A78400E7A0D6 /* ThresholdProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThresholdProvider.swift; sourceTree = "<group>"; };
+		B96673062BF4A78F00E7A0D6 /* yolov7-tiny.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = "yolov7-tiny.mlmodel"; sourceTree = "<group>"; };
 		B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingMessage.swift; sourceTree = "<group>"; };
 		B9CFB5EB2BC3C10C00637685 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
 		B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCClient.swift; sourceTree = "<group>"; };
@@ -121,9 +123,9 @@
 		5709DFF12BB13E9200553A23 /* YellowLine */ = {
 			isa = PBXGroup;
 			children = (
-				B948801F2BE52CDA00CD08E2 /* bus.jpg */,
+				B96673072BF4A78F00E7A0D6 /* Object Detection */,
+				B96673022BF4A78400E7A0D6 /* Utils */,
 				B9D2101C2BCFD10F00F61AD2 /* WebRTCs */,
-				B966D3FA2BBE9998004F4E98 /* chauchaudog.jpg */,
 				5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */,
 				5709DFF22BB13E9200553A23 /* AppDelegate.swift */,
 				5709DFF42BB13E9200553A23 /* SceneDelegate.swift */,
@@ -159,10 +161,29 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B96673022BF4A78400E7A0D6 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B96673002BF4A78400E7A0D6 /* BoundingBoxView.swift */,
+				B96673012BF4A78400E7A0D6 /* ThresholdProvider.swift */,
+			);
+			name = Utils;
+			path = ../../../../Demo/YellowLine/frontend/YellowLine/YellowLine/Utils;
+			sourceTree = "<group>";
+		};
+		B96673072BF4A78F00E7A0D6 /* Object Detection */ = {
+			isa = PBXGroup;
+			children = (
+				B96673062BF4A78F00E7A0D6 /* yolov7-tiny.mlmodel */,
+			);
+			name = "Object Detection";
+			path = "../../../../Demo/YellowLine/frontend/YellowLine/YellowLine/Object Detection";
+			sourceTree = "<group>";
+		};
 		B9D2101C2BCFD10F00F61AD2 /* WebRTCs */ = {
 			isa = PBXGroup;
 			children = (
-				B956CA062BCEA7C800188A09 /* WebRtcManager.swift */,
+				B956CA062BCEA7C800188A09 /* WebRTCManager.swift */,
 				B9D2101D2BCFD12800F61AD2 /* WebRTCClient.swift */,
 				B9A5C3182BD6747F00EE1429 /* SignalingMessage.swift */,
 			);
@@ -236,10 +257,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B94880202BE52CDA00CD08E2 /* bus.jpg in Resources */,
 				5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */,
 				5709DFFF2BB13E9300553A23 /* Base in Resources */,
-				B966D3FB2BBE9998004F4E98 /* chauchaudog.jpg in Resources */,
 				5709DFFA2BB13E9200553A23 /* Base in Resources */,
 				B931A2902BE91874005DBE6F /* mock.json in Resources */,
 			);
@@ -257,14 +276,16 @@
 				B931A2872BE8C1EF005DBE6F /* CameraOnlyView.swift in Sources */,
 				5709DFF72BB13E9200553A23 /* ViewController.swift in Sources */,
 				B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */,
-				B956CA072BCEA7C800188A09 /* WebRtcManager.swift in Sources */,
+				B956CA072BCEA7C800188A09 /* WebRTCManager.swift in Sources */,
 				B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */,
 				B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */,
 				B931A28B2BE90D4D005DBE6F /* ParentModeView.swift in Sources */,
 				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */,
+				B96673032BF4A78400E7A0D6 /* BoundingBoxView.swift in Sources */,
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
+				B96673092BF4A78F00E7A0D6 /* yolov7-tiny.mlmodel in Sources */,
 				B931A2852BE8C1D6005DBE6F /* NaviCameraView.swift in Sources */,
 				B931A2922BE91965005DBE6F /* ChildsData.swift in Sources */,
 				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
@@ -273,6 +294,7 @@
 				5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */,
 				57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */,
 				57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */,
+				B96673042BF4A78400E7A0D6 /* ThresholdProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,7 +455,7 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CX8QXFQAMZ;
+				DEVELOPMENT_TEAM = LLKYF9URAK;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -471,7 +493,7 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CX8QXFQAMZ;
+				DEVELOPMENT_TEAM = LLKYF9URAK;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

@@ -72,45 +72,41 @@ def findParents(clientId):
 
 class YLConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        """
+        room_name : 시각장애인 - 카메라가 시작되면 webrtc도 같이 접속해 먼저 room을 생성.
+                    보호자 - webrtc연결하기 전에 서버에서 받아온 시각장애인의 id를 이용해 room_name에 접속.
+
+        """
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         print(f'channel name is {self.channel_name}')
         await self.channel_layer.group_add(
             self.room_name,
             self.channel_name
         )
-
         await self.accept()
+
+    # async def websocket_disconnect(self, message):
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(
             self.room_name,
             self.channel_name
         )
-        # pass
+        pass
 
     async def receive(self, text_data=None, bytes_data=None):
 
         if bytes_data:
             print('bytes data가 도착 하였습니다.')
+            print(bytes_data)
             print(len(bytes_data))
             self.send(bytes_data=bytes_data)
         else:
+        # if text_data:
             print(f'text data is {text_data}')
             self.send(text_data=text_data)
             text_data_json = json.loads(text_data)
-            # print(f'json data is {text_data_json}')
-            # parentId = findParents(text_data_json['clientId'])
-            # if parentId not in connected_users:
-            #     connected_users[parentId] = set()
-            #     connected_users[parentId].add(text_data_json['clientId'])
-            # else:
-            #     connected_users[parentId].add(text_data_json['clientId'])
-
-            # print(text_data_json)
-            # print(f'=> {connected_users}')
-            # message = text_data_json['message']
             message = text_data_json
-            # userName = text_data_json['clientId']
 
             await self.channel_layer.group_send(
                 self.room_name,

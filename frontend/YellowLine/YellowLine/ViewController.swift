@@ -20,11 +20,10 @@ class ViewController: UIViewController{
     
     @IBOutlet weak var previewView: UIView!
      @IBOutlet var imageView: UIImageView!
-
-    @IBOutlet var btns: UIButton!
     
-    let queue = DispatchQueue(label: "videoQueue")
+    @IBOutlet var callBtn: UIButton!
     
+    var webRTCManager: WebRTCManager?
     
     var cameraSession: CameraSession?
     
@@ -33,16 +32,11 @@ class ViewController: UIViewController{
     }
     
     override func viewDidLoad() {
-        cameraSession = CameraSession(queue: self.queue, view: self.imageView)
-        cameraSession?.checkCameraAuthor()
-        self.cameraSession?.startSession()
+        webRTCManager = WebRTCManager(imageView, "YLUSER01")
+
     }
     
-    @IBAction func btnclick(_ sender: Any) {
-        guard let image = UIImage(named: "bus.jpg"),
-              let imageData = image.jpegData(compressionQuality: 0.8) else { return }
-        cameraSession?.socketManager?.send(image: imageData)
-    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.cameraSession?.stopSession()
@@ -53,6 +47,9 @@ class ViewController: UIViewController{
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "SearchDestinationViewController") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
           self.present(nextVC, animated: true)
+    }
+    @IBAction func callBtnTapped(_ sender: Any) {
+        self.webRTCManager?.callButtonTapped()
     }
 }
 
