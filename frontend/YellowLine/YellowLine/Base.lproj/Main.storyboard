@@ -57,6 +57,21 @@
             </objects>
             <point key="canvasLocation" x="55" y="-34"/>
         </scene>
+        <!--Main ScreenVC-->
+        <scene sceneID="JaK-Z5-fOe">
+            <objects>
+                <viewController storyboardIdentifier="MainScreenVC" id="qZy-kp-fdV" customClass="MainScreenVC" customModule="YellowLine" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="axF-bV-7z1">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="6RG-wn-rf1"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gJr-cJ-mEz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="52.671755725190835" y="817.6056338028169"/>
+        </scene>
         <!--Search Destination View Controller-->
         <scene sceneID="7r9-MM-CvB">
             <objects>
@@ -83,7 +98,7 @@
                                 </connections>
                             </searchBar>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fhs-hr-zOH">
-                                <rect key="frame" x="106" y="58" width="180" height="35"/>
+                                <rect key="frame" x="83" y="57" width="180" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="길안내 데이터 불러오기"/>
@@ -92,12 +107,21 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ffN-4d-6FW">
-                                <rect key="frame" x="296" y="58" width="88" height="35"/>
+                                <rect key="frame" x="305" y="56" width="88" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="지도 로드"/>
                                 <connections>
                                     <action selector="loadMap:" destination="A0H-OX-U1a" eventType="touchUpInside" id="3QO-N0-MjH"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q1Y-LC-U4p">
+                                <rect key="frame" x="259" y="55" width="38" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="ui"/>
+                                <connections>
+                                    <action selector="UITest:" destination="A0H-OX-U1a" eventType="touchUpInside" id="6PA-Yw-nQN"/>
                                 </connections>
                             </button>
                         </subviews>
