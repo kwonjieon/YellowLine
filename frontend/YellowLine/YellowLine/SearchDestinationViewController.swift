@@ -38,6 +38,13 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         self.present(nextVC, animated: true)
     }
     
+    @IBAction func UITest(_ sender: Any) {
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "MainScreenVC") else {return}
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(nextVC, animated: true)
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         searchBar.delegate = self
