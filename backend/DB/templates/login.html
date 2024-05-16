@@ -1,8 +1,10 @@
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>회원가입</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
 </head>
 <body>
     <nav>
@@ -22,11 +24,15 @@
             {% endif %}
         </ul>
     </nav>
-    <h2>회원가입</h2>
+    <h2>로그인</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">가입하기</button>
+        <!-- 아이디 필드를 'id'로 설정 -->
+        <label for="id">ID:</label>
+        <input type="id" id="id" name="id" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">로그인</button>
     </form>
 </body>
 </html>
