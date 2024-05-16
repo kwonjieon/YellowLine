@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <!-- 다른 네비게이션 링크들... -->
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><span>{{ user.username }}</span></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Register</a></li>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <li><span>{{ user.id }}</span></li>
+                <li><span>{{ user.name }}</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <h2>회원가입</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">가입하기</button>
+    </form>
+</body>
+</html>

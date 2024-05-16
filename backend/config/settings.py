@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'camapp',
     'detectionImage',
-    # 'channels',
+    'channels',
+    'DB'
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,8 @@ CHANNEL_LAYERS = {
     },
 }
 """
+AUTH_USER_MODEL='DB.User'
+#AUTHENTICATION_BACKENDS = (
+    #'DB.views.user_login'
+    #'django.contrib.auth.backends.ModelBackend',
+#)
