@@ -2,7 +2,7 @@
 
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import home, signup, user_login, user_logout
+from .views import home, makeRelations, recentSearch, relations_view, signup, user_login, user_logout
 
 
 urlpatterns = [
@@ -11,9 +11,11 @@ urlpatterns = [
     path('signup/', signup, name='signup'),  # 회원가입 페이지
     
     path('login/', user_login, name='login'),#로그인
-    #로그인 커스텀모델로 인증할수있도록 옵션변경 '필'
-    path('logout/', user_logout, name='logout'),
-    #로그아웃
+    path('logout/', user_logout, name='logout'),#로그아웃
     #보호자이면 피보호자리스트 볼수있는화면
+    path('relations/', relations_view, name='relations_url'),
+    path('makerelations/',makeRelations,name='makeRelations'),
+    
+    path('recent/',recentSearch,name='recent_search_url')#최근경로
 
 ]
