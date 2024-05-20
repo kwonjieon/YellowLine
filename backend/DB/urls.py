@@ -1,8 +1,6 @@
-
-
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import home, makeRelations, recentSearch, relations_view, signup, user_login, user_logout
+from .views import DestinationArrival, home, insertSearch, makeRelations, recentSearch, relations_view, signup, startNavi, startWalk, user_login, user_logout
 
 
 urlpatterns = [
@@ -16,6 +14,14 @@ urlpatterns = [
     path('relations/', relations_view, name='relations_url'),
     path('makerelations/',makeRelations,name='makeRelations'),
     
-    path('recent/',recentSearch,name='recent_search_url')#최근경로
+    path('recent/',recentSearch,name='recent_search_url'),#최근경로
+    path('routeSearch/',insertSearch,name='insertSearch'),
+
+
+    path('startnavi/',startNavi,name='startNavi'),
+    path('startwalk/',startWalk,name='startWalk'),
+    path('arrival/',DestinationArrival,name='DestinationArrival'),
+
+    
 
 ]
