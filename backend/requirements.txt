@@ -87,3 +87,6 @@ wcwidth==0.2.13
 Werkzeug==3.0.2
 wheel==0.43.0
 zope.interface==6.3
+
+
+drf-yasg==1.21.7
