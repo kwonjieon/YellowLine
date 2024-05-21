@@ -3,7 +3,7 @@ Description=uWSGI service
 After=syslog.target
 
 [Service]
-ExecStart=/home/ubuntu/mac-venv/bin/uwsgi -i /home/ProjectFile/YellowLine/backend/uwsgi/YellowLine.ini
+ExecStart=/home/ubuntu/mac-venv/bin/uwsgi -i /home/ubuntu/ProjectFile/YellowLine/backend/uwsgi/YellowLine.ini
 
 Restart=always
 KillSignal=SIGQUIT
