@@ -16,33 +16,30 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
     
-    var navigationDataModel : NavigationDataModel?
     var destinationModel : DestinationModel?
-    var navigationList : [String] = [] // 네비게이션 경로 데이터
     var destinationList : [String] = [] // 목적지 검색 리스트 데이터
+    
+    var selectDestinationName : String?
+    var selectDestinationLati : String?
+    var selectDestinationLongi : String?
+    
+    var navigationDataModel : NavigationDataModel?
+    var navigationList : [String] = [] // 네비게이션 경로 데이터
     var naviDestinationList: [String] = [] // 목적지
     var naviPointList : [String] = [] // 경로 중 좌, 우회전 해야하는 경/위도 리스트
     static var pointDict: [String: String] = [:] // 좌/우회전 해야하는 위치 포인트 딕셔너리, 범위 조정이 된 상태임
     static var pointerDataList: [LocationData] = []
     
     @IBOutlet weak var searchBar: UISearchBar!
-    @IBAction func getTMapAPINavigationInformBtn(_ sender: Any) {
-        getTMapAPINavigationInform()
-    }
+    @IBOutlet weak var listTableView: UITableView!
+    
+    
     @IBAction func backBtn(_ sender: Any) {
         self.dismiss(animated: true)
     }
-    @IBAction func loadMap(_ sender: Any) {
-        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "MapViewController") else {return}
-        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        self.present(nextVC, animated: true)
-    }
+
+    @IBOutlet weak var navigationBar: UIView!
     
-    @IBAction func UITest(_ sender: Any) {
-        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "MainScreenVC") else {return}
-        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        self.present(nextVC, animated: true)
-    }
     
     
     override func viewDidLoad() {
@@ -50,16 +47,115 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         searchBar.delegate = self
         self.mapView?.delegate = self
         self.mapView?.setApiKey(apiKey)
+        
+        listTableView.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        listTableView.delegate = self
+        listTableView.dataSource = self
+        
+        // 엥 중복?
+        //searchBar.delegate = self
+        
+        self.view.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        //setNaviBar()
+        setSearchBar()
+        setNavivgationBar()
+    }
+    
+    func setNavivgationBar() {
+        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 128)
+        navigationBar.layer.cornerRadius = 10
+        var shadows = UIView()
+        shadows.frame = navigationBar.frame
+        shadows.clipsToBounds = false
+        navigationBar.addSubview(shadows)
+
+        let shadowPath0 = UIBezierPath(roundedRect: shadows.bounds, cornerRadius: 20)
+        let layer0 = CALayer()
+        layer0.shadowPath = shadowPath0.cgPath
+        layer0.shadowColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.25).cgColor
+        layer0.shadowOpacity = 1
+        layer0.shadowRadius = 25
+        layer0.shadowOffset = CGSize(width: 0, height: 0)
+        layer0.bounds = shadows.bounds
+        layer0.position = shadows.center
+        shadows.layer.addSublayer(layer0)
+
+        var shapes = UIView()
+        shapes.frame = navigationBar.frame
+        shapes.clipsToBounds = true
+        navigationBar.addSubview(shapes)
+
+        let layer1 = CALayer()
+        layer1.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
+        layer1.bounds = shapes.bounds
+        layer1.position = shapes.center
+        shapes.layer.addSublayer(layer1)
+
+        shapes.layer.cornerRadius = 20
+
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
+        navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
+        navigationBar.heightAnchor.constraint(equalToConstant: 128).isActive = true
+        
+    }
+    
+    func setSearchBar() {
+        searchBar.placeholder = "목적지를 입력해주세요"
+        //searchBar.setImage(UIImage(named: "search-icon"), for: UISearchBar.Icon.search, state: .normal)
+        searchBar.backgroundImage = UIImage()
+        if let textfield = searchBar.value(forKey: "searchField") as? UITextField {
+            textfield.backgroundColor = UIColor.white
+            textfield.textColor = UIColor.black
+        }
+        /*
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.widthAnchor.constraint(equalToConstant: 356).isActive = true
+        searchBar.heightAnchor.constraint(equalToConstant: 149).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
+        searchBar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 0).isActive = true
+        
+        UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+
+        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+         */
+    }
+    
+    func setNaviBar() {
+        // safe area
+        var statusBarHeight: CGFloat = 0
+        statusBarHeight = UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0
+        
+        // navigationBar
+        let naviBar = UINavigationBar(frame: .init(x: 0, y: statusBarHeight, width: view.frame.width, height: statusBarHeight))
+        naviBar.isTranslucent = false
+        
+        // 네비게이션 바의 배경 이미지를 설정하여 둥근 모서리를 표현
+        if let backgroundImage = UIImage(named: "SearchNaviBar") {
+            naviBar.setBackgroundImage(backgroundImage, for: .default)
+        }
+        
+        let naviItem = UINavigationItem(title: "title")
+        naviItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(test))
+        naviBar.items = [naviItem]
+        
+        view.addSubview(naviBar)
+    }
+    
+    @objc func test() {
+        print("click")
     }
     
     // 목적지 리스트 API 요청
-    func getTMapAPISearchDestination(searchStr: String) {
+    func getTMapAPISearchDestination(searchStr: String, count: Int) {
         let headers = [
             "Accept": "application/json",
             "appKey": "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
         ]
+        let requestStr: String = "https://apis.openapi.sk.com/tmap/pois?version=1&searchKeyword=" + searchStr + "&searchType=all&searchtypCd=A&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&page=1&count=" + String(count) + "&multiPoint=N&poiGroupYn=N"
         
-        let request = NSMutableURLRequest(url: NSURL(string: "https://apis.openapi.sk.com/tmap/pois?version=1&searchKeyword=%EC%84%B8%EC%A2%85%EB%8C%80%ED%95%99%EA%B5%90&searchType=all&searchtypCd=A&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&page=1&count=20&multiPoint=N&poiGroupYn=N")! as URL,
+        guard let encodedStr = requestStr.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
+        
+        let request = NSMutableURLRequest(url: NSURL(string: encodedStr)! as URL,
                                           cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
         request.httpMethod = "GET"
         request.allHTTPHeaderFields = headers
@@ -75,10 +171,13 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
             
             //데이터 디코딩
             do{
+                self.destinationList.removeAll()
                 self.destinationModel = try JSONDecoder().decode(DestinationModel.self, from: data!)
                 for i in 0...self.destinationModel!.searchPoiInfo.pois.poi.count-1 {
-                    //print(self.destinationModel!.searchPoiInfo.pois.poi[i].name)
                     self.destinationList.append(self.destinationModel!.searchPoiInfo.pois.poi[i].name)
+                }
+                DispatchQueue.main.async {
+                    self.listTableView.reloadData()
                 }
                 print(self.destinationList)
             }catch{
@@ -189,19 +288,19 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     func degreesToRadians(_ degrees: Double) -> Double {
         return degrees * .pi / 180.0
     }
-
+    
     func radiansToDegrees(_ radians: Double) -> Double {
         return radians * 180.0 / .pi
     }
-
-
+    
+    
     
     // 포인트리스트 값을 입력하면 뒷자리가 잘린(범위가 넓어진) 포인트 리스트 반환
     // 포인트 근접인정 범위 계산 함수
     func pointRangeChange (latitude: Double, longitude: Double) -> Coordinate {
         let centerCoordinate = Coordinate(latitude: 37.54748588, longitude: 127.07295740) // 값 계산을 위한 임시 값
         let radiusInMeters = 30.0 // 경로안내 범위지정, m 단위
-
+        
         // 위도, 경도 범위 알아냄
         let boundingBox = calculateBoundingBox(center: centerCoordinate, radius: radiusInMeters)
         // 위도, 경도 범위의 반경값 = 특정 위도, 경도 값을 기준으로 몇 미터 이내까지 가도 되는가?
@@ -221,12 +320,12 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     func calculateBoundingBox(center: Coordinate, radius: Double) -> (minLatitude: Double, maxLatitude: Double, minLongitude: Double, maxLongitude: Double) {
         let latDistance = radius / 111111.0 // 1도의 위도 차이는 약 111,111 미터
         let lonDistance = radius / (111111.0 * cos(degreesToRadians(center.latitude))) // 경도는 위도에 따라 변할 수 있음
-
+        
         let minLatitude = center.latitude - latDistance
         let maxLatitude = center.latitude + latDistance
         let minLongitude = center.longitude - lonDistance
         let maxLongitude = center.longitude + lonDistance
-
+        
         return (minLatitude, maxLatitude, minLongitude, maxLongitude)
     }
     
@@ -260,6 +359,54 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
 // 입력된 목적지 검색 시 API 요청 시도
 extension SearchDestinationViewController:UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        getTMapAPISearchDestination(searchStr: searchBar.text!)
+        getTMapAPISearchDestination(searchStr: searchBar.text!, count: 20)
+    }
+}
+
+extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return destinationList.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DestinationCell", for: indexPath)as! DestinationCell
+        cell.locationLabel.text = destinationList[indexPath.row]
+        cell.locationLabel.textColor = .black
+        cell.locationLabel.font = UIFont(name: "AppleSDGothicNeoH", size: 5)
+        cell.backgroundColor = .white
+        cell.layer.cornerRadius = 10
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 45 // example height for each row
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerView = UIView()
+        footerView.backgroundColor = .clear
+        return footerView
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 8.0 // space between cells
+    }
+    
+    // row 클릭 시
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let nextVC = self.storyboard?.instantiateViewController(identifier: "SelectDestinationVC") as! SelectDestinationVC
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+        
+        // 클릭한 목적지 데이터 같이 전송
+        //getTMapAPISearchDestination(searchStr: destinationList[indexPath.row], count: 1)
+        nextVC.destinationName = destinationList[indexPath.row]
+        nextVC.destinationLati = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLat
+        nextVC.destinationLongi = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLon
+        
+        
+        self.present(nextVC, animated: true)
+        
+        // 한번 클릭 한 row 클릭상태 ui 바로 해제
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

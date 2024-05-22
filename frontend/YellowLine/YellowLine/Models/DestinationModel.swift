@@ -23,6 +23,8 @@ struct Pois: Codable {
 
 struct PoiResult: Codable {
     let name: String
+    let frontLat : String
+    let frontLon : String
     let newAddressList: NewAddress
 }
 

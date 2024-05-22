@@ -18,16 +18,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
         dismiss(animated: true)
     }
 
+
+    @IBOutlet weak var standardText: UILabel!
+    @IBOutlet weak var destinationText: UILabel!
+    @IBOutlet weak var navigationBar: UIView!
     @IBOutlet weak var offTrackText: UILabel!
     @IBOutlet weak var latitudeText: UILabel!
     @IBOutlet weak var longitudeText: UILabel!
-    @IBOutlet weak var latitudeGapLabel: UILabel!
-    @IBOutlet weak var longitudeGapLabel: UILabel!
     @IBOutlet weak var routineInform: UILabel!
-    
-    @IBOutlet weak var changedLatitude: UILabel!
-    @IBOutlet weak var changedLongitude: UILabel!
-    
     @IBOutlet weak var twoPointsDistance: UILabel!
     
     var mapView:TMapView?
@@ -40,12 +38,34 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var polyline:TMapPolyline?
     var LocationPT:Int = 0
     
+    // 목적지까지의 네비게이션 안내 정보
+    var navigationDataModel : NavigationDataModel?
+    
+    // 좌/우회전 포함된 기존의 경로안내
+    // "편의점에서 우회전 후 55m 직진"
+    var navigationList : [String] = []
+    
+    // 좌/우회전 포함된 목적지 리스트
+    var naviDestinationList: [String] = []
+    
+    // 최종적으로 사용할 좌/우 회전해야 하는 위치 정보 리스트
+    var pointerDataList: [LocationData] = []
+    
+    // 경로 중 좌, 우회전 해야하는 경/위도 리스트
+    var naviPointList : [String] = []
+    
+    // 현재위치
     var longitude:Double = 0.0
     var latitude:Double = 0.0
     
     var startCheckLocation:Bool = false
     
     var searchDestinationViewController: SearchDestinationViewController = .init()
+    
+    // 선택한 목적지 데이터로, SelectDestinationVC에서 전달받는다
+    var destinationName : String?
+    var destinationLati : String?
+    var destinationLongi : String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,11 +94,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
         // GPS 위치 탐지 시작
         //locationManager.startUpdatingLocation()
         
+        getTMapAPINavigationInform()
         
+        setNaviBar()
     }
     
     // 맵 로드 이후 ui 표시
     override func viewDidAppear(_ animated: Bool) {
+
         // 맵 로드 이후 마커 표기 시작하게 하는 flag
         startCheckLocation = true
         
@@ -89,7 +112,56 @@ class MapViewController: UIViewController, TMapViewDelegate {
         //updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
         
+
     }
+    
+    func setNaviBar() {
+        navigationBar.frame = CGRect(x: 0, y: 0, width: 394, height: 122)
+        navigationBar.layer.backgroundColor = UIColor(red: 0.114, green: 0.114, blue: 0.114, alpha: 1).cgColor
+        navigationBar.layer.cornerRadius = 20
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func setDestinationText() {
+        standardText.frame = CGRect(x: 0, y: 0, width: 47, height: 22)
+        standardText.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        standardText.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 18)
+        var paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 0.88
+        // Line height: 22 pt
+        // (identical to box height)
+        standardText.textAlignment = .center
+        standardText.attributedText = NSMutableAttributedString(string: "현위치", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+
+        standardText.translatesAutoresizingMaskIntoConstraints = false
+        standardText.widthAnchor.constraint(equalToConstant: 47).isActive = true
+        standardText.heightAnchor.constraint(equalToConstant: 22).isActive = true
+        standardText.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 117).isActive = true
+        standardText.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 68).isActive = true
+        
+        
+        destinationText.frame = CGRect(x: 0, y: 0, width: 171, height: 22)
+        destinationText.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        destinationText.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 18)
+        paragraphStyle.lineHeightMultiple = 0.88
+
+        destinationText.textAlignment = .center
+        destinationText.attributedText = NSMutableAttributedString(string: destinationName!, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+        destinationText.translatesAutoresizingMaskIntoConstraints = false
+        destinationText.widthAnchor.constraint(equalToConstant: 171).isActive = true
+        destinationText.heightAnchor.constraint(equalToConstant: 22).isActive = true
+        destinationText.leadingAnchor.constraint(equalTo: standardText.leadingAnchor, constant: 25).isActive = true
+        destinationText.topAnchor.constraint(equalTo: standardText.topAnchor, constant: 68).isActive = true
+        
+        var setView = UIView()
+        setView.backgroundColor = .none
+        setView.addSubview(standardText)
+        setView.addSubview(destinationText)
+        
+        setView.translatesAutoresizingMaskIntoConstraints = false
+        setView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+    }
+    
     
     // 마커 초기화
     func clearMarkers() {
@@ -175,11 +247,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
         clearPolylines()
         
         let pathData = TMapPathData()
-        //let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        let startPoint = CLLocationCoordinate2D(latitude: 37.551447232646765, longitude: 127.07412355017871) // 도서관 입구
-        let endPoint = CLLocationCoordinate2D(latitude: 37.54885914948882, longitude: 127.07501188046824) // 목적지 : 가츠시 건대점
-        
-        //let endPoint = CLLocationCoordinate2D(latitude: 37.54748588, longitude: 127.07295740) // 목적지 : 써브웨이 어린이대공원점
+
+        let startPoint = CLLocationCoordinate2D(latitude: latitude, longitude: longitude) // 현재위치
+
+        let endPoint = CLLocationCoordinate2D(latitude: Double(destinationLati!)!, longitude: Double(destinationLongi!)!)
         
         pathData.findPathDataWithType(.PEDESTRIAN_PATH, startPoint: startPoint, endPoint: endPoint) { (result, error)->Void in
             self.polyline = result
@@ -201,6 +272,103 @@ class MapViewController: UIViewController, TMapViewDelegate {
             }
         }
     }
+    
+    // 목적지까지의 도보 네비게이션 주행 정보 API 요청
+    func getTMapAPINavigationInform() {
+        
+        let headers = [
+            "accept": "application/json",
+            "content-type": "application/json",
+            "appKey": "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
+        ]
+        let parameters = [
+            // 집 37.53943759237482 127.21876285658607
+            // 학정 입구 127.07412355017871,37.551447232646765
+            // 가츠시 127.07570314407349 37.54633818154831
+            // 알바 37.54089617063285 127.22094921007677
+            // 어대공 6번출구 37.54885914948882, 127.07501188046824
+            "startX": 127.07412355017871,
+            "startY": 37.551447232646765,
+            "angle": 20,
+            "speed": 30,
+            "endPoiId": "10001",
+            "endX": Double(destinationLongi!)!,
+            "endY": Double(destinationLati!)!,
+            "reqCoordType": "WGS84GEO",
+            "startName": "%EC%B6%9C%EB%B0%9C",
+            "endName": "%EB%8F%84%EC%B0%A9",
+            "searchOption": "0",
+            "resCoordType": "WGS84GEO",
+            "sort": "index"
+        ] as [String : Any]
+        
+        do{
+            let postData = try JSONSerialization.data(withJSONObject: parameters, options: [])
+            let request = NSMutableURLRequest(url: NSURL(string: "https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1&callback=function")! as URL,
+                                              cachePolicy: .useProtocolCachePolicy,timeoutInterval: 10.0)
+            request.httpMethod = "POST"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = postData as Data
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                if (error != nil) {
+                    print(error as Any)
+                } else {
+                    let httpResponse = response as? HTTPURLResponse
+                    print(httpResponse)
+                }
+                //데이터 디코딩
+                // 목적지 선택 후, 지정된 목적지로 포인트들 탐색 후 mapvie 에서 데이터 사용
+                do{
+                    self.navigationDataModel = try JSONDecoder().decode(NavigationDataModel.self, from: data!)
+                    for i in 0...self.navigationDataModel!.features.count-1 {
+                        
+                        if let destinationInput = self.navigationDataModel!.features[i].properties.nearPoiName {
+                            if destinationInput != "" {
+                                self.naviDestinationList.append(destinationInput)
+                            }
+                        }
+                        
+                        // 목적지까지의 좌/우 회전 경로 저장
+                        switch self.navigationDataModel!.features[i].geometry.coordinates {
+                            // 1차원 배열인 경우 -> 경로가 아닌 장소 포인트를 의미
+                        case .oneDimensional(let array):
+                            let description = self.navigationDataModel!.features[i].properties.description!
+                            print(description)
+                            // 좌회전 또는 우회전 단어가 포함된 description만 좌/우 방향회전 장소 포인트이므로 단어 포함 확인
+                            if description.contains("좌회전") || description.contains("우회전") {
+                                self.navigationList.append(self.navigationDataModel!.features[i].properties.description!)
+                                
+                                // 위치 및 방향 데이터 객체 생성 및 삽입
+                                var inputData: LocationData = LocationData()
+                                inputData.latitude = array[1]
+                                inputData.longitude = array[0]
+                                inputData.name = self.navigationDataModel!.features[i].properties.nearPoiName!
+                                
+                                if description.contains("좌회전") {
+                                    inputData.direction = "좌회전"
+                                }
+                                else {
+                                    inputData.direction = "우회전"
+                                }
+                                self.pointerDataList.append(inputData)
+                            }
+                        case .twoDimensional(let array): break
+                        }
+                    }
+                    print("navigationList : \(self.navigationList)")
+                    print("naviDestinationList : \(self.naviDestinationList)")
+                }catch{
+                    print(error)
+                }
+            })
+            dataTask.resume()
+        }catch{
+            print(error)
+        }
+    }
+
     // 네비게이션 경로 범위 내 위치인지 확인
     func checkNavigationDistance() {
         var isOffCourse: Bool = false
@@ -232,9 +400,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 }
                 print ("위도 차이 : \(differenceLati)")
                 print ("경도 차이 : \(differenceLong)")
-                
-                latitudeGapLabel.text = String(differenceLati)
-                longitudeGapLabel.text = String(differenceLong)
                 
                 // 경로 이탈 여부 확인
                 if  differenceLati < 0.00018 && differenceLong < 0.00018 {
@@ -271,7 +436,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
     func checkCurrentLoactionRotate() {
-        for location in SearchDestinationViewController.pointerDataList {
+        for location in pointerDataList {
             var distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
             if distance < 0.00003428 {
                 twoPointsDistance.text = String(distance)
@@ -356,4 +521,3 @@ extension MapViewController: CLLocationManagerDelegate {
         print("locationManager >> didFailWithError 🐥 ")
     }
 }
-

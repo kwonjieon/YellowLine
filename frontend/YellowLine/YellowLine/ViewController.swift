@@ -44,7 +44,7 @@ class ViewController: UIViewController{
     }
     
 	@IBAction func moveToSearch(_ sender: Any) {
-        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "SearchDestinationViewController") else {return}
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "MainScreenVC") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
           self.present(nextVC, animated: true)
     }
