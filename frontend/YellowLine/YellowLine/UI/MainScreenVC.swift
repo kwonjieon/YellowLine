@@ -10,7 +10,9 @@ import UIKit
 class MainScreenVC: UIViewController {
     // 네비게이션 버튼 클릭 시 실행되는 함수
     @objc func clickNaviBtn(_ gesture: UITapGestureRecognizer) {
-        print("view click")
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "SearchDestinationViewController") else {return}
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(nextVC, animated: true)
     }
     
     // 객체탐지 버튼 클릭 시 실행되는 함수
@@ -177,9 +179,9 @@ class MainScreenVC: UIViewController {
         var view = UILabel()
         view.frame = CGRect(x: 0, y: 0, width: 172, height: 22)
         view.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        view.font = UIFont(name: "AppleSDGothicNeoH00-Regular", size: 32)
+        view.font = UIFont(name: "AppleSDGothicNeoH00", size: 32)
         var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 0.46
+        paragraphStyle.lineHeightMultiple = 1
         // Line height: 22 pt
         // (identical to box height)
         view.textAlignment = .center
