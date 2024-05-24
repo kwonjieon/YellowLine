@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hNr-lx-6MK">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
@@ -232,12 +232,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jem-k4-MKx">
-                                <rect key="frame" x="4" y="298" width="385" height="299"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="299" id="vzV-ko-DHw"/>
-                                </constraints>
-                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fIQ-FS-GXZ">
                                 <rect key="frame" x="170" y="699" width="53" height="35"/>
                                 <state key="normal" title="Button"/>
@@ -254,37 +248,39 @@
                                     <action selector="moveToSearch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dsd-A5-rtS"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JI9-eO-R1Z">
-                                <rect key="frame" x="32" y="119" width="211" height="157"/>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lP6-fR-Z70">
+                                <rect key="frame" x="71" y="420" width="250" height="253"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jem-k4-MKx">
+                                <rect key="frame" x="71" y="121" width="250" height="253"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="299" id="vzV-ko-DHw"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="jem-k4-MKx" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="4" id="1dh-sp-i2K"/>
-                            <constraint firstItem="jem-k4-MKx" firstAttribute="top" secondItem="JI9-eO-R1Z" secondAttribute="bottom" constant="22" id="4Jt-kI-0WF"/>
                             <constraint firstItem="jem-k4-MKx" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4mo-zh-zyH"/>
                             <constraint firstItem="UUh-yd-svu" firstAttribute="centerX" secondItem="jem-k4-MKx" secondAttribute="centerX" id="FkW-lv-bEo"/>
                             <constraint firstItem="jem-k4-MKx" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="298" id="RSZ-sr-5Eg"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="fIQ-FS-GXZ" secondAttribute="bottom" constant="84" id="TPZ-Fm-MBV"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="JI9-eO-R1Z" secondAttribute="trailing" constant="150" id="VXd-se-2Wt"/>
                             <constraint firstItem="UUh-yd-svu" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="139" id="c9n-CC-eBl"/>
                             <constraint firstItem="UUh-yd-svu" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="19" id="iyq-Up-5WS"/>
                             <constraint firstItem="jem-k4-MKx" firstAttribute="centerX" secondItem="fIQ-FS-GXZ" secondAttribute="centerX" id="lRQ-fa-hYH"/>
-                            <constraint firstItem="JI9-eO-R1Z" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="32" id="mGc-jS-aP3"/>
-                            <constraint firstItem="JI9-eO-R1Z" firstAttribute="top" secondItem="UUh-yd-svu" secondAttribute="bottom" constant="6" id="oaf-w8-F8T"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="callBtn" destination="fIQ-FS-GXZ" id="zoL-Em-0Xn"/>
                         <outlet property="imageView" destination="jem-k4-MKx" id="ceT-x7-yFe"/>
-                        <outlet property="previewView" destination="JI9-eO-R1Z" id="D7v-so-luS"/>
+                        <outlet property="secView" destination="lP6-fR-Z70" id="LuJ-Wd-adP"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-346" y="-26"/>
+            <point key="canvasLocation" x="-347.32824427480915" y="-26.056338028169016"/>
         </scene>
         <!--Main ScreenVC-->
         <scene sceneID="JaK-Z5-fOe">

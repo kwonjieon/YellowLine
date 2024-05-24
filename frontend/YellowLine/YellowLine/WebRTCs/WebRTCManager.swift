@@ -21,9 +21,9 @@ class WebRTCManager {
     var isParent = false
     
     
-    init(_ view: UIImageView, _ userName: String) {
+    init(_ view: UIImageView, _ midasView: UIImageView , _ userName: String) {
         self.userName = userName
-        cameraSession = CameraSession(view: view)
+        cameraSession = CameraSession(view: view, view2: midasView)
         cameraSession?.delegate = self
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
