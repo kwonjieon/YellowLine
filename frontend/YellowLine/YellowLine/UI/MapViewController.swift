@@ -96,7 +96,11 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         getTMapAPINavigationInform()
         
+        setDestinationText()
+        
         setNaviBar()
+        
+        
     }
     
     // 맵 로드 이후 ui 표시
@@ -123,9 +127,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
     }
     
     func setDestinationText() {
-        standardText.frame = CGRect(x: 0, y: 0, width: 47, height: 22)
         standardText.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        
+        standardText.frame = CGRect(x: 0, y: 0, width: 47, height: 22)
+        
         standardText.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 18)
+        
         var paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = 0.88
         // Line height: 22 pt
@@ -147,12 +154,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
 
         destinationText.textAlignment = .center
         destinationText.attributedText = NSMutableAttributedString(string: destinationName!, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+        destinationText.text = destinationName!
         destinationText.translatesAutoresizingMaskIntoConstraints = false
         destinationText.widthAnchor.constraint(equalToConstant: 171).isActive = true
         destinationText.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        destinationText.leadingAnchor.constraint(equalTo: standardText.leadingAnchor, constant: 25).isActive = true
-        destinationText.topAnchor.constraint(equalTo: standardText.topAnchor, constant: 68).isActive = true
-        
+        destinationText.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 225).isActive = true
+        destinationText.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 68).isActive = true
+         
+        /*
         var setView = UIView()
         setView.backgroundColor = .none
         setView.addSubview(standardText)
@@ -160,6 +169,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         setView.translatesAutoresizingMaskIntoConstraints = false
         setView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+         */
     }
     
     

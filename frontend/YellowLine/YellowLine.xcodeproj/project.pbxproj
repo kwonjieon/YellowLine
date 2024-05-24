@@ -24,6 +24,9 @@
 		5714A1FD2BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1F92BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf */; };
 		5714A1FE2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */; };
 		5714A2002BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */; };
+		5744902E2BFF66F2002A30BD /* RegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744902D2BFF66F2002A30BD /* RegisterVC.swift */; };
+		574490302BFF6DE3002A30BD /* PopUpInformVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */; };
+		574490322C0027DA002A30BD /* RegisterCompletedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574490312C0027DA002A30BD /* RegisterCompletedVC.swift */; };
 		5761D8E02BCCC6070071C0EB /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; };
 		5761D8E12BCCC6070071C0EB /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BB2BF347230013D6CF /* LocationData.swift */; };
@@ -88,6 +91,9 @@
 		5714A1F92BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoEB.ttf; sourceTree = "<group>"; };
 		5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoB.ttf; sourceTree = "<group>"; };
 		5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoM.ttf; sourceTree = "<group>"; };
+		5744902D2BFF66F2002A30BD /* RegisterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVC.swift; sourceTree = "<group>"; };
+		5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpInformVC.swift; sourceTree = "<group>"; };
+		574490312C0027DA002A30BD /* RegisterCompletedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterCompletedVC.swift; sourceTree = "<group>"; };
 		5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TMapSDK.framework; path = ../../../../../TMapSDK.framework; sourceTree = "<group>"; };
 		5788A8BB2BF347230013D6CF /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		5788A8BE2BF455550013D6CF /* MainScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenVC.swift; sourceTree = "<group>"; };
@@ -176,7 +182,6 @@
 				B931A28E2BE91874005DBE6F /* mock.json */,
 				B931A2912BE91965005DBE6F /* ChildsData.swift */,
 				B931A2932BE91EC5005DBE6F /* ParentModeDataPreview.swift */,
-				57FC78512BC7CED500C81CA1 /* MapViewController.swift */,
 				5788A8BB2BF347230013D6CF /* LocationData.swift */,
 			);
 			path = YellowLine;
@@ -214,11 +219,15 @@
 		5788A8BD2BF455020013D6CF /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				57FC78512BC7CED500C81CA1 /* MapViewController.swift */,
 				57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */,
 				5788A8BE2BF455550013D6CF /* MainScreenVC.swift */,
 				5788A8C02BF5F19E0013D6CF /* SearchDestinationVC.swift */,
 				570FC20A2BFB115500F03378 /* SelectDestinationVC.swift */,
 				570FC20C2BFC913F00F03378 /* LoginVC.swift */,
+				5744902D2BFF66F2002A30BD /* RegisterVC.swift */,
+				5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */,
+				574490312C0027DA002A30BD /* RegisterCompletedVC.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -366,11 +375,14 @@
 				B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */,
 				570FC20B2BFB115500F03378 /* SelectDestinationVC.swift in Sources */,
 				B956CA072BCEA7C800188A09 /* WebRTCManager.swift in Sources */,
+				5744902E2BFF66F2002A30BD /* RegisterVC.swift in Sources */,
 				B931A2832BE8B6DF005DBE6F /* ClientModeView.swift in Sources */,
 				B9D2101E2BCFD12800F61AD2 /* WebRTCClient.swift in Sources */,
 				B931A28B2BE90D4D005DBE6F /* ParentModeView.swift in Sources */,
 				5788A8BF2BF455550013D6CF /* MainScreenVC.swift in Sources */,
 				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
+				574490322C0027DA002A30BD /* RegisterCompletedVC.swift in Sources */,
+				574490302BFF6DE3002A30BD /* PopUpInformVC.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */,
 				570FC20D2BFC913F00F03378 /* LoginVC.swift in Sources */,
