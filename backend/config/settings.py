@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-*5vzdgg9_eztyyd0wfjyso*=dm0!pu(f-jp!dov*oc16)y91@v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# allowed port = 8001
+ALLOWED_HOSTS = ['*','.ap-northeast-2.compute.amazonaws.com']
 
 # Application definition
 
@@ -41,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'camapp',
     'detectionImage',
-    # 'channels',
+    'channels',
+    'DB'
 ]
 
 MIDDLEWARE = [
@@ -118,6 +120,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/camapp/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, os.path.join('camapp', 'media'))
@@ -146,3 +149,8 @@ CHANNEL_LAYERS = {
     },
 }
 """
+AUTH_USER_MODEL='DB.User'
+#AUTHENTICATION_BACKENDS = (
+    #'DB.views.user_login'
+    #'django.contrib.auth.backends.ModelBackend',
+#)
