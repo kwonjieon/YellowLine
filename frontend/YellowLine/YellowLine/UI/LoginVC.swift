@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class LoginVC: UIViewController {
 
@@ -43,13 +44,53 @@ class LoginVC: UIViewController {
     
     // 로그인 시도
     func login() {
-        // IDField.text!   -> 아이디
+//         IDField.text!   -> 아이디
         // PWField.text!   -> 비밀번호 입니다
+        let tmpId = IDField.text!
+        let tmpPw = PWField.text!
         
-        // 로그인 성공시 메인 화면(피보호자)으로 이동
-        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "MainScreenVC") else {return}
-        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        self.present(nextVC, animated: true)
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://yellowline-demo.duckdns.org/user/login/"
+        AF.upload(multipartFormData: { multipartFormData in
+            multipartFormData.append(tmpId.data(using:.utf8)!, withName: "id")
+            multipartFormData.append(tmpPw.data(using:.utf8)!, withName: "password")
+        }, to: loginURL, method: .post, headers: header)
+        .responseDecodable(of: LoginResult.self){ response in
+            //결과.
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    let result = response
+                    // error가 없으면
+                    guard let resOption = result.option else {
+                        return
+                    }
+                    let cType = resOption
+                    switch cType{
+                        // 로그인 성공시 메인 화면(보호자)으로 이동
+                    case "Protector":
+                        // MARK: 보호자페이지 이동 코드추가
+                        
+                        break
+                    case "Protected":
+                        // 로그인 성공시 메인 화면(피보호자)으로 이동
+                        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "MainScreenVC") else {return}
+                        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+                        self.present(nextVC, animated: true)
+                    default:
+                        break
+                    }
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
+
     }
     
     func setPWField() {
@@ -65,6 +106,11 @@ class LoginVC: UIViewController {
         IDField.returnKeyType = .done
     }
 
+}
+
+struct LoginResult :Codable {
+    let option : String?
+    let error : String?
 }
 
 extension LoginVC:UITextFieldDelegate {

@@ -87,7 +87,6 @@ class RegisterVC: UIViewController {
         telnumField.returnKeyType = .done
     }
     
-    
     @objc func radioOptionBtn(_ sender: UIButton) {
         print("번호 : \(sender.tag)")
         

@@ -507,8 +507,6 @@ class CameraSession: NSObject {
                         let dalue = pixelData!.pointee
                         depthValue = CGFloat(dalue) / 255.0
                         //2
-
-//                        
 //                        CVPixelBufferLockBaseAddress(bf, .readOnly)
 //                        let floatBuffer = unsafeBitCast(CVPixelBufferGetBaseAddress(bf), to: UnsafeMutablePointer<Float>.self)
 //
