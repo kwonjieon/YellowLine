@@ -34,7 +34,6 @@ class PopUpInformVC: UIViewController {
     // 회원정보 보내줌
     func register() {
         // id!, password!, name!, option!, phoneNum! 으로 이용하심 됩니다
-        
         // 회원가입 성공시 성공 안내 화면으로 이동
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "RegisterCompletedVC") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
