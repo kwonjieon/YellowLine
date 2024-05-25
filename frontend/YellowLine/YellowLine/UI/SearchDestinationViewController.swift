@@ -52,9 +52,6 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         listTableView.delegate = self
         listTableView.dataSource = self
         
-        // 엥 중복?
-        //searchBar.delegate = self
-        
         self.view.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
         //setNaviBar()
         setSearchBar()

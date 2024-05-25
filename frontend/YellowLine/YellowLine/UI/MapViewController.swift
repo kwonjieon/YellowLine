@@ -15,7 +15,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     @IBOutlet weak var mapContainerView: UIView!
     @IBAction func backBtn(_ sender: Any) {
-        dismiss(animated: true)
+        if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController {
+            // 첫번째 화면(로그인)으로 돌아감
+            presentingVC.dismiss(animated: true, completion: nil)
+        }
     }
 
 

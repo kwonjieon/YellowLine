@@ -8,7 +8,10 @@
 import UIKit
 
 class RegisterVC: UIViewController {
-
+    @IBAction func clickBackBtn(_ sender: Any) {
+        self.dismiss(animated: true)
+    }
+    
     @IBOutlet var optionBtn: [UIButton]!
     var option : String?
     

@@ -22,10 +22,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8IR-dF-5Eu">
-                                <rect key="frame" x="162" y="680" width="69" height="35"/>
+                                <rect key="frame" x="63" y="678" width="140" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="로그인"/>
+                                <buttonConfiguration key="configuration" style="plain" title="로그인(피보호자)"/>
                                 <connections>
                                     <action selector="clickLoginBtn:" destination="hNr-lx-6MK" eventType="touchUpInside" id="kaT-jX-PlB"/>
                                 </connections>
@@ -51,6 +51,15 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8u9-s3-EAd">
+                                <rect key="frame" x="211" y="680" width="129" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="로그인 (보호자)"/>
+                                <connections>
+                                    <action selector="clickLoginBtnProtect:" destination="hNr-lx-6MK" eventType="touchUpInside" id="qjo-Lg-HqU"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="rDS-Dg-1Yf"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -120,6 +129,15 @@
                                     <action selector="clickRegisterBtn:" destination="uOm-OS-OLy" eventType="touchUpInside" id="xUx-UP-IrM"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ul5-Fo-KS2">
+                                <rect key="frame" x="32" y="59" width="36" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="backButton.png"/>
+                                <connections>
+                                    <action selector="clickBackBtn:" destination="uOm-OS-OLy" eventType="touchUpInside" id="gYV-eC-3Bt"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="MgS-8V-Lbl"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -141,6 +159,67 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Y9F-wo-p6V" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-2682" y="-26"/>
+        </scene>
+        <!--Protector MainVC-->
+        <scene sceneID="nnF-Bb-Tcp">
+            <objects>
+                <viewController storyboardIdentifier="ProtectorMainVC" id="gQy-ox-PYk" customClass="ProtectorMainVC" customModule="YellowLine" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="v7K-Zg-uNf">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="8j6-fE-ENs">
+                                <rect key="frame" x="0.0" y="124" width="393" height="702"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="ProtectedCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ProtectedCell" rowHeight="90" id="xW2-BT-cO9" customClass="ProtectedCell" customModule="YellowLine" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="90"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xW2-BT-cO9" id="cLh-xB-iAI">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="90"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="이름" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uSo-wj-mCD">
+                                                    <rect key="frame" x="20" y="11" width="30" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yY5-XZ-yuZ">
+                                                    <rect key="frame" x="26" y="44" width="333" height="35"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="gray" title="Button"/>
+                                                    <connections>
+                                                        <action selector="clickCheckBtn:" destination="xW2-BT-cO9" eventType="touchUpInside" id="7Dk-0c-smx"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="name" destination="uSo-wj-mCD" id="8T6-65-Oim"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Onk-bZ-Txh">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="126"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="17b-PC-3nD"/>
+                        <color key="backgroundColor" red="0.1764705926" green="0.1764705926" blue="0.1764705926" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                    </view>
+                    <connections>
+                        <outlet property="navigationBar" destination="Onk-bZ-Txh" id="3La-Cu-est"/>
+                        <outlet property="protectedTableView" destination="8j6-fE-ENs" id="4Pu-N0-JF8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="avx-yV-fzJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2692.3664122137402" y="748.59154929577471"/>
         </scene>
         <!--Pop Up InformVC-->
         <scene sceneID="KZo-dP-iE3">
