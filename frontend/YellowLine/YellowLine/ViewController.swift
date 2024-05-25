@@ -18,13 +18,12 @@ import UIKit
  */
 class ViewController: UIViewController{
     
-    @IBOutlet weak var previewView: UIView!
      @IBOutlet var imageView: UIImageView!
     
+    @IBOutlet var secView: UIImageView!
     @IBOutlet var callBtn: UIButton!
     
     var webRTCManager: WebRTCManager?
-    
     var cameraSession: CameraSession?
     
     override func viewWillAppear(_ animated: Bool) {
@@ -32,7 +31,7 @@ class ViewController: UIViewController{
     }
     
     override func viewDidLoad() {
-        webRTCManager = WebRTCManager(imageView, "YLUSER01")
+        webRTCManager = WebRTCManager(imageView, secView, "YLUSER01")
 
     }
     
