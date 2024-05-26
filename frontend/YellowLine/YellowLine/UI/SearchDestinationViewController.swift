@@ -44,11 +44,15 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        
         searchBar.delegate = self
         self.mapView?.delegate = self
         self.mapView?.setApiKey(apiKey)
         
         listTableView.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        //listTableView.backgroundColor = .none
+        
         listTableView.delegate = self
         listTableView.dataSource = self
         
@@ -104,6 +108,9 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
             textfield.backgroundColor = UIColor.white
             textfield.textColor = UIColor.black
         }
+        
+        // 키보드에 return 표기
+        searchBar.returnKeyType = .done
         /*
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.widthAnchor.constraint(equalToConstant: 356).isActive = true
@@ -165,7 +172,7 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
                 let httpResponse = response as? HTTPURLResponse
                 print(httpResponse)
             }
-            
+            print("data :::: \(data!)")
             //데이터 디코딩
             do{
                 self.destinationList.removeAll()
@@ -358,6 +365,17 @@ extension SearchDestinationViewController:UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         getTMapAPISearchDestination(searchStr: searchBar.text!, count: 20)
     }
+    
+    // 키보드 외 다른 영역 클릭 시 키보드 내리기
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+    
+    // 키보드 리턴(확인) 입력 시 키보드 내리기
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        searchBar.resignFirstResponder()
+        return true
+    }
 }
 
 extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataSource {
@@ -370,13 +388,19 @@ extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataS
         cell.locationLabel.text = destinationList[indexPath.row]
         cell.locationLabel.textColor = .black
         cell.locationLabel.font = UIFont(name: "AppleSDGothicNeoH", size: 5)
-        cell.backgroundColor = .white
-        cell.layer.cornerRadius = 10
+        cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        cell.cellView.layer.cornerRadius = 10
+        
+        // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
+        let background = UIView()
+        background.backgroundColor = .clear
+        cell.selectedBackgroundView = background
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 45 // example height for each row
+        return 60 // example height for each row
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {

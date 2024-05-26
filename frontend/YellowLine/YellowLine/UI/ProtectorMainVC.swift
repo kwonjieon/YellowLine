@@ -6,8 +6,14 @@
 //
 
 import UIKit
+import Alamofire
 
 class ProtectorMainVC: UIViewController {
+    @IBAction func clickRelationBtn(_ sender: Any) {
+        let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpRelationTextField") as! PopUpRelationTextField
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+        self.present(nextVC, animated: true)
+    }
     @IBOutlet weak var navigationBar: UIView!
     @IBOutlet weak var protectedTableView: UITableView!
     // 서버에서 받을 피보호자 JSON 데이터
@@ -29,15 +35,52 @@ class ProtectorMainVC: UIViewController {
     
     // 테스트 필요함
     func network() {
+        
+        let headers = ["Accept": "application/json"]
+        let requestStr: String = "http://43.202.136.75/user/relations/"
+        
+        let request = NSMutableURLRequest(url: NSURL(string: requestStr)! as URL,
+                                          cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+        
+        let session = URLSession.shared
+        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+            if (error != nil) {
+                print(error as Any)
+            } else {
+                let httpResponse = response as? HTTPURLResponse
+                print(httpResponse)
+            }
+            print("data :::: \(data!)")
+            //데이터 디코딩
+            do{
+                self.protectedModel = try JSONDecoder().decode(ProtectedModel.self, from: data!)
+                for i in 0...self.protectedModel!.results.count-1 {
+                    self.protectedList.append(self.protectedModel!.results[i]!)
+                    print(self.protectedModel!.results[i]!.name)
+                }
+                DispatchQueue.main.async {
+                    self.protectedTableView.reloadData()
+                }
+            }catch{
+                print(error)
+            }
+        })
+        dataTask.resume()
+    
+        
+        
+        /*
         // URL 생성
-        let url = URL(string: "http://yellowline-demo.duckdns.org/ "+"user/relations")!
+        let url = URL(string: "http://43.202.136.75/ "+"user/relations/")!
         
         // 헤더 설정
         let headers = [
             "Accept": "application/json",
             "Content-Type": "application/json"
         ]
-        
+
         // URLRequest 인스턴스 생성
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -49,7 +92,7 @@ class ProtectorMainVC: UIViewController {
                 print("Error: \(error.localizedDescription)")
                 return
             }
-            
+            print(data!)
             guard let data = data else {
                 print("No data received")
                 return
@@ -57,18 +100,78 @@ class ProtectorMainVC: UIViewController {
             
             do {
                 // 데이터를 디코딩 (JSON 예제)
-                let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                //let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                 
                 self.protectedModel = try JSONDecoder().decode(ProtectedModel.self, from: data)
+                print("수행")
                 for i in 0...self.protectedModel!.results.count {
-                    self.protectedList.append(self.protectedModel!.results[i])
+                    self.protectedList.append(self.protectedModel!.results[i]!)
                 }
-                print("Response JSON: \(jsonResponse)")
+                //print("Response JSON: \(jsonResponse)")
             } catch {
                 print("JSON Decoding Error: \(error.localizedDescription)")
             }
         }
         task.resume()
+         */
+        /*
+        let url = "http://43.202.136.75/ "+"user/relations"
+        AF.request(url,
+                   method: .get,
+                   parameters: nil,
+                   encoding: URLEncoding.default,
+                   headers: ["Content-Type":"application/json", "Accept":"application/json"])
+        .responseJSON { (json) in
+            //응답처리
+            print(json)
+        }
+         */
+    }
+    
+    func makeRelations() {
+        let helper_id = LoginVC.protectorID
+        print("보호자 아이디:\(helper_id)")
+        let recipient_id = "testID"
+        
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let makeRelationsURL = "http://43.202.136.75/user/makerelations/"
+        
+        AF.upload(multipartFormData: { multipartFormData in
+            multipartFormData.append(helper_id.data(using:.utf8)!, withName: "helper_id")
+            multipartFormData.append(recipient_id.data(using:.utf8)!, withName: "recipient_id")
+        }, to: makeRelationsURL, method: .post, headers: header)
+        .responseDecodable(of: MakeRelationResult.self){ response in
+            //결과.
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    let result = response
+                    // error가 없으면
+                    guard let resOption = result.success else {
+                        return
+                    }
+                    let cType = resOption
+                    print(cType)
+                    switch cType{
+                        
+                    case true:
+                        print("관계 추가 성공")
+                        break
+                    default:
+                        print("관계 추가 실패")
+                        print(result.message)
+                        break
+                    }
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
     }
     
     func setNavivgationBar() {
@@ -86,15 +189,24 @@ class ProtectorMainVC: UIViewController {
     
 }
 
+struct MakeRelationResult : Codable {
+    let success : Bool?
+    let message : String?
+}
+
 extension ProtectorMainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return protectedList.count
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ProtectedCell", for: indexPath)as! ProtectedCell
         cell.name.text = protectedList[indexPath.row].name
-        
+        cell.statusBtn.titleLabel?.text = protectedList[indexPath.row].latest_state
         return cell
     }
 }

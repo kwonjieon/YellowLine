@@ -35,7 +35,7 @@ class PopUpInformVC: UIViewController {
     func register() {
         // id!, password!, name!, option!, phoneNum! 으로 이용하심 됩니다
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
-        let loginURL = "http://yellowline-demo.duckdns.org/user/signup/"
+        let loginURL = "http://43.202.136.75/user/signup/"
         let tmpData : [String : String] = ["id": id!,
                                            "password": password!,
                                            "name": name!,

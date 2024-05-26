@@ -181,7 +181,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="이름" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uSo-wj-mCD">
-                                                    <rect key="frame" x="20" y="11" width="30" height="21"/>
+                                                    <rect key="frame" x="20" y="11" width="339" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -199,7 +199,9 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="contentView" destination="cLh-xB-iAI" id="1bi-cn-sv6"/>
                                             <outlet property="name" destination="uSo-wj-mCD" id="8T6-65-Oim"/>
+                                            <outlet property="statusBtn" destination="yY5-XZ-yuZ" id="bIj-Hq-hjU"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -207,6 +209,17 @@
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Onk-bZ-Txh">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="126"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vBg-xX-5Os">
+                                        <rect key="frame" x="155" y="67" width="83" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="관계추가"/>
+                                        <connections>
+                                            <action selector="clickRelationBtn:" destination="gQy-ox-PYk" eventType="touchUpInside" id="Bbs-2t-YgU"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="17b-PC-3nD"/>
@@ -220,6 +233,57 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="avx-yV-fzJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-2692.3664122137402" y="748.59154929577471"/>
+        </scene>
+        <!--Pop Up Relation Text Field-->
+        <scene sceneID="ReV-bh-Nwz">
+            <objects>
+                <viewController storyboardIdentifier="PopUpRelationTextField" id="aSU-ES-S2d" customClass="PopUpRelationTextField" customModule="YellowLine" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Jbd-PH-8HI">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UtQ-fo-dMF">
+                                <rect key="frame" x="76" y="328" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Uu-In-v0o">
+                                        <rect key="frame" x="142" y="75" width="54" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="확인"/>
+                                        <connections>
+                                            <action selector="clickCheckBtn:" destination="aSU-ES-S2d" eventType="touchUpInside" id="Mhi-Qu-IKf"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PPe-gX-2VH">
+                                        <rect key="frame" x="50" y="74" width="54" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="취소"/>
+                                        <connections>
+                                            <action selector="clickCancelBtn:" destination="aSU-ES-S2d" eventType="touchUpInside" id="oJe-o3-5Xc"/>
+                                        </connections>
+                                    </button>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8mx-Ny-Uz0">
+                                        <rect key="frame" x="34" y="26" width="174" height="34"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Nzz-AG-B6R"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
+                    </view>
+                    <connections>
+                        <outlet property="idTextField" destination="8mx-Ny-Uz0" id="dnP-bF-7pZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gBH-fc-mzl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1823.6641221374045" y="756.33802816901414"/>
         </scene>
         <!--Pop Up InformVC-->
         <scene sceneID="KZo-dP-iE3">
@@ -439,23 +503,31 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="DestinationCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="DestinationCell" rowHeight="52" id="z0Q-NT-mFa" customClass="DestinationCell" customModule="YellowLine" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="393" height="52"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="DestinationCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="DestinationCell" rowHeight="84" id="z0Q-NT-mFa" customClass="DestinationCell" customModule="YellowLine" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="z0Q-NT-mFa" id="DOi-b8-B1c">
-                                            <rect key="frame" x="0.0" y="0.0" width="393" height="52"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="84"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gx9-Ne-fWL">
-                                                    <rect key="frame" x="20" y="13" width="353" height="26"/>
+                                                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TbI-mR-4Nr">
+                                                    <rect key="frame" x="11" y="0.0" width="373" height="50"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gx9-Ne-fWL">
+                                                            <rect key="frame" x="28" y="12" width="345" height="26"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="cellView" destination="TbI-mR-4Nr" id="wnZ-e5-tNR"/>
                                             <outlet property="locationLabel" destination="Gx9-Ne-fWL" id="RlG-8R-QA4"/>
                                         </connections>
                                     </tableViewCell>

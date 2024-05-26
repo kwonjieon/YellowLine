@@ -9,7 +9,7 @@ import UIKit
 import Alamofire
 
 class LoginVC: UIViewController {
-
+    static var protectorID = ""
     @IBOutlet weak var PWField: UITextField!
     @IBOutlet weak var IDField: UITextField!
     
@@ -57,7 +57,7 @@ class LoginVC: UIViewController {
         let tmpPw = PWField.text!
         
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
-        let loginURL = "http://yellowline-demo.duckdns.org/user/login/"
+        let loginURL = "http://43.202.136.75/user/login/"
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(tmpId.data(using:.utf8)!, withName: "id")
             multipartFormData.append(tmpPw.data(using:.utf8)!, withName: "password")
@@ -74,9 +74,16 @@ class LoginVC: UIViewController {
                     }
                     let cType = resOption
                     switch cType{
-                        // 로그인 성공시 메인 화면(보호자)으로 이동
+                        
                     case "Protector":
-                        // MARK: 보호자페이지 이동 코드추가
+                        // 관계추가시에 필요한 보호자 ID 기록
+                        LoginVC.protectorID = self.IDField.text!
+                        
+                        
+                        // 로그인 성공시 메인 화면(보호자)으로 이동
+                        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ProtectorMainVC") else {return}
+                        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+                        self.present(nextVC, animated: true)
                         
                         break
                     case "Protected":
@@ -128,10 +135,13 @@ extension LoginVC:UITextFieldDelegate {
            self.leftViewMode = ViewMode.always
        }
      */
+    
+    // 키보드 외 다른 영역 클릭 시 키보드 내리기
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
     
+    // 키보드 리턴(확인) 입력 시 키보드 내리기
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         PWField.resignFirstResponder()
         IDField.resignFirstResponder()

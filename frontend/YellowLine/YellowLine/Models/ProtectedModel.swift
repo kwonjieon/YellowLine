@@ -7,12 +7,12 @@
 
 import Foundation
 struct ProtectedModel: Codable {
-    let results: [ResultData]
+    let results: [ResultData?]
 }
 
 struct ResultData: Codable {
     let id : String
     let name: String
     let phoneNum: String
-    let lastest_state : String
+    let latest_state : String
 }
