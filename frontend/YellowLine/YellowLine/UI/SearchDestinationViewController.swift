@@ -8,6 +8,7 @@
 import UIKit
 import TMapSDK
 import Foundation
+import Alamofire
 struct Coordinate {
     let latitude: Double
     let longitude: Double
@@ -18,6 +19,9 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     
     var destinationModel : DestinationModel?
     var destinationList : [String] = [] // 목적지 검색 리스트 데이터
+    
+    var searchHistoryModel : SearchHistoryResult?
+    var searchHistoryList : [UserHistory] = []
     
     var selectDestinationName : String?
     var selectDestinationLati : String?
@@ -30,23 +34,28 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     static var pointDict: [String: String] = [:] // 좌/우회전 해야하는 위치 포인트 딕셔너리, 범위 조정이 된 상태임
     static var pointerDataList: [LocationData] = []
     
+    // 검색 시작 후에 최근 경로 대신 검색한 리스트 값을 호출하기 위한 flag 값
+    var startSearch = false
+    
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var listTableView: UITableView!
     
+    @IBOutlet weak var recentSearchLabel: UILabel!
     
     @IBAction func backBtn(_ sender: Any) {
         self.dismiss(animated: true)
     }
-
+    
     @IBOutlet weak var navigationBar: UIView!
     
-    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        loadSearchHistory()
         
         searchBar.delegate = self
+        
         self.mapView?.delegate = self
         self.mapView?.setApiKey(apiKey)
         
@@ -69,7 +78,7 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         shadows.frame = navigationBar.frame
         shadows.clipsToBounds = false
         navigationBar.addSubview(shadows)
-
+        
         let shadowPath0 = UIBezierPath(roundedRect: shadows.bounds, cornerRadius: 20)
         let layer0 = CALayer()
         layer0.shadowPath = shadowPath0.cgPath
@@ -80,20 +89,20 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         layer0.bounds = shadows.bounds
         layer0.position = shadows.center
         shadows.layer.addSublayer(layer0)
-
+        
         var shapes = UIView()
         shapes.frame = navigationBar.frame
         shapes.clipsToBounds = true
         navigationBar.addSubview(shapes)
-
+        
         let layer1 = CALayer()
         layer1.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
         layer1.bounds = shapes.bounds
         layer1.position = shapes.center
         shapes.layer.addSublayer(layer1)
-
+        
         shapes.layer.cornerRadius = 20
-
+        
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
         navigationBar.heightAnchor.constraint(equalToConstant: 128).isActive = true
@@ -112,15 +121,15 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         // 키보드에 return 표기
         searchBar.returnKeyType = .done
         /*
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.widthAnchor.constraint(equalToConstant: 356).isActive = true
-        searchBar.heightAnchor.constraint(equalToConstant: 149).isActive = true
-        searchBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
-        searchBar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 0).isActive = true
-        
-        UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-
-        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+         searchBar.translatesAutoresizingMaskIntoConstraints = false
+         searchBar.widthAnchor.constraint(equalToConstant: 356).isActive = true
+         searchBar.heightAnchor.constraint(equalToConstant: 149).isActive = true
+         searchBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
+         searchBar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 0).isActive = true
+         
+         UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+         
+         searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
          */
     }
     
@@ -147,6 +156,85 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     
     @objc func test() {
         print("click")
+    }
+    
+    // 목적지 검색 기록 저장
+    func saveSearchHistory() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/routeSearch/"
+        
+        guard let text = searchBar.text else {
+            return
+        }
+        
+        AF.upload(multipartFormData: { multipartFormData in
+            multipartFormData.append(text.data(using:.utf8)!, withName: "arrival")
+        }, to: loginURL, method: .post, headers: header)
+        .responseDecodable(of: RouteSearchResult.self){ response in
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    let result = response
+                    // error가 없으면 통과
+                    guard let resOption = result.success else {
+                        return
+                    }
+                    let cType = resOption
+                    switch cType{
+                        
+                    case true:
+                        print("저장성공")
+                        break
+                    default:
+                        print("저장실패")
+                        break
+                    }
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
+        
+    }
+    
+    // 목적지 검색 기록 로드
+    func loadSearchHistory() {
+        let headers = ["Accept": "application/json"]
+        let requestStr: String = "http://43.202.136.75/user/recent/"
+        
+        let request = NSMutableURLRequest(url: NSURL(string: requestStr)! as URL,
+                                          cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+        
+        let session = URLSession.shared
+        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+            if (error != nil) {
+                print(error as Any)
+            } else {
+                let httpResponse = response as? HTTPURLResponse
+                print(httpResponse)
+            }
+            //데이터 디코딩
+            do{
+                self.searchHistoryModel = try JSONDecoder().decode(SearchHistoryResult.self, from: data!)
+                for i in 0...self.searchHistoryModel!.user_history.count-1 {
+                    self.searchHistoryList.append(self.searchHistoryModel!.user_history[i]!)
+                    print(self.searchHistoryModel!.user_history[i]?.arrival)
+                }
+                DispatchQueue.main.async {
+                    self.listTableView.reloadData()
+                }
+            }catch{
+                print(error)
+            }
+        })
+        dataTask.resume()
     }
     
     // 목적지 리스트 API 요청
@@ -180,7 +268,13 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
                 for i in 0...self.destinationModel!.searchPoiInfo.pois.poi.count-1 {
                     self.destinationList.append(self.destinationModel!.searchPoiInfo.pois.poi[i].name)
                 }
+                
+                
                 DispatchQueue.main.async {
+                    if (self.startSearch == false) {
+                        self.startSearch = true
+                        self.recentSearchLabel.isHidden = true
+                    }
                     self.listTableView.reloadData()
                 }
                 print(self.destinationList)
@@ -364,6 +458,7 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
 extension SearchDestinationViewController:UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         getTMapAPISearchDestination(searchStr: searchBar.text!, count: 20)
+        saveSearchHistory()
     }
     
     // 키보드 외 다른 영역 클릭 시 키보드 내리기
@@ -378,25 +473,64 @@ extension SearchDestinationViewController:UISearchBarDelegate {
     }
 }
 
+struct RouteSearchResult : Codable {
+    let success : Bool?
+    let message : String?
+}
+
+struct SearchHistoryResult : Codable {
+    let user_history : [UserHistory?]
+}
+
+struct UserHistory : Codable {
+    let historyNum : Int
+    let user_id : String
+    let arrival : String
+    let time : String
+}
+
 extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return destinationList.count
+    func tableView(_ tableView: UITableView,
+                   numberOfRowsInSection section: Int) -> Int {
+        if (startSearch == true) {
+            return destinationList.count
+        }
+        else {
+            print ("개수 ok")
+            return searchHistoryList.count
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "DestinationCell", for: indexPath)as! DestinationCell
-        cell.locationLabel.text = destinationList[indexPath.row]
-        cell.locationLabel.textColor = .black
-        cell.locationLabel.font = UIFont(name: "AppleSDGothicNeoH", size: 5)
-        cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
-        cell.cellView.layer.cornerRadius = 10
+        if (startSearch == true) {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "DestinationCell", for: indexPath)as! DestinationCell
+            cell.locationLabel.text = destinationList[indexPath.row]
+            cell.locationLabel.textColor = .black
+            cell.locationLabel.font = UIFont(name: "AppleSDGothicNeoH", size: 5)
+            cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+            cell.cellView.layer.cornerRadius = 10
+            
+            // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
+            let background = UIView()
+            background.backgroundColor = .clear
+            cell.selectedBackgroundView = background
+            return cell
+        }
         
-        // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
-        let background = UIView()
-        background.backgroundColor = .clear
-        cell.selectedBackgroundView = background
-        
-        return cell
+        else {
+            print ("데이터 불러오기 ok")
+            let cell = tableView.dequeueReusableCell(withIdentifier: "DestinationCell", for: indexPath)as! DestinationCell
+            cell.locationLabel.text = searchHistoryList[indexPath.row].arrival
+            cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+            cell.cellView.layer.cornerRadius = 10
+            
+            // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
+            let background = UIView()
+            background.backgroundColor = .clear
+            cell.selectedBackgroundView = background
+            return cell
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -408,22 +542,28 @@ extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataS
         footerView.backgroundColor = .clear
         return footerView
     }
-    
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 8.0 // space between cells
-    }
-    
+
     // row 클릭 시
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "SelectDestinationVC") as! SelectDestinationVC
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
         
-        // 클릭한 목적지 데이터 같이 전송
-        //getTMapAPISearchDestination(searchStr: destinationList[indexPath.row], count: 1)
-        nextVC.destinationName = destinationList[indexPath.row]
-        nextVC.destinationLati = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLat
-        nextVC.destinationLongi = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLon
-        
+        // 목적지 검색
+        if (startSearch == true) {
+            // 클릭한 목적지 데이터 같이 전송
+            nextVC.destinationName = destinationList[indexPath.row]
+            nextVC.destinationLati = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLat
+            nextVC.destinationLongi = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLon
+        }
+        // 최근 경로
+        else {
+            // 클릭한 목적지 데이터 같이 전송
+            nextVC.destinationName = searchHistoryList[indexPath.row].arrival
+            
+            // 넣을 좌표 수정해야함
+            nextVC.destinationLati = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLat
+            nextVC.destinationLongi = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLon
+        }
         
         self.present(nextVC, animated: true)
         

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import Alamofire
 class SelectDestinationVC: UIViewController {
     
     // SearchDestinationViewController 의 결과 리스트에서 선택한 데이터 전달받음
@@ -23,6 +23,8 @@ class SelectDestinationVC: UIViewController {
     }
     @IBAction func clickStartBtn(_ sender: Any) {
         print("start")
+        
+        sendStartNavi()
         
         let nextVC = self.storyboard?.instantiateViewController(identifier: "MapViewController") as! MapViewController
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
@@ -42,6 +44,72 @@ class SelectDestinationVC: UIViewController {
         setStartBtn()
     }
     
+    // 피보호자가 네비게이션 이용 중이라는 상태를 서버에 업데이트
+    func sendStartNavi() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/startnavi/"
+        
+        AF.request(loginURL,
+                   method: .post,
+                   encoding: JSONEncoding(options: []),
+                   headers: ["Content-Type":"application/json", "Accept":"application/json"])
+            .responseJSON { response in
+
+            /** 서버로부터 받은 데이터 활용 */
+            switch response.result {
+            case .success(let data):
+                break
+            case .failure(let error):
+                break
+            }
+        }
+    }
+    
+    // 수정필요
+    /*
+    func saveSearchHistory() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/routeSearch/"
+        
+        guard let text = searchBar.text else {
+            return
+        }
+        
+        AF.upload(multipartFormData: { multipartFormData in
+            multipartFormData.append(text.data(using:.utf8)!, withName: "arrival")
+        }, to: loginURL, method: .post, headers: header)
+        .responseDecodable(of: RouteSearchResult.self){ response in
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    let result = response
+                    // error가 없으면 통과
+                    guard let resOption = result.success else {
+                        return
+                    }
+                    let cType = resOption
+                    switch cType{
+                        
+                    case true:
+                        print("저장성공")
+                        break
+                    default:
+                        print("저장실패")
+                        break
+                    }
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
+        
+    }
+    */
     func setPopUpView() {
         popUpView.frame = CGRect(x: 0, y: 0, width: 346, height: 191)
         popUpView.layer.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor

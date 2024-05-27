@@ -31,6 +31,7 @@
 		5744903A2C006832002A30BD /* ProtectedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574490392C006832002A30BD /* ProtectedCell.swift */; };
 		5744903C2C00696D002A30BD /* ProtectedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744903B2C00696D002A30BD /* ProtectedModel.swift */; };
 		5744903F2C035EBB002A30BD /* PopUpRelationTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744903E2C035EBB002A30BD /* PopUpRelationTextField.swift */; };
+		5754C41E2C041A17002FE306 /* SearchHistoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5754C41D2C041A17002FE306 /* SearchHistoryCell.swift */; };
 		5761D8E02BCCC6070071C0EB /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; };
 		5761D8E12BCCC6070071C0EB /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BB2BF347230013D6CF /* LocationData.swift */; };
@@ -96,6 +97,7 @@
 		574490392C006832002A30BD /* ProtectedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedCell.swift; sourceTree = "<group>"; };
 		5744903B2C00696D002A30BD /* ProtectedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedModel.swift; sourceTree = "<group>"; };
 		5744903E2C035EBB002A30BD /* PopUpRelationTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpRelationTextField.swift; sourceTree = "<group>"; };
+		5754C41D2C041A17002FE306 /* SearchHistoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchHistoryCell.swift; sourceTree = "<group>"; };
 		5761D8DE2BCCC6010071C0EB /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TMapSDK.framework; path = ../../../../../TMapSDK.framework; sourceTree = "<group>"; };
 		5788A8BB2BF347230013D6CF /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		5788A8BE2BF455550013D6CF /* MainScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenVC.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 			children = (
 				570FC2082BF710E200F03378 /* DestinationCell.swift */,
 				574490392C006832002A30BD /* ProtectedCell.swift */,
+				5754C41D2C041A17002FE306 /* SearchHistoryCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -393,6 +396,7 @@
 				5744903A2C006832002A30BD /* ProtectedCell.swift in Sources */,
 				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
 				5788A8C12BF5F19E0013D6CF /* SearchDestinationVC.swift in Sources */,
+				5754C41E2C041A17002FE306 /* SearchHistoryCell.swift in Sources */,
 				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,
 				57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */,
 				5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */,

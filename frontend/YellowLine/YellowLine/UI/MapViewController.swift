@@ -366,12 +366,17 @@ class MapViewController: UIViewController, TMapViewDelegate {
                                     inputData.direction = "우회전"
                                 }
                                 self.pointerDataList.append(inputData)
+                                
                             }
                         case .twoDimensional(let array): break
                         }
                     }
                     print("navigationList : \(self.navigationList)")
                     print("naviDestinationList : \(self.naviDestinationList)")
+                    for j in 0...self.pointerDataList.count-1 {
+                        print("pointerDataList : \(self.pointerDataList[j].name)")
+                    }
+                    
                 }catch{
                     print(error)
                 }
@@ -450,12 +455,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
     //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
     func checkCurrentLoactionRotate() {
         for location in pointerDataList {
+            //var isArrive
             var distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
             if distance < 0.00003428 {
                 twoPointsDistance.text = String(distance)
                 routineInform.text = location.direction
                 print("가야하는 방향: \(location.direction)")
             }
+            
         }
     }
     
@@ -480,8 +487,8 @@ extension MapViewController: CLLocationManagerDelegate {
             latitude = location.coordinate.latitude
             longitude = location.coordinate.longitude
             
-            print("위도: \(location.coordinate.latitude)")
-            print("경도: \(location.coordinate.longitude)")
+            print("현재위도: \(location.coordinate.latitude)")
+            print("현재경도: \(location.coordinate.longitude)")
         }
         
         // ui에 그려지는 건 viewDidAppear 이후에 작동

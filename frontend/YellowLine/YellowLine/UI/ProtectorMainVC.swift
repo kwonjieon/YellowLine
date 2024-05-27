@@ -28,13 +28,13 @@ class ProtectorMainVC: UIViewController {
         protectedTableView.delegate = self
         
         setNavivgationBar()
-        network()
+        loadRecipients()
         
         protectedTableView.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
     }
     
-    // 테스트 필요함
-    func network() {
+    // 피보호자 리스트 불러오기
+    func loadRecipients() {
         
         let headers = ["Accept": "application/json"]
         let requestStr: String = "http://43.202.136.75/user/relations/"
@@ -68,64 +68,6 @@ class ProtectorMainVC: UIViewController {
             }
         })
         dataTask.resume()
-    
-        
-        
-        /*
-        // URL 생성
-        let url = URL(string: "http://43.202.136.75/ "+"user/relations/")!
-        
-        // 헤더 설정
-        let headers = [
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-        ]
-
-        // URLRequest 인스턴스 생성
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        
-        // 작업 요청
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                print("Error: \(error.localizedDescription)")
-                return
-            }
-            print(data!)
-            guard let data = data else {
-                print("No data received")
-                return
-            }
-            
-            do {
-                // 데이터를 디코딩 (JSON 예제)
-                //let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                
-                self.protectedModel = try JSONDecoder().decode(ProtectedModel.self, from: data)
-                print("수행")
-                for i in 0...self.protectedModel!.results.count {
-                    self.protectedList.append(self.protectedModel!.results[i]!)
-                }
-                //print("Response JSON: \(jsonResponse)")
-            } catch {
-                print("JSON Decoding Error: \(error.localizedDescription)")
-            }
-        }
-        task.resume()
-         */
-        /*
-        let url = "http://43.202.136.75/ "+"user/relations"
-        AF.request(url,
-                   method: .get,
-                   parameters: nil,
-                   encoding: URLEncoding.default,
-                   headers: ["Content-Type":"application/json", "Accept":"application/json"])
-        .responseJSON { (json) in
-            //응답처리
-            print(json)
-        }
-         */
     }
     
     func makeRelations() {
