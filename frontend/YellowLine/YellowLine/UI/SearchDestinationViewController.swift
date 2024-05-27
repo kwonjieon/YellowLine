@@ -458,7 +458,7 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
 extension SearchDestinationViewController:UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         getTMapAPISearchDestination(searchStr: searchBar.text!, count: 20)
-        saveSearchHistory()
+        //saveSearchHistory()
     }
     
     // 키보드 외 다른 영역 클릭 시 키보드 내리기
@@ -486,6 +486,8 @@ struct UserHistory : Codable {
     let historyNum : Int
     let user_id : String
     let arrival : String
+    let latitude : String
+    let longitude : String
     let time : String
 }
 
@@ -554,15 +556,15 @@ extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataS
             nextVC.destinationName = destinationList[indexPath.row]
             nextVC.destinationLati = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLat
             nextVC.destinationLongi = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLon
+            nextVC.isRecentSeleted = false
         }
         // 최근 경로
         else {
             // 클릭한 목적지 데이터 같이 전송
             nextVC.destinationName = searchHistoryList[indexPath.row].arrival
-            
-            // 넣을 좌표 수정해야함
-            nextVC.destinationLati = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLat
-            nextVC.destinationLongi = self.destinationModel!.searchPoiInfo.pois.poi[indexPath.row].frontLon
+            nextVC.destinationLati = searchHistoryList[indexPath.row].latitude
+            nextVC.destinationLongi = searchHistoryList[indexPath.row].longitude
+            nextVC.isRecentSeleted = true
         }
         
         self.present(nextVC, animated: true)

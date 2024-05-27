@@ -13,6 +13,7 @@ class SelectDestinationVC: UIViewController {
     var destinationName : String?
     var destinationLati : String?
     var destinationLongi : String?
+    var isRecentSeleted : Bool?
     
     @IBOutlet weak var startBtn: UIButton!
     @IBOutlet weak var cancelBtn: UIButton!
@@ -22,7 +23,10 @@ class SelectDestinationVC: UIViewController {
         self.dismiss(animated: true)
     }
     @IBAction func clickStartBtn(_ sender: Any) {
-        print("start")
+        // 최근경로가 아닌 직접 검색을 통한 목적지 검색일 때만 검색 기록 저장
+        if isRecentSeleted == false {
+            saveSearchHistory()
+        }
         
         sendStartNavi()
         
@@ -66,18 +70,17 @@ class SelectDestinationVC: UIViewController {
     }
     
     // 수정필요
-    /*
     func saveSearchHistory() {
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let loginURL = "http://43.202.136.75/user/routeSearch/"
-        
-        guard let text = searchBar.text else {
-            return
+        let tmpData : [String : String] = ["arrival" : destinationName!,
+                                           "latitude" : destinationLati!,
+                                           "longitude" : destinationLongi!]
+        AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
+            multipartFormData.append(val.data(using: .utf8)!, withName: key)
         }
-        
-        AF.upload(multipartFormData: { multipartFormData in
-            multipartFormData.append(text.data(using:.utf8)!, withName: "arrival")
-        }, to: loginURL, method: .post, headers: header)
+            
+        },to: loginURL, method: .post, headers: header)
         .responseDecodable(of: RouteSearchResult.self){ response in
             DispatchQueue.main.async {
                 switch response.result {
@@ -107,9 +110,8 @@ class SelectDestinationVC: UIViewController {
                 }
             }
         } //Alamofire request end...
-        
     }
-    */
+    
     func setPopUpView() {
         popUpView.frame = CGRect(x: 0, y: 0, width: 346, height: 191)
         popUpView.layer.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor

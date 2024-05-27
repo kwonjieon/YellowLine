@@ -78,6 +78,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         self.mapView?.setApiKey(apiKey)
         mapContainerView.addSubview(self.mapView!)
         
+        routineInform.textColor = .white
         
         locationManager.delegate = self  // 델리게이트 설정
         locationManager.desiredAccuracy = kCLLocationAccuracyBest  // 거리 정확도 설정

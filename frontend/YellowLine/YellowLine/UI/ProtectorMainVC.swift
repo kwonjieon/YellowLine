@@ -70,6 +70,7 @@ class ProtectorMainVC: UIViewController {
         dataTask.resume()
     }
     
+    // 보호자-피보호자 관계 추가
     func makeRelations() {
         let helper_id = LoginVC.protectorID
         print("보호자 아이디:\(helper_id)")
@@ -148,7 +149,22 @@ extension ProtectorMainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ProtectedCell", for: indexPath)as! ProtectedCell
         cell.name.text = protectedList[indexPath.row].name
+        cell.cellView.layer.cornerRadius = 15
+
+        cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        
+        cell.statusBtn.layer.cornerRadius = 15
+        cell.statusBtn.backgroundColor = .green
         cell.statusBtn.titleLabel?.text = protectedList[indexPath.row].latest_state
+        
+        // 피보호자가 오프라인 상태인 경우
+        if (protectedList[indexPath.row].latest_state == "Offline") {
+            
+        }
+        // 피보호자가 네비 or 물체탐지 사용중인 경우
+        else {
+            
+        }
         return cell
     }
 }

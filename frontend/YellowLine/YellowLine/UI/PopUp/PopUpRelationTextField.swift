@@ -9,7 +9,6 @@ import UIKit
 import Alamofire
 
 class PopUpRelationTextField: UIViewController {
-
     @IBAction func clickCancelBtn(_ sender: Any) {
         self.dismiss(animated: true)
     }
