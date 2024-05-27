@@ -9,7 +9,7 @@ import UIKit
 import TMapSDK
 import CoreLocation
 import CoreMotion
-
+import Alamofire
 // 지도 뷰 로드
 class MapViewController: UIViewController, TMapViewDelegate {
     
@@ -102,7 +102,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
         setDestinationText()
         
         setNaviBar()
-        
         
     }
     
@@ -371,12 +370,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
                         case .twoDimensional(let array): break
                         }
                     }
+                    var destinationData: LocationData = LocationData()
+                    destinationData.latitude = Double(self.destinationLati!)!
+                    destinationData.longitude = Double(self.destinationLongi!)!
+                    destinationData.name = "finishLine2749"
+                    
+                    self.pointerDataList.append(destinationData)
                     print("navigationList : \(self.navigationList)")
                     print("naviDestinationList : \(self.naviDestinationList)")
-                    for j in 0...self.pointerDataList.count-1 {
-                        print("pointerDataList : \(self.pointerDataList[j].name)")
-                    }
-                    
                 }catch{
                     print(error)
                 }
@@ -456,13 +457,25 @@ class MapViewController: UIViewController, TMapViewDelegate {
     func checkCurrentLoactionRotate() {
         for location in pointerDataList {
             //var isArrive
-            var distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
+            
+            let distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
             if distance < 0.00003428 {
+                // 목적지에 도착
+                if (location.name == "finishLine2749") {
+                    print("경로안내 종료")
+                    
+                    // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
+                    sendArrival()
+                    
+                    // 첫 메인 화면으로 이동
+                    if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController {
+                        presentingVC.dismiss(animated: true, completion: nil)
+                    }
+                }
                 twoPointsDistance.text = String(distance)
                 routineInform.text = location.direction
                 print("가야하는 방향: \(location.direction)")
             }
-            
         }
     }
     
@@ -472,6 +485,27 @@ class MapViewController: UIViewController, TMapViewDelegate {
         let deltaY = y2 - y1
         let distance = sqrt(deltaX * deltaX + deltaY * deltaY)
         return distance
+    }
+    
+    // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
+    func sendArrival() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/arrival/"
+        
+        AF.request(loginURL,
+                   method: .post,
+                   encoding: JSONEncoding(options: []),
+                   headers: ["Content-Type":"application/json", "Accept":"application/json"])
+            .responseJSON { response in
+
+            /** 서버로부터 받은 데이터 활용 */
+            switch response.result {
+            case .success(let data):
+                break
+            case .failure(let error):
+                break
+            }
+        }
     }
 }
 
