@@ -123,6 +123,8 @@ def insertSearch(request):# 목적지검색 최근기록에 삽입 /routeSearch
         if form.is_valid():
             history = form.save(commit=False)  # Don't save to the database yet
             history.user_id = request.user.id  # Set the current user's ID
+            history.latitude = form.cleaned_data.get('latitude', '')
+            history.longitude = form.cleaned_data.get('longitude', '')
             history.save()  # Now save to the database
             return JsonResponse({'success': True, 'message': 'History saved successfully.'})
         else:
@@ -142,6 +144,8 @@ def recentSearch(request):
             'historyNum': history.historyNum,
             'user_id': history.user_id,
             'arrival': history.arrival,
+            'latitude': history.latitude,
+            'longitude': history.longitude,
             'time': history.time
         })
 
