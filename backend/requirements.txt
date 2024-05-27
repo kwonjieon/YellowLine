@@ -90,3 +90,4 @@ zope.interface==6.3
 
 
 drf-yasg==1.21.7
+pyfcm==1.5.4
