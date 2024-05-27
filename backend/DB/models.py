@@ -37,6 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ]
     option = models.CharField(max_length=45, choices=OPTION_CHOICES)
     phoneNum = models.CharField(max_length=45)
+    apns_token = models.CharField(max_length=255, blank=True, null=True)  # APNs 토큰 필드
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -62,8 +63,9 @@ class History(models.Model):
     historyNum = models.AutoField(primary_key=True)
     user_id = models.CharField(max_length=45)
     arrival = models.CharField(max_length=45)
+    latitude = models.CharField(max_length=45,default='')
+    longitude = models.CharField(max_length=45,default='')
     time = models.DateTimeField(default=timezone.now)
-
     def __str__(self):
         return str(self.historyNum)
     

@@ -1,5 +1,8 @@
+import json
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+
+from pushNoti.views import send_push_notification_to_protectors
 
 from .models import History, User, UserRelation, UserState
 from django.views.decorators.csrf import csrf_exempt
@@ -123,6 +126,8 @@ def insertSearch(request):# 목적지검색 최근기록에 삽입 /routeSearch
         if form.is_valid():
             history = form.save(commit=False)  # Don't save to the database yet
             history.user_id = request.user.id  # Set the current user's ID
+            history.latitude = form.cleaned_data.get('latitude', '')
+            history.longitude = form.cleaned_data.get('longitude', '')
             history.save()  # Now save to the database
             return JsonResponse({'success': True, 'message': 'History saved successfully.'})
         else:
@@ -142,6 +147,8 @@ def recentSearch(request):
             'historyNum': history.historyNum,
             'user_id': history.user_id,
             'arrival': history.arrival,
+            'latitude': history.latitude,
+            'longitude': history.longitude,
             'time': history.time
         })
 
@@ -151,20 +158,73 @@ def recentSearch(request):
 @csrf_exempt
 def startNavi(request):#네비시작 /startnavi
     current_user_id = request.user.id
+    current_user_name = request.user.name
     UserState.objects.create(user_id=current_user_id, state='Navigation')#회원의 상태를 네비게이션으로 설정
+    
+    # 현재 사용자의 보호자들 가져오기
+    user_relations = UserRelation.objects.filter(recipient_id=current_user_id)
+    protector_ids = user_relations.values_list('helper_id', flat=True)
+    
+    # 푸시 알림 보내기
+    send_push_notification_to_protectors(protector_ids, "네비게이션 시작", f"{current_user_name}님이 네비게이션을 시작했습니다.")
+      
+    
     return JsonResponse({'success': True, 'state': 'Navigation'})
 
 
 @csrf_exempt
 def startWalk(request):#도보시작 /startwalk
     current_user_id = request.user.id
+    current_user_name = request.user.name
     UserState.objects.create(user_id=current_user_id, state='Walking')#회원의 상태를 도보로 설정
+    
+    # 현재 사용자의 보호자들 가져오기
+    user_relations = UserRelation.objects.filter(recipient_id=current_user_id)
+    protector_ids = user_relations.values_list('helper_id', flat=True)
+    
+    # 푸시 알림 보내기
+    send_push_notification_to_protectors(protector_ids, "도보 시작", f"{current_user_name}님이 도보로 이동을 시작했습니다.")
+    
+    
     return JsonResponse({'success': True, 'state': 'Walking'})
 
 
 @csrf_exempt
 def DestinationArrival(request):#목적지 도착 /arrival
     current_user_id = request.user.id
+    current_user_name = request.user.name
     UserState.objects.create(user_id=current_user_id, state='Offline')#회원의 상태를 오프라인으로 설정
+    
+    # 현재 사용자의 보호자들 가져오기
+    user_relations = UserRelation.objects.filter(recipient_id=current_user_id)
+    protector_ids = user_relations.values_list('helper_id', flat=True)
+    
+    # 푸시 알림 보내기
+    send_push_notification_to_protectors(protector_ids, "목적지 도착", f"{current_user_name}님이 목적지에 도착했습니다.")
+    
+    
+    
     return JsonResponse({'success': True, 'state': 'Offline'})
 
+@csrf_exempt
+def register_or_update_apns_token(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        apns_token = data.get('apns_token')
+
+        if not user_id or not apns_token:
+            return JsonResponse({'error': 'user_id and apns_token are required.'}, status=400)
+
+        try:
+            user = User.objects.get(id=user_id)
+            user.apns_token = apns_token
+            user.save()
+            return JsonResponse({'success': True, 'message': 'APNs token updated successfully.'})
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User does not exist.'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    
+
+    

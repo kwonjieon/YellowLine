@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import DestinationArrival, home, insertSearch, makeRelations, recentSearch, relations_view, signup, startNavi, startWalk, user_login, user_logout
+from .views import DestinationArrival, home, insertSearch, makeRelations, recentSearch, register_or_update_apns_token, relations_view, signup, startNavi, startWalk, user_login, user_logout
 
 
 urlpatterns = [
@@ -21,6 +21,9 @@ urlpatterns = [
     path('startnavi/',startNavi,name='startNavi'),
     path('startwalk/',startWalk,name='startWalk'),
     path('arrival/',DestinationArrival,name='DestinationArrival'),
+
+    path('register_apns_token/', register_or_update_apns_token, name='register_apns_token'),  # APNs 토큰 등록
+    
 
     
 

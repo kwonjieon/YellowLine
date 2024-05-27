@@ -18,7 +18,7 @@ class UserRelationForm(forms.Form):
 class HistoryForm(forms.ModelForm):
     class Meta:
         model = History
-        fields = ['arrival']  
+        fields = ['arrival','latitude','longitude']  
 
     def save(self, commit=True):
         history = super().save(commit=False)
