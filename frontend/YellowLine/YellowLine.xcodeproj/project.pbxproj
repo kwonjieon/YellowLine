@@ -24,6 +24,7 @@
 		5714A1FD2BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1F92BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf */; };
 		5714A1FE2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */; };
 		5714A2002BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */; };
+		57253F762C057FEC00FE2CCA /* TTSModelModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57253F752C057FEC00FE2CCA /* TTSModelModule.swift */; };
 		5744902E2BFF66F2002A30BD /* RegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744902D2BFF66F2002A30BD /* RegisterVC.swift */; };
 		574490302BFF6DE3002A30BD /* PopUpInformVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */; };
 		574490322C0027DA002A30BD /* RegisterCompletedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574490312C0027DA002A30BD /* RegisterCompletedVC.swift */; };
@@ -90,6 +91,7 @@
 		5714A1F92BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoEB.ttf; sourceTree = "<group>"; };
 		5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoB.ttf; sourceTree = "<group>"; };
 		5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoM.ttf; sourceTree = "<group>"; };
+		57253F752C057FEC00FE2CCA /* TTSModelModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSModelModule.swift; sourceTree = "<group>"; };
 		5744902D2BFF66F2002A30BD /* RegisterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVC.swift; sourceTree = "<group>"; };
 		5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpInformVC.swift; sourceTree = "<group>"; };
 		574490312C0027DA002A30BD /* RegisterCompletedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterCompletedVC.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 		5709DFF12BB13E9200553A23 /* YellowLine */ = {
 			isa = PBXGroup;
 			children = (
+				57253F722C057E8000FE2CCA /* TTS Model */,
 				5714A1F62BFDCD7800EBCD35 /* Fonts */,
 				570FC2072BF710CE00F03378 /* Cells */,
 				570FC2062BF710C700F03378 /* Models */,
@@ -208,6 +211,14 @@
 				5714A1F72BFDCFEC00EBCD35 /* AppleSDGothicNeoL.ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		57253F722C057E8000FE2CCA /* TTS Model */ = {
+			isa = PBXGroup;
+			children = (
+				57253F752C057FEC00FE2CCA /* TTSModelModule.swift */,
+			);
+			path = "TTS Model";
 			sourceTree = "<group>";
 		};
 		5744903D2C035E70002A30BD /* PopUp */ = {
@@ -375,6 +386,7 @@
 				B962DBE62BF4AE1900F86729 /* ThresholdProvider.swift in Sources */,
 				5709DFF72BB13E9200553A23 /* ViewController.swift in Sources */,
 				B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */,
+				57253F762C057FEC00FE2CCA /* TTSModelModule.swift in Sources */,
 				5744903F2C035EBB002A30BD /* PopUpRelationTextField.swift in Sources */,
 				5744903C2C00696D002A30BD /* ProtectedModel.swift in Sources */,
 				570FC20B2BFB115500F03378 /* SelectDestinationVC.swift in Sources */,
