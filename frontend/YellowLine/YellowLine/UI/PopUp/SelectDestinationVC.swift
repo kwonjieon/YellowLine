@@ -6,13 +6,14 @@
 //
 
 import UIKit
-
+import Alamofire
 class SelectDestinationVC: UIViewController {
     
     // SearchDestinationViewController 의 결과 리스트에서 선택한 데이터 전달받음
     var destinationName : String?
     var destinationLati : String?
     var destinationLongi : String?
+    var isRecentSeleted : Bool?
     
     @IBOutlet weak var startBtn: UIButton!
     @IBOutlet weak var cancelBtn: UIButton!
@@ -22,7 +23,12 @@ class SelectDestinationVC: UIViewController {
         self.dismiss(animated: true)
     }
     @IBAction func clickStartBtn(_ sender: Any) {
-        print("start")
+        // 최근경로가 아닌 직접 검색을 통한 목적지 검색일 때만 검색 기록 저장
+        if isRecentSeleted == false {
+            saveSearchHistory()
+        }
+        
+        sendStartNavi()
         
         let nextVC = self.storyboard?.instantiateViewController(identifier: "MapViewController") as! MapViewController
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
@@ -40,6 +46,70 @@ class SelectDestinationVC: UIViewController {
         setPopUpView()
         setCancelBtn()
         setStartBtn()
+    }
+    
+    // 피보호자가 네비게이션 이용 중이라는 상태를 서버에 업데이트
+    func sendStartNavi() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/startnavi/"
+        
+        AF.request(loginURL,
+                   method: .post,
+                   encoding: JSONEncoding(options: []),
+                   headers: ["Content-Type":"application/json", "Accept":"application/json"])
+            .responseJSON { response in
+
+            /** 서버로부터 받은 데이터 활용 */
+            switch response.result {
+            case .success(let data):
+                break
+            case .failure(let error):
+                break
+            }
+        }
+    }
+    
+    // 수정필요
+    func saveSearchHistory() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/routeSearch/"
+        let tmpData : [String : String] = ["arrival" : destinationName!,
+                                           "latitude" : destinationLati!,
+                                           "longitude" : destinationLongi!]
+        AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
+            multipartFormData.append(val.data(using: .utf8)!, withName: key)
+        }
+            
+        },to: loginURL, method: .post, headers: header)
+        .responseDecodable(of: RouteSearchResult.self){ response in
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    let result = response
+                    // error가 없으면 통과
+                    guard let resOption = result.success else {
+                        return
+                    }
+                    let cType = resOption
+                    switch cType{
+                        
+                    case true:
+                        print("저장성공")
+                        break
+                    default:
+                        print("저장실패")
+                        break
+                    }
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
     }
     
     func setPopUpView() {

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import Alamofire
 class MainScreenVC: UIViewController {
     // 네비게이션 버튼 클릭 시 실행되는 함수
     @objc func clickNaviBtn(_ gesture: UITapGestureRecognizer) {
@@ -17,7 +17,28 @@ class MainScreenVC: UIViewController {
     
     // 객체탐지 버튼 클릭 시 실행되는 함수
     @objc func clickobjectDetectBtn(_ gesture: UITapGestureRecognizer) {
-        print("view click")
+        sendStartWalk()
+    }
+    
+    // 피보호자가 물체탐지 이용 중이라는 상태를 서버에 업데이트
+    func sendStartWalk() {
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let loginURL = "http://43.202.136.75/user/startwalk/"
+        
+        AF.request(loginURL,
+                   method: .post,
+                   encoding: JSONEncoding(options: []),
+                   headers: ["Content-Type":"application/json", "Accept":"application/json"])
+            .responseJSON { response in
+
+            /** 서버로부터 받은 데이터 활용 */
+            switch response.result {
+            case .success(let data):
+                break
+            case .failure(let error):
+                break
+            }
+        }
     }
     
     lazy var naviBtn: UIView = {
