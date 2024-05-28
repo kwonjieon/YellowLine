@@ -21,7 +21,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
         }
     }
 
-
     @IBOutlet weak var standardText: UILabel!
     @IBOutlet weak var destinationText: UILabel!
     @IBOutlet weak var navigationBar: UIView!
@@ -69,6 +68,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var destinationName : String?
     var destinationLati : String?
     var destinationLongi : String?
+    
+    let tts = TTSModelModule()
+    var isFirstTTSInform = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -119,7 +121,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         //updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
         
-
+        //locationManager.startMonitoringSignificantLocationChanges()
+        locationManager.startUpdatingLocation()
     }
     
     func setNaviBar() {
@@ -228,31 +231,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
         // 새로운 위치에 마커 생성 및 추가
         currentMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLatitude, longitude: currentLongitude))
         currentMarker?.map = mapView
-    }
-    
-    // 디바이스 방향 감지
-    func directionDetection() {
-        if motionManager.isDeviceMotionAvailable {
-            motionManager.deviceMotionUpdateInterval = 0.2 // 업데이트 간격 설정 (초 단위)
-            motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (data, error) in
-                guard let data = data else { return }
-                
-                // 디바이스의 방향 데이터 추출
-                let attitude = data.attitude
-                
-                // 방향 데이터를 사용하여 각도를 계산
-                let pitch = attitude.pitch * 180.0 / Double.pi
-                let roll = attitude.roll * 180.0 / Double.pi
-                let yaw = attitude.yaw * 180.0 / Double.pi
-                
-                // 화면에 방향 데이터 출력
-                print("Pitch: \(pitch) degrees")
-                print("Roll: \(roll) degrees")
-                print("Yaw: \(yaw) degrees")
-            }
-        } else {
-            print("Device motion is not available")
-        }
     }
     
     // 지도에 경로 표기
@@ -457,13 +435,15 @@ class MapViewController: UIViewController, TMapViewDelegate {
     //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
     func checkCurrentLoactionRotate() {
         for location in pointerDataList {
-            //var isArrive
-            
             let distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
             if distance < 0.00003428 {
                 // 목적지에 도착
                 if (location.name == "finishLine2749") {
                     print("경로안내 종료")
+                    
+                    // 음성안내
+                    let speechText = location.direction + "에 도착했습니다. 경로안내를 종료합니다."
+                    tts.speakText(speechText, 1.0, 0.4, true)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
                     sendArrival()
@@ -475,6 +455,11 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 }
                 twoPointsDistance.text = String(distance)
                 routineInform.text = location.direction
+                
+                // 음성안내
+                // speakText(내용, 볼륨, 속도, 옵션)
+                let speechText = "여기서" + location.direction + "하세요"
+                tts.speakText(speechText, 1.0, 0.4, true)
                 print("가야하는 방향: \(location.direction)")
             }
         }
@@ -528,6 +513,15 @@ extension MapViewController: CLLocationManagerDelegate {
         
         // ui에 그려지는 건 viewDidAppear 이후에 작동
         if startCheckLocation == true {
+            // 현재위치 ui 표기 시작
+            // 로딩 끝나고 시작할 때
+            if (isFirstTTSInform == true) {
+                isFirstTTSInform = false
+                
+                // 음성안내
+                let speechText = "음성안내를 시작합니다."
+                tts.speakText(speechText, 1.0, 0.4, true)
+            }
             latitudeText.text = String(latitude)
             longitudeText.text = String(longitude)
             
@@ -541,27 +535,9 @@ extension MapViewController: CLLocationManagerDelegate {
             self.mapView?.setZoom(18)
             
             // 경로 안내
-            checkNavigationDistance()
-            
-            // 길 안내
-            // 포인트 지역에 접근했다면 좌, 우회전 출력
-            /*
-            let currentPositionRangeChange = searchDestinationViewController.pointRangeChange(latitude: latitude, longitude: longitude)
-            let coordinate : String = String(currentPositionRangeChange.latitude) + String(currentPositionRangeChange.longitude)
-            let condition: ((String, String)) -> Bool = {
-                $0.0.contains(coordinate)
-            }
-            
-            print("범위 수정된 내위치 : \(currentPositionRangeChange.latitude), \(currentPositionRangeChange.longitude)")
-            */
-            
-            // ui 테스트 표기
-            /*
-            changedLatitude.text = String(currentPositionRangeChange.latitude)
-            changedLongitude.text = String(currentPositionRangeChange.longitude)
-            */
-            
-            // 각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
+            //checkNavigationDistance()
+
+            // 현재 위치에 따른 길안내
             checkCurrentLoactionRotate();
         }
     }

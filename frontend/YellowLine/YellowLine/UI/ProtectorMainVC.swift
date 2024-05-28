@@ -56,12 +56,15 @@ class ProtectorMainVC: UIViewController {
             //데이터 디코딩
             do{
                 self.protectedModel = try JSONDecoder().decode(ProtectedModel.self, from: data!)
-                for i in 0...self.protectedModel!.results.count-1 {
-                    self.protectedList.append(self.protectedModel!.results[i]!)
-                    print(self.protectedModel!.results[i]!.name)
-                }
-                DispatchQueue.main.async {
-                    self.protectedTableView.reloadData()
+                // 연결된 피보호자가 한명도 없다면 ui 리스트 업데이트 안함
+                if (self.protectedModel!.results.count != 0 ) {
+                    for i in 0...self.protectedModel!.results.count-1 {
+                        self.protectedList.append(self.protectedModel!.results[i]!)
+                        print(self.protectedModel!.results[i]!.name)
+                    }
+                    DispatchQueue.main.async {
+                        self.protectedTableView.reloadData()
+                    }
                 }
             }catch{
                 print(error)
