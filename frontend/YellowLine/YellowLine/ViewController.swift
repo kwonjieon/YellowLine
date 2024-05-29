@@ -33,8 +33,8 @@ class ViewController: UIViewController{
     override func viewDidLoad() {
         webRTCManager = WebRTCManager(uiView: localView, midasView ,"YLUSER01")
     }
-    
 
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.cameraSession?.stopSession()

@@ -16,7 +16,6 @@ import Vision
 
 protocol CameraSessionDelegate {
     func didWebRTCOutput(_ sampleBuffer: CMSampleBuffer)
-    func didSampleOutput(_ ciImage: CIImage)
 }
 
 

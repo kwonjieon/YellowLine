@@ -52,12 +52,14 @@ class LoginVC: UIViewController {
     // 로그인 시도
     func login() {
 //         IDField.text!   -> 아이디
-        // PWField.text!   -> 비밀번호 입니다
-        let tmpId = IDField.text!
-        let tmpPw = PWField.text!
+//         PWField.text!   -> 비밀번호 입니다
+
+        // id, pw 검증
+        guard let tmpId = IDField.text, isValidId(id: tmpId) else { return }
+        guard let tmpPw = PWField.text, isValidPassword(pwd: tmpPw) else { return }
         
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
-        let loginURL = "http://43.202.136.75/user/login/"
+        let loginURL = Config.default.urls.login
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(tmpId.data(using:.utf8)!, withName: "id")
             multipartFormData.append(tmpPw.data(using:.utf8)!, withName: "password")
@@ -78,7 +80,6 @@ class LoginVC: UIViewController {
                     case "Protector":
                         // 관계추가시에 필요한 보호자 ID 기록
                         LoginVC.protectorID = self.IDField.text!
-                        
                         
                         // 로그인 성공시 메인 화면(보호자)으로 이동
                         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ProtectorMainVC") else {return}
@@ -118,6 +119,23 @@ class LoginVC: UIViewController {
         IDField.placeholder = "아이디"
         IDField.clearButtonMode = .always
         IDField.returnKeyType = .done
+    }
+    
+    
+    // MARK: 로그인 검증
+    
+    // 아이디 형식 검사
+    func isValidId(id: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: id)
+    }
+    
+    // 비밀번호 형식 검사
+    func isValidPassword(pwd: String) -> Bool {
+        let passwordRegEx = "^[a-zA-Z0-9]{8,}$"
+        let passwordTest = NSPredicate(format: "SELF MATCHES %@", passwordRegEx)
+        return passwordTest.evaluate(with: pwd)
     }
 
 }

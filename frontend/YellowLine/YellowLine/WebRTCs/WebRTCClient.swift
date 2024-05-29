@@ -16,7 +16,6 @@ protocol WebRTCClientDelegate: AnyObject {
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState)
     func didReceiveData(data: Data)
     func didReceiveMessage(message: String)
-//    func didBase64ImageArrived(base64: String)
 }
 
 /**
@@ -111,24 +110,9 @@ class WebRTCClient: NSObject{
             localRenderView = RTCEAGLVideoView()
             localRenderView!.delegate = self
             localView.addSubview(localRenderView!)
-//            self.localVideoTrack?.add(self.localRenderView!)
         }
     }
 
-
-    private func setupView() {
-        // local
-        localRenderView = RTCEAGLVideoView()
-        localRenderView!.delegate = self
-//        localView = UIView()
-//        localView.addSubview(localRenderView!)
-        // remote
-        remoteRenderView = RTCEAGLVideoView()
-        remoteRenderView?.delegate = self
-//        remoteView = UIView()
-        remoteView.addSubview(remoteRenderView!)
-    }
-    
     func localVideoView() -> UIView {
         return localView
     }
@@ -136,18 +120,6 @@ class WebRTCClient: NSObject{
     func remoteVideoView() -> UIView {
         return remoteView
     }
-    
-    func setupLocalViewFrame(frame: CGRect){
-        localView.frame = frame
-        localRenderView?.frame = localView.frame
-    }
-    
-    func setupRemoteViewFrame(frame: CGRect){
-         remoteView.frame = frame
-         remoteRenderView?.frame = remoteView.frame
-     }
-
-    
 
     //MARK: - setup Connection( peerConnection, tracks, videoCapturer)
     func connect(onSuccess: @escaping (RTCSessionDescription) -> Void){
@@ -160,8 +132,7 @@ class WebRTCClient: NSObject{
         makeOffer(onSuccess: onSuccess)
     }
     
-    // MARK: ERROR 예측지점
-    // peerConnection
+    
     private func setupPeerConnection() -> RTCPeerConnection? {
         let constraints = RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: ["DtlsSrtpKeyAgreement": "true"])
         let config = generateConfig()
@@ -170,7 +141,8 @@ class WebRTCClient: NSObject{
         return pc
     }
     
-    // localframe 설정 (내가 찍고있는 비디오 화면을 내 화면에 보여줄 때 설정함.)
+    
+    // localframe 설정 (내 비디오트랙을 파이프라인에 보내기 위해 사용함.)
     func didCaptureLocalFrame(_ videoFrame: RTCVideoFrame) {
         guard let videoSource = self.localVideoSource,
             let videoCapturer = videoCapturer else { return }
@@ -222,8 +194,7 @@ class WebRTCClient: NSObject{
                     }
                 }
             }
-            // 예상 error 지점
-            capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
+            capturer.startCapture(with: cameraDevice!, format: targetFormat!, fps: 30)
         }
     }
 
@@ -537,7 +508,6 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
         self.remoteDataChannel = dataChannel
         self.delegate?.didOpenDataChanel()
-//        self.sendMessage(message: "hello")
     }
     
 }
@@ -560,11 +530,8 @@ extension WebRTCClient: RTCDataChannelDelegate {
     func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
         DispatchQueue.main.async {
             if buffer.isBinary {
-                //이거 안씀...
                 self.delegate?.didReceiveData(data: buffer.data)
-//                debugPrint("DataChannel did receiveMessageWith: \(buffer.data)")
             } else {
-                print("메시지를 받았습니당")
                 let msg = String(data: buffer.data, encoding: String.Encoding.utf8)
                 self.delegate?.didReceiveMessage(message: msg!)
                 

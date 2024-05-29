@@ -18,12 +18,11 @@ class WebRTCManager {
     var webRTCClient: WebRTCClient!
     var socket: WebSocket!
     var tryToConnectWebSocket: Timer!
-    let ipAddress: String = Config.default.signalingURL
+    let ipAddress: String = Config.default.urls.signaling
     var cameraSession: CameraSession?
     var isSocketConnected = false
     
     var localView: UIView?
-    
     
     init(uiView : UIView, _ midasView : UIImageView ,_ userName: String) {
         self.userName = userName
@@ -217,22 +216,15 @@ extension WebRTCManager: WebRTCClientDelegate {
     }
 }
 
+// MARK: Render local view
 extension WebRTCManager: CameraSessionDelegate {
-    //didSampleOutput은 단순히 CameraSession + WebRTC동시 적용을 위한 테스트 카메라입니다. 삭제 필수!!!
-    func didSampleOutput(_ ciImage: CIImage) {
-//        DispatchQueue.main.async {
-//            self._view?.image = UIImage(ciImage: ciImage)
-//        }
-    }
-    
-    // 확인해보니 WebRTC + CameraSession이 문제가 아니었음.
-    // socket request가 문제로 보임. 모든 테스트 완료 후 문제 없으면 삭제하기.
-    // local video view에 표시하는 함수임.
+    // video view에 표시하는 함수임.
     func didWebRTCOutput(_ sampleBuffer: CMSampleBuffer) {
         if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
             let rtcpixelBuffer = RTCCVPixelBuffer(pixelBuffer: pixelBuffer)
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
-            let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._0, timeStampNs: timeStampNs)
+            // select rotation
+            let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
             
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
