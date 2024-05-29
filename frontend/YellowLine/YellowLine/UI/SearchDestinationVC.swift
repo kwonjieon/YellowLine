@@ -15,16 +15,6 @@ class SearchDestinationVC: UIViewController{
     }
     
     func setSearchBar() {
-        
-        
-        /*
-         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.widthAnchor.constraint(equalToConstant: 356).isActive = true
-        searchBar.heightAnchor.constraint(equalToConstant: 149).isActive = true
-        searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        */
-        
         searchBar.placeholder = "목적지를 입력해주세요"
         //searchBar.setImage(UIImage(named: "search-icon"), for: UISearchBar.Icon.search, state: .normal)
         searchBar.backgroundImage = UIImage()

@@ -13,7 +13,7 @@ class LoginVC: UIViewController {
     @IBOutlet weak var PWField: UITextField!
     @IBOutlet weak var IDField: UITextField!
     
-    // 피보호자 로그인 버튼 클릭
+    // 로그인 버튼 클릭
     @IBAction func clickLoginBtn(_ sender: Any) {
         // 버튼 누르면 키보드가 자동으로 내려감
         PWField.resignFirstResponder()
@@ -27,8 +27,9 @@ class LoginVC: UIViewController {
         }
     }
 
+    // 임시 물체탐지 버튼 클릭
     @IBAction func clickLoginBtnProtect(_ sender: Any) {
-        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ProtectorMainVC") else {return}
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ViewController") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         self.present(nextVC, animated: true)
     }

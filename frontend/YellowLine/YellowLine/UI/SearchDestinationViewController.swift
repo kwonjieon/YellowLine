@@ -86,9 +86,9 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         searchBar.placeholder = "목적지를 입력해주세요"
         //searchBar.setImage(UIImage(named: "search-icon"), for: UISearchBar.Icon.search, state: .normal)
         searchBar.backgroundImage = UIImage()
-        searchBar.backgroundColor = .lightGray
+        searchBar.backgroundColor = UIColor(red: 0.885, green: 0.885, blue: 0.885, alpha: 1)
         if let textfield = searchBar.value(forKey: "searchField") as? UITextField {
-            textfield.backgroundColor = UIColor.white
+            textfield.backgroundColor = .clear
             textfield.textColor = UIColor.black
             textfield.font = UIFont(name: "AppleSDGothicNeoM00-Regular", size: 16)
         }
@@ -96,17 +96,16 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
         // 키보드에 return 표기
         searchBar.returnKeyType = .done
         searchBar.layer.cornerRadius = 20
-        /*
-         searchBar.translatesAutoresizingMaskIntoConstraints = false
-         searchBar.widthAnchor.constraint(equalToConstant: 356).isActive = true
-         searchBar.heightAnchor.constraint(equalToConstant: 149).isActive = true
-         searchBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
-         searchBar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 0).isActive = true
-         
-         UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-         
-         searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-         */
+        
+        // Auto Layout 설정
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        
+        // 개별 제약 조건 활성화
+        searchBar.widthAnchor.constraint(equalToConstant: 361).isActive = true
+        searchBar.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16).isActive = true
+        searchBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 128).isActive = true
+        
     }
     
     func setNaviBar() {
@@ -199,12 +198,14 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
             //데이터 디코딩
             do{
                 self.searchHistoryModel = try JSONDecoder().decode(SearchHistoryResult.self, from: data!)
-                for i in 0...self.searchHistoryModel!.user_history.count-1 {
-                    self.searchHistoryList.append(self.searchHistoryModel!.user_history[i]!)
-                    print(self.searchHistoryModel!.user_history[i]?.arrival)
-                }
-                DispatchQueue.main.async {
-                    self.listTableView.reloadData()
+                if self.searchHistoryModel!.user_history.count != 0 {
+                    for i in 0...self.searchHistoryModel!.user_history.count-1 {
+                        self.searchHistoryList.append(self.searchHistoryModel!.user_history[i]!)
+                        print(self.searchHistoryModel!.user_history[i]?.arrival)
+                    }
+                    DispatchQueue.main.async {
+                        self.listTableView.reloadData()
+                    }
                 }
             }catch{
                 print(error)
