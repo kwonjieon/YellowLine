@@ -11,12 +11,14 @@ class ProtectedCell: UITableViewCell {
     @IBOutlet weak var cellView: UIView!
     @IBOutlet weak var statusBtn: UIButton!
     @IBOutlet weak var name: UILabel!
+    var protectorMainVC = ProtectorMainVC()
     @IBAction func clickCheckBtn(_ sender: Any) {
         if statusBtn.titleLabel?.text == "네비게이션 및 도보 카메라 확인" {
-            print("네비 사용중")
+            
         }
         else if statusBtn.titleLabel?.text == "도보 카메라 확인" {
-            print("물체탐지")
+            print("도보")
+            protectorMainVC.loadShowObjectDetection()
         }
     }
 }

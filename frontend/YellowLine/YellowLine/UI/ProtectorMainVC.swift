@@ -168,6 +168,26 @@ class ProtectorMainVC: UIViewController {
 
     }
     
+    func loadShowObjectDetection() {
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(nextVC, animated: true)
+        
+        print("엥?")
+    }
+    
+    @objc func checkBoxButtonTapped(sender: UIButton) {
+        if sender.titleLabel?.text == "도보 카메라 확인" {
+            guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
+            nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            self.present(nextVC, animated: true)
+        }
+        else if sender.titleLabel?.text == "네비게이션 및 도보 카메라 확인" {
+            guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowNavigationVC") else {return}
+            nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            self.present(nextVC, animated: true)
+        }
+    }
 }
 
 struct MakeRelationResult : Codable {
@@ -190,19 +210,14 @@ extension ProtectorMainVC: UITableViewDelegate, UITableViewDataSource {
         
         // cell 뷰 디자인
         cell.cellView.layer.cornerRadius = 10
-
         cell.backgroundColor = .clear
-        
-        /*
-        cell.statusBtn.layer.cornerRadius = 15
-        cell.statusBtn.backgroundColor = .green
-         */
-        
         setBtn(cell: cell.statusBtn)
-        
         cell.statusBtn.titleLabel?.text = protectedList[indexPath.row].latest_state
         
-        print(protectedList[indexPath.row].latest_state)
+        // 버튼 구별
+        cell.statusBtn.tag = indexPath.row
+        cell.statusBtn.addTarget(self, action: #selector(checkBoxButtonTapped(sender:)), for: .touchUpInside)
+        
         
         // 피보호자가 오프라인 상태인 경우
         if (protectedList[indexPath.row].latest_state == "Offline") {
