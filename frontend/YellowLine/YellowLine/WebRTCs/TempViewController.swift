@@ -14,7 +14,7 @@ import Starscream
 
 class TempViewController: UIViewController, WebSocketDelegate, WebRTCClientDelegate {
     private var protectedId = "YLUSER01"
-    private var ipAddress: String = Config.default.signalingURL
+    private var ipAddress: String = Config.default.urls.signaling
     
     
     

@@ -56,14 +56,14 @@ class LoginVC: UIViewController {
 //         PWField.text!   -> 비밀번호 입니다
 
         // id, pw 검증
-        guard let tmpId = IDField.text, isValidId(id: tmpId) else { return }
-        guard let tmpPw = PWField.text, isValidPassword(pwd: tmpPw) else { return }
+        //guard let tmpId = IDField.text, isValidId(id: tmpId) else { return }
+        //guard let tmpPw = PWField.text, isValidPassword(pwd: tmpPw) else { return }
         
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let loginURL = Config.default.urls.login
         AF.upload(multipartFormData: { multipartFormData in
-            multipartFormData.append(tmpId.data(using:.utf8)!, withName: "id")
-            multipartFormData.append(tmpPw.data(using:.utf8)!, withName: "password")
+            multipartFormData.append(self.IDField.text!.data(using:.utf8)!, withName: "id")
+            multipartFormData.append(self.PWField.text!.data(using:.utf8)!, withName: "password")
         }, to: loginURL, method: .post, headers: header)
         .responseDecodable(of: LoginResult.self){ response in
             //결과.
