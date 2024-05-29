@@ -9,16 +9,12 @@ import Foundation
 import UIKit
 class DestinationCell: UITableViewCell, UITableViewDelegate {
     @IBOutlet weak var cellView: UIView!
-    @IBOutlet weak var locationLabel: UILabel! {
+    @IBOutlet weak var locationLabel: UILabel!
+    /*{
         didSet {
-            locationLabel.font = UIFont(name: "AppleSDGothicNeoB", size: 18)
+            locationLabel.font = UIFont(name: "AppleSDGothicNeoB", size: 25)
             print("리스트 생성")
         }
-    }
-    /*
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 16, bottom: 4, right: 16))
     }
      */
 }

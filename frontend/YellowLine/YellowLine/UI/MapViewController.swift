@@ -15,12 +15,17 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     @IBOutlet weak var mapContainerView: UIView!
     @IBAction func backBtn(_ sender: Any) {
-        if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController {
-            // 첫번째 화면(로그인)으로 돌아감
-            presentingVC.dismiss(animated: true, completion: nil)
-        }
+        let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpStopNavi") as! PopUpStopNavi
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+        nextVC.btn1Text = "취소"
+        nextVC.btn2Text = "안내 중단"
+        nextVC.titletext = "안내 중단"
+        nextVC.descriptionText = "경로 안내를 중단할까요?"
+        
+        self.present(nextVC, animated: true)
     }
 
+    @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var standardText: UILabel!
     @IBOutlet weak var destinationText: UILabel!
     @IBOutlet weak var navigationBar: UIView!
@@ -126,56 +131,29 @@ class MapViewController: UIViewController, TMapViewDelegate {
     }
     
     func setNaviBar() {
-        navigationBar.frame = CGRect(x: 0, y: 0, width: 394, height: 122)
-        navigationBar.layer.backgroundColor = UIColor(red: 0.114, green: 0.114, blue: 0.114, alpha: 1).cgColor
+        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 120)
+        navigationBar.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
         navigationBar.layer.cornerRadius = 20
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func setDestinationText() {
-        standardText.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        
-        standardText.frame = CGRect(x: 0, y: 0, width: 47, height: 22)
-        
-        standardText.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 18)
-        
-        var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 0.88
-        // Line height: 22 pt
-        // (identical to box height)
+        standardText.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        standardText.font = UIFont(name: "AppleSDGothicNeo-Medium", size: 18)
         standardText.textAlignment = .center
-        standardText.attributedText = NSMutableAttributedString(string: "현위치", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-
-        standardText.translatesAutoresizingMaskIntoConstraints = false
-        standardText.widthAnchor.constraint(equalToConstant: 47).isActive = true
-        standardText.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        standardText.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 117).isActive = true
-        standardText.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 68).isActive = true
         
         
-        destinationText.frame = CGRect(x: 0, y: 0, width: 171, height: 22)
-        destinationText.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        destinationText.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 18)
-        paragraphStyle.lineHeightMultiple = 0.88
-
+        destinationText.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        destinationText.font = UIFont(name: "AppleSDGothicNeo-Medium", size: 18)
         destinationText.textAlignment = .center
-        destinationText.attributedText = NSMutableAttributedString(string: destinationName!, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+
         destinationText.text = destinationName!
-        destinationText.translatesAutoresizingMaskIntoConstraints = false
-        destinationText.widthAnchor.constraint(equalToConstant: 171).isActive = true
-        destinationText.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        destinationText.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 225).isActive = true
-        destinationText.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 68).isActive = true
-         
-        /*
-        var setView = UIView()
-        setView.backgroundColor = .none
-        setView.addSubview(standardText)
-        setView.addSubview(destinationText)
         
-        setView.translatesAutoresizingMaskIntoConstraints = false
-        setView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
-         */
+        // 목적지의 글자크기가 바뀌더라도 중앙정렬 유지
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        stackView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 74).isActive = true
+         
     }
     
     
@@ -446,12 +424,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     tts.speakText(speechText, 1.0, 0.4, true)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
-                    sendArrival()
+                    sendNaviFinish()
                     
-                    // 첫 메인 화면으로 이동
-                    if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController {
-                        presentingVC.dismiss(animated: true, completion: nil)
-                    }
+                    // 도착 안내 화면으로 이동
+                    let nextVC = self.storyboard?.instantiateViewController(identifier: "ArrivalDestinationVC") as! ArrivalDestinationVC
+                    nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+                    self.present(nextVC, animated: true)
                 }
                 twoPointsDistance.text = String(distance)
                 routineInform.text = location.direction
@@ -474,7 +452,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     }
     
     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
-    func sendArrival() {
+    func sendNaviFinish() {
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let loginURL = "http://43.202.136.75/user/arrival/"
         

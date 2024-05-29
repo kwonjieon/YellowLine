@@ -25,6 +25,14 @@
 		5714A1FE2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */; };
 		5714A2002BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */; };
 		57253F762C057FEC00FE2CCA /* TTSModelModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57253F752C057FEC00FE2CCA /* TTSModelModule.swift */; };
+		57253F782C06CA8600FE2CCA /* direction.png in Resources */ = {isa = PBXBuildFile; fileRef = 57253F772C06CA8600FE2CCA /* direction.png */; };
+		57253F7A2C06CAD100FE2CCA /* backBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 57253F792C06CAD100FE2CCA /* backBtn.png */; };
+		57253F7C2C06CB4500FE2CCA /* direction2.png in Resources */ = {isa = PBXBuildFile; fileRef = 57253F7B2C06CB4500FE2CCA /* direction2.png */; };
+		573D506A2C06CCC5007A42B8 /* ArrivalDestinationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D50692C06CCC5007A42B8 /* ArrivalDestinationVC.swift */; };
+		573D506C2C070A7F007A42B8 /* PopUpStopNavi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D506B2C070A7F007A42B8 /* PopUpStopNavi.swift */; };
+		573D506E2C078D01007A42B8 /* ObjectDetectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D506D2C078D01007A42B8 /* ObjectDetectionVC.swift */; };
+		573D50702C079152007A42B8 /* ShowObjectDetectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D506F2C079152007A42B8 /* ShowObjectDetectionVC.swift */; };
+		573D50722C079164007A42B8 /* ShowNavigationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D50712C079164007A42B8 /* ShowNavigationVC.swift */; };
 		5744902E2BFF66F2002A30BD /* RegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744902D2BFF66F2002A30BD /* RegisterVC.swift */; };
 		574490302BFF6DE3002A30BD /* PopUpInformVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */; };
 		574490322C0027DA002A30BD /* RegisterCompletedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574490312C0027DA002A30BD /* RegisterCompletedVC.swift */; };
@@ -84,7 +92,7 @@
 		570FC2012BF62C3100F03378 /* SearchNaviBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SearchNaviBar.png; sourceTree = "<group>"; };
 		570FC2032BF6D4AC00F03378 /* search-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "search-icon.png"; sourceTree = "<group>"; };
 		570FC2082BF710E200F03378 /* DestinationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationCell.swift; sourceTree = "<group>"; };
-		570FC20A2BFB115500F03378 /* SelectDestinationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDestinationVC.swift; sourceTree = "<group>"; };
+		570FC20A2BFB115500F03378 /* SelectDestinationVC.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = SelectDestinationVC.swift; sourceTree = "<group>"; };
 		570FC20C2BFC913F00F03378 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		5714A1F42BFDC82A00EBCD35 /* backButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backButton.png; sourceTree = "<group>"; };
 		5714A1F72BFDCFEC00EBCD35 /* AppleSDGothicNeoL.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoL.ttf; sourceTree = "<group>"; };
@@ -93,6 +101,14 @@
 		5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoB.ttf; sourceTree = "<group>"; };
 		5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleSDGothicNeoM.ttf; sourceTree = "<group>"; };
 		57253F752C057FEC00FE2CCA /* TTSModelModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSModelModule.swift; sourceTree = "<group>"; };
+		57253F772C06CA8600FE2CCA /* direction.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = direction.png; sourceTree = "<group>"; };
+		57253F792C06CAD100FE2CCA /* backBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backBtn.png; sourceTree = "<group>"; };
+		57253F7B2C06CB4500FE2CCA /* direction2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = direction2.png; sourceTree = "<group>"; };
+		573D50692C06CCC5007A42B8 /* ArrivalDestinationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrivalDestinationVC.swift; sourceTree = "<group>"; };
+		573D506B2C070A7F007A42B8 /* PopUpStopNavi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpStopNavi.swift; sourceTree = "<group>"; };
+		573D506D2C078D01007A42B8 /* ObjectDetectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionVC.swift; sourceTree = "<group>"; };
+		573D506F2C079152007A42B8 /* ShowObjectDetectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowObjectDetectionVC.swift; sourceTree = "<group>"; };
+		573D50712C079164007A42B8 /* ShowNavigationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNavigationVC.swift; sourceTree = "<group>"; };
 		5744902D2BFF66F2002A30BD /* RegisterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVC.swift; sourceTree = "<group>"; };
 		5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpInformVC.swift; sourceTree = "<group>"; };
 		574490312C0027DA002A30BD /* RegisterCompletedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterCompletedVC.swift; sourceTree = "<group>"; };
@@ -226,9 +242,12 @@
 		5744903D2C035E70002A30BD /* PopUp */ = {
 			isa = PBXGroup;
 			children = (
-				570FC20A2BFB115500F03378 /* SelectDestinationVC.swift */,
+				574490312C0027DA002A30BD /* RegisterCompletedVC.swift */,
 				5744902F2BFF6DE3002A30BD /* PopUpInformVC.swift */,
 				5744903E2C035EBB002A30BD /* PopUpRelationTextField.swift */,
+				570FC20A2BFB115500F03378 /* SelectDestinationVC.swift */,
+				573D50692C06CCC5007A42B8 /* ArrivalDestinationVC.swift */,
+				573D506B2C070A7F007A42B8 /* PopUpStopNavi.swift */,
 			);
 			path = PopUp;
 			sourceTree = "<group>";
@@ -243,8 +262,10 @@
 				5788A8C02BF5F19E0013D6CF /* SearchDestinationVC.swift */,
 				570FC20C2BFC913F00F03378 /* LoginVC.swift */,
 				5744902D2BFF66F2002A30BD /* RegisterVC.swift */,
-				574490312C0027DA002A30BD /* RegisterCompletedVC.swift */,
 				574490332C004754002A30BD /* ProtectorMainVC.swift */,
+				573D506D2C078D01007A42B8 /* ObjectDetectionVC.swift */,
+				573D506F2C079152007A42B8 /* ShowObjectDetectionVC.swift */,
+				573D50712C079164007A42B8 /* ShowNavigationVC.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -252,6 +273,9 @@
 		5788A8C22BF6151D0013D6CF /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				57253F7B2C06CB4500FE2CCA /* direction2.png */,
+				57253F792C06CAD100FE2CCA /* backBtn.png */,
+				57253F772C06CA8600FE2CCA /* direction.png */,
 				5714A1F42BFDC82A00EBCD35 /* backButton.png */,
 				570FC2032BF6D4AC00F03378 /* search-icon.png */,
 				570FC2012BF62C3100F03378 /* SearchNaviBar.png */,
@@ -372,7 +396,10 @@
 				5714A1FB2BFDCFEC00EBCD35 /* AppleSDGothicNeoL.ttf in Resources */,
 				5714A1FD2BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf in Resources */,
 				570FC2022BF62C3100F03378 /* SearchNaviBar.png in Resources */,
+				57253F782C06CA8600FE2CCA /* direction.png in Resources */,
+				57253F7C2C06CB4500FE2CCA /* direction2.png in Resources */,
 				5714A1FE2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf in Resources */,
+				57253F7A2C06CAD100FE2CCA /* backBtn.png in Resources */,
 				5714A2002BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -390,7 +417,9 @@
 				5709DFF72BB13E9200553A23 /* ViewController.swift in Sources */,
 				B92DDC2B2C075450005820BA /* TempViewController.swift in Sources */,
 				B9D210202BCFD87F00F61AD2 /* Config.swift in Sources */,
+				573D506E2C078D01007A42B8 /* ObjectDetectionVC.swift in Sources */,
 				57253F762C057FEC00FE2CCA /* TTSModelModule.swift in Sources */,
+				573D50702C079152007A42B8 /* ShowObjectDetectionVC.swift in Sources */,
 				5744903F2C035EBB002A30BD /* PopUpRelationTextField.swift in Sources */,
 				5744903C2C00696D002A30BD /* ProtectedModel.swift in Sources */,
 				570FC20B2BFB115500F03378 /* SelectDestinationVC.swift in Sources */,
@@ -401,6 +430,7 @@
 				B9741B9D2C00CF8400E87A72 /* MiDaS.mlmodel in Sources */,
 				B96535142BC5737E00643DC9 /* NetworkManager.swift in Sources */,
 				574490322C0027DA002A30BD /* RegisterCompletedVC.swift in Sources */,
+				573D506A2C06CCC5007A42B8 /* ArrivalDestinationVC.swift in Sources */,
 				574490302BFF6DE3002A30BD /* PopUpInformVC.swift in Sources */,
 				5709DFF32BB13E9200553A23 /* AppDelegate.swift in Sources */,
 				57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */,
@@ -410,6 +440,8 @@
 				5709DFF52BB13E9200553A23 /* SceneDelegate.swift in Sources */,
 				5744903A2C006832002A30BD /* ProtectedCell.swift in Sources */,
 				B9A5C3192BD6747F00EE1429 /* SignalingMessage.swift in Sources */,
+				573D50722C079164007A42B8 /* ShowNavigationVC.swift in Sources */,
+				573D506C2C070A7F007A42B8 /* PopUpStopNavi.swift in Sources */,
 				5788A8C12BF5F19E0013D6CF /* SearchDestinationVC.swift in Sources */,
 				5754C41E2C041A17002FE306 /* SearchHistoryCell.swift in Sources */,
 				B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */,

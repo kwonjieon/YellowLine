@@ -30,7 +30,8 @@ class ProtectorMainVC: UIViewController {
         setNavivgationBar()
         loadRecipients()
         
-        protectedTableView.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        protectedTableView.backgroundColor = UIColor(red: 0.902, green: 0.902, blue: 0.902, alpha: 1)
+        self.view.backgroundColor = UIColor(red: 0.902, green: 0.902, blue: 0.902, alpha: 1)
     }
     
     // 피보호자 리스트 불러오기
@@ -121,18 +122,72 @@ class ProtectorMainVC: UIViewController {
     }
     
     func setNavivgationBar() {
-        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 128)
-        navigationBar.layer.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
-        navigationBar.layer.cornerRadius = 20
+        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 109)
+        navigationBar.layer.backgroundColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1).cgColor
+        navigationBar.layer.cornerRadius = 10
+
 
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
-        navigationBar.heightAnchor.constraint(equalToConstant: 128).isActive = true
-        navigationBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
-        navigationBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0).isActive = true
-        
+        navigationBar.heightAnchor.constraint(equalToConstant: 109).isActive = true
     }
     
+    func setBtn(cell : UIButton) {
+        // Auto layout, variables, and unit scale are not yet supported
+        cell.backgroundColor = UIColor(red: 0.398, green: 0.452, blue: 0.936, alpha: 1)
+        cell.layer.cornerRadius = 10
+        
+        var shadows = UIView()
+        shadows.frame = cell.frame
+        shadows.clipsToBounds = false
+        cell.addSubview(shadows)
+
+        let shadowPath0 = UIBezierPath(roundedRect: shadows.bounds, cornerRadius: 10)
+        let layer0 = CALayer()
+        layer0.shadowPath = shadowPath0.cgPath
+        layer0.shadowColor = UIColor(red: 0.08, green: 0, blue: 1, alpha: 0.25).cgColor
+        layer0.shadowOpacity = 1
+        layer0.shadowRadius = 10
+        layer0.shadowOffset = CGSize(width: 0, height: 0)
+        layer0.bounds = shadows.bounds
+        layer0.position = shadows.center
+        shadows.layer.addSublayer(layer0)
+
+        var shapes = UIView()
+        shapes.frame = cell.frame
+        shapes.clipsToBounds = true
+        cell.addSubview(shapes)
+
+        let layer1 = CALayer()
+        layer1.backgroundColor = UIColor(red: 0.398, green: 0.452, blue: 0.936, alpha: 1).cgColor
+        layer1.bounds = shapes.bounds
+        layer1.position = shapes.center
+        shapes.layer.addSublayer(layer1)
+
+        shapes.layer.cornerRadius = 10
+
+    }
+    
+    func loadShowObjectDetection() {
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(nextVC, animated: true)
+        
+        print("엥?")
+    }
+    
+    @objc func checkBoxButtonTapped(sender: UIButton) {
+        if sender.titleLabel?.text == "도보 카메라 확인" {
+            guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
+            nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            self.present(nextVC, animated: true)
+        }
+        else if sender.titleLabel?.text == "네비게이션 및 도보 카메라 확인" {
+            guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowNavigationVC") else {return}
+            nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            self.present(nextVC, animated: true)
+        }
+    }
 }
 
 struct MakeRelationResult : Codable {
@@ -146,28 +201,53 @@ extension ProtectorMainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        return 107
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ProtectedCell", for: indexPath)as! ProtectedCell
         cell.name.text = protectedList[indexPath.row].name
-        cell.cellView.layer.cornerRadius = 15
-
-        cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
         
-        cell.statusBtn.layer.cornerRadius = 15
-        cell.statusBtn.backgroundColor = .green
+        // cell 뷰 디자인
+        cell.cellView.layer.cornerRadius = 10
+        cell.backgroundColor = .clear
+        setBtn(cell: cell.statusBtn)
         cell.statusBtn.titleLabel?.text = protectedList[indexPath.row].latest_state
+        
+        // 버튼 구별
+        cell.statusBtn.tag = indexPath.row
+        cell.statusBtn.addTarget(self, action: #selector(checkBoxButtonTapped(sender:)), for: .touchUpInside)
+        
         
         // 피보호자가 오프라인 상태인 경우
         if (protectedList[indexPath.row].latest_state == "Offline") {
+            cell.statusBtn.backgroundColor = UIColor(red: 0.661, green: 0.661, blue: 0.661, alpha: 1)
+            cell.statusBtn.layer.cornerRadius = 10
+            cell.statusBtn.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+            cell.statusBtn.setTitle("오프라인 상태", for: .normal)
             
+            cell.cellView.backgroundColor = UIColor(red: 0.787, green: 0.787, blue: 0.787, alpha: 1)
         }
-        // 피보호자가 네비 or 물체탐지 사용중인 경우
+        // 피보호자가 네비 사용중인 경우
+        else if (protectedList[indexPath.row].latest_state == "Navigation") {
+            cell.statusBtn.backgroundColor = UIColor(red: 0.398, green: 0.452, blue: 0.936, alpha: 1)
+            cell.statusBtn.layer.cornerRadius = 10
+            cell.statusBtn.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+            cell.statusBtn.setTitle("네비게이션 및 도보 카메라 확인", for: .normal)
+        }
+        // 피보호자가 물체탐지 사용중인 경우
         else {
-            
+            cell.statusBtn.backgroundColor = UIColor(red: 0.398, green: 0.452, blue: 0.936, alpha: 1)
+            cell.statusBtn.layer.cornerRadius = 10
+            cell.statusBtn.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+            cell.statusBtn.setTitle("도보 카메라 확인", for: .normal)
         }
+        
+        // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
+        let background = UIView()
+        background.backgroundColor = .clear
+        cell.selectedBackgroundView = background
+        
         return cell
     }
 }
