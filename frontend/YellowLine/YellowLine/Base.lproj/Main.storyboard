@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hNr-lx-6MK">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -375,58 +376,49 @@
             </objects>
             <point key="canvasLocation" x="-1065" y="-26"/>
         </scene>
-        <!--View Controller-->
+        <!--LabStoryboard-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="YellowLine" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="LabStoryboard" id="BYZ-38-t0r" customClass="ViewController" customModule="YellowLine" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fIQ-FS-GXZ">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fIQ-FS-GXZ">
                                 <rect key="frame" x="170" y="699" width="53" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Call"/>
                                 <connections>
                                     <action selector="callBtnTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ngV-1w-fid"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UUh-yd-svu">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UUh-yd-svu">
                                 <rect key="frame" x="139" y="78" width="115" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="ui로 이동"/>
                                 <connections>
                                     <action selector="moveToSearch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dsd-A5-rtS"/>
                                 </connections>
                             </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lP6-fR-Z70">
-                                <rect key="frame" x="71" y="420" width="250" height="253"/>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Gp-te-iWe">
+                                <rect key="frame" x="16" y="181" width="361" height="253"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jem-k4-MKx">
-                                <rect key="frame" x="71" y="121" width="250" height="253"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="299" id="vzV-ko-DHw"/>
-                                </constraints>
+                                <color key="backgroundColor" name="AccentColor"/>
+                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9I6-nN-86s">
+                                <rect key="frame" x="76" y="492" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="jem-k4-MKx" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="4" id="1dh-sp-i2K"/>
-                            <constraint firstItem="jem-k4-MKx" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4mo-zh-zyH"/>
-                            <constraint firstItem="UUh-yd-svu" firstAttribute="centerX" secondItem="jem-k4-MKx" secondAttribute="centerX" id="FkW-lv-bEo"/>
-                            <constraint firstItem="jem-k4-MKx" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="298" id="RSZ-sr-5Eg"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="fIQ-FS-GXZ" secondAttribute="bottom" constant="84" id="TPZ-Fm-MBV"/>
-                            <constraint firstItem="UUh-yd-svu" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="139" id="c9n-CC-eBl"/>
-                            <constraint firstItem="UUh-yd-svu" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="19" id="iyq-Up-5WS"/>
-                            <constraint firstItem="jem-k4-MKx" firstAttribute="centerX" secondItem="fIQ-FS-GXZ" secondAttribute="centerX" id="lRQ-fa-hYH"/>
-                        </constraints>
                     </view>
                     <connections>
                         <outlet property="callBtn" destination="fIQ-FS-GXZ" id="zoL-Em-0Xn"/>
-                        <outlet property="imageView" destination="jem-k4-MKx" id="ceT-x7-yFe"/>
-                        <outlet property="secView" destination="lP6-fR-Z70" id="LuJ-Wd-adP"/>
+                        <outlet property="localView" destination="9Gp-te-iWe" id="nf4-z5-eAr"/>
+                        <outlet property="midasView" destination="9I6-nN-86s" id="WNn-ld-Gug"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -736,6 +728,9 @@
     </scenes>
     <resources>
         <image name="backButton.png" width="12" height="20"/>
+        <namedColor name="AccentColor">
+            <color red="1" green="0.84313725490196079" blue="0.43529411764705883" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

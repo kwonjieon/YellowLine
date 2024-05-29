@@ -10,64 +10,48 @@ import UIKit
 import WebRTC
 import Starscream
 
+
+
+
 class WebRTCManager {
     var userName: String?
     var webRTCClient: WebRTCClient!
     var socket: WebSocket!
     var tryToConnectWebSocket: Timer!
-    let ipAddress: String = "ws://0.tcp.jp.ngrok.io:16108/yl/ws/sock/"
+    let ipAddress: String = Config.default.signalingURL
     var cameraSession: CameraSession?
     var isSocketConnected = false
-    var isParent = false
+    
+    var localView: UIView?
     
     
-    init(_ view: UIImageView, _ midasView: UIImageView , _ userName: String) {
+    init(uiView : UIView, _ midasView : UIImageView ,_ userName: String) {
         self.userName = userName
-        cameraSession = CameraSession(view: view, view2: midasView)
+        self.localView = uiView
+        cameraSession = CameraSession(view: uiView, midasView)
         cameraSession?.delegate = self
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
+        webRTCClient.cameraDevice = cameraSession!.cameraDevice
+        webRTCClient.setupWithRole(isProtector: false, uiView)
         if cameraSession?.checkCameraAuthor() == true{
-            cameraSession?.startVideo()
-            webRTCClient.setupDevice()
+            cameraSession!.startVideo()
             let request = URLRequest(url: URL(string: ipAddress + "\(self.userName!)/")!)
             socket = WebSocket(request: request)
             socket.delegate = self
-            //websocket 연결 설정
-            if !isParent {
-//                DispatchQueue.global(qos: .background).async {
-                    self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
-                        if self.webRTCClient.isConnected || self.isSocketConnected {
-                            print("socket connected!")
-                            return
-                        }
-                        print("Request socket connect")
-                        self.socket.connect()
-                    })
-//                }
-            }
-        }
-    }
-    
-    //MARK: UI setting
-    func setupUI() {
-        if isParent {
             
-        } else {
-            
-        }
-    }
-    
-    //MARK: UI Event mapping
-    func callButtonTapped() {
-        if !webRTCClient.isConnected {
-            print("WebRTCManager 63: not connected")
-            webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
-                self.sendSDP(sessionDescription: offerSDP)
+            // socket 반복요청
+            self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
+                if self.webRTCClient.isConnected || self.isSocketConnected {
+                    print("socket connected!")
+                    return
+                }
+                print("Request socket connect")
+                self.socket.connect()
             })
         }
     }
-    
+
     func exitButtonTapped() {
         if webRTCClient.isConnected {
             webRTCClient.disconnect()
@@ -120,6 +104,7 @@ extension WebRTCManager {
 extension WebRTCManager: WebSocketDelegate {
     func didReceive(event: Starscream.WebSocketEvent, client: any Starscream.WebSocketClient) {
         print("WebSocketDelegate didReceive!")
+        print("==event: ",event)
         switch event {
         case .connected(let headers):
             self.isSocketConnected = true
@@ -129,25 +114,29 @@ extension WebRTCManager: WebSocketDelegate {
             self.isSocketConnected = false
             print("websocket is disconnected: \(reason) with code: \(code)")
         case .text(let string):
+            print("WebSocket에서 자료를 받았습니다.")
             do{
-                let signalingMessage = try JSONDecoder().decode(SignalingMessage.self, from: string.data(using: .utf8)!)
-                
+                let message = try JSONDecoder().decode(Message.self, from: string.data(using: .utf8)!)
+                let signalingMessage = message.message!
+
                 if signalingMessage.type == "offer" {
                     webRTCClient.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
                         self.sendSDP(sessionDescription: answerSDP)
                     })
                 }else if signalingMessage.type == "answer" {
                     webRTCClient.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
+                    
                 }else if signalingMessage.type == "candidate" {
                     let candidate = signalingMessage.candidate!
                     webRTCClient.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
                 }
             }catch{
+                print("didReceive Error 발생")
                 print(error)
             }
-            print("Received text: \(string)")
+//            print("Received text: \(string)")
         case .binary(let data):
-            print("Received data: \(data.count)")
+            print("Websocket: Received data: \(data.count)")
         case .ping(_):
             break
         case .pong(_):
@@ -157,10 +146,12 @@ extension WebRTCManager: WebSocketDelegate {
         case .reconnectSuggested(_):
             break
         case .cancelled:
+            print("cancelled...")
             self.isSocketConnected = false
         case .error(let error):
             self.isSocketConnected = false
 //            handleError(error)
+            print("202 Error 발생.")
             print(error)
         case .peerClosed:
                break
@@ -171,6 +162,8 @@ extension WebRTCManager: WebSocketDelegate {
 
 //MARK: - WebRTCClient Delegate
 extension WebRTCManager: WebRTCClientDelegate {
+
+    
     func didOpenDataChanel() {
         print("did open data channel")
     }
@@ -214,10 +207,13 @@ extension WebRTCManager: WebRTCClientDelegate {
     
     func didReceiveData(data: Data) {
         // data channel 을 연결했을 때 여기에 데이터가 옴. 추가기능임.
+        print("Data received...! \(data)")
     }
     
     func didReceiveMessage(message: String) {
         // 위와 마찬가지 data channel용.
+        print(message)
+        
     }
 }
 
@@ -231,6 +227,7 @@ extension WebRTCManager: CameraSessionDelegate {
     
     // 확인해보니 WebRTC + CameraSession이 문제가 아니었음.
     // socket request가 문제로 보임. 모든 테스트 완료 후 문제 없으면 삭제하기.
+    // local video view에 표시하는 함수임.
     func didWebRTCOutput(_ sampleBuffer: CMSampleBuffer) {
         if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
             let rtcpixelBuffer = RTCCVPixelBuffer(pixelBuffer: pixelBuffer)
@@ -239,7 +236,9 @@ extension WebRTCManager: CameraSessionDelegate {
             
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
+        
     }
+    
     
     
 }

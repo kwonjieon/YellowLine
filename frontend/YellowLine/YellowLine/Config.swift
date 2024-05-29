@@ -7,7 +7,8 @@
 
 import Foundation
 
-//fileprivate let defaultSignalingServerUrl = URL(string: "ws://localhost:8001/yl/ws/sock/")
+//fileprivate let defaultSignalingServerUrl = "ws://0.tcp.jp.ngrok.io:10514/yl/ws/sock/"
+fileprivate let defaultSignalingServerUrl = "ws://43.202.136.75:8001/yl/ws/sock/"
 
 fileprivate let defaultIceServers = ["stun:stun.l.google.com:19302",
                                      "stun:stun1.l.google.com:19302",
@@ -15,6 +16,6 @@ fileprivate let defaultIceServers = ["stun:stun.l.google.com:19302",
 
 struct Config {
     let webRTCServers: [String]
-    
-    static let `default` = Config(webRTCServers: defaultIceServers)
+    let signalingURL: String
+    static let `default` = Config(webRTCServers: defaultIceServers, signalingURL: defaultSignalingServerUrl)
 }

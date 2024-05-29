@@ -11,9 +11,9 @@ import Foundation
 //}
 
 struct YLUser:Codable {
-    let clientId: String
-    let message: String
-    let connDate: String
+    let clientId: String?
+    let message: String?
+    let connDate: String?
 //    let userType : YLUserType
     
 }
@@ -23,7 +23,7 @@ struct Message: Codable {
 }
 
 struct SignalingMessage: Codable {
-    let type: String
+    let type: String?
     let sessionDescription: SDP?
     let candidate: Candidate?
 }

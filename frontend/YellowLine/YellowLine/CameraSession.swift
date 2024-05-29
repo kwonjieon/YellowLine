@@ -9,9 +9,8 @@ import Foundation
 import AVFoundation
 import Accelerate
 import UIKit
-import Combine
-import CoreMedia
 import CoreML
+import CoreVideo
 import Vision
 //import Alamofire
 
@@ -20,25 +19,22 @@ protocol CameraSessionDelegate {
     func didSampleOutput(_ ciImage: CIImage)
 }
 
+
+let mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
 // ai 모델
-let mlModel = try! yolov8s(configuration: MLModelConfiguration()).model
-//let midasModel = try! midas_small(configuration: MLModelConfiguration()).model
 let midasModel = try! MiDaS()
-//let midasModel = try! FCRNFP16(configuration: MLModelConfiguration())
 
 class CameraSession: NSObject {
     let semaphore = DispatchSemaphore(value: 1)
     var delegate: CameraSessionDelegate?
     var captureSession = AVCaptureSession()
-    //    var videoOutput: AVCaptureVideoDataOutput
     var videoOutput = AVCaptureVideoDataOutput()
-    var imgUrl: String!
-    let queue = DispatchQueue(label: "videoQueue")
-    var _ciImage: CIImage?
-    //    var _cvpixelbuffer: CVPixelBuffer?
-    var _imageView: UIImageView? // videoPreview
-    var secImageView: UIImageView?
-    //    var subscriptions = Set<>()
+    let queue = DispatchQueue(label: "videoQueue", qos: .userInitiated)
+
+    var localView: UIView?
+    
+    //for test
+    var midasView: UIImageView?
     public var previewLayer: AVCaptureVideoPreviewLayer?
     public var midasPreviewLayer: AVCaptureVideoPreviewLayer?
     
@@ -47,22 +43,17 @@ class CameraSession: NSObject {
     
     //    var preferredOutputPixelFormat = FourCharCode("BGRA")
     var preferredOutputPixelFormat: FourCharCode = 0
-    
-    //networkmanager는 websocket을 사용하기 때문에 현재 사용안함. 나중에 추가로 서버와 통신할 때 간단한 통신작업만 추가할예정.
-    //    let _networkManager = NetworkManager(url : URL(string: "ws://0.tcp.jp.ngrok.io:15046/yl/ws/"))
-    //    let socketManager: WebSocketManager?
+
     
     var isCapturing = false
     let clientId = "YLUser01"
     
-    init(view: UIImageView?, view2: UIImageView?){
+    init(view: UIView, _ midasView: UIImageView){
         super.init()
-        //url도 websocket 주소로 바꿀계획.
+        self.localView = view
+        self.midasView = midasView
         setUpBoundingBoxViews()
-        
         self.cameraDevice = setupInput(w: 1280, h:720)
-        self._imageView = view
-        self.secImageView = view2
     }
     
     // 이걸로 CameraSession + object detection 시작
@@ -71,19 +62,13 @@ class CameraSession: NSObject {
             if success {
                 // Add the video preview into the UI.
                 if let previewLayer = self.previewLayer {
-                    _imageView!.layer.addSublayer(previewLayer)
-                    self.previewLayer?.frame = self._imageView!.bounds  // resize preview layer
+                    localView!.layer.addSublayer(previewLayer)
+                    self.previewLayer?.frame = self.localView!.bounds  // resize preview layer
                 }
-                
-                if let midasPreviewLayer = self.midasPreviewLayer{
-                    secImageView!.layer.addSublayer(midasPreviewLayer)
-                    self.midasPreviewLayer?.frame = self.secImageView!.bounds  // resize preview layer
-                }
-                
                 
                 // Add the bounding box layers to the UI, on top of the video preview.
                 for box in self.boundingBoxViews {
-                    box.addToLayer(self._imageView!.layer)
+                    box.addToLayer(self.localView!.layer)
                 }
                 
                 print("setup complete")
@@ -94,31 +79,19 @@ class CameraSession: NSObject {
     }
     
     func setup(completion: @escaping (Bool) -> Void) {
-        self.imgUrl = "https://145b-182-222-253-136.ngrok-free.app/yl/img"
         queue.async {
             self.captureSession = .init()
             self.videoOutput = .init()
             // 뷰를 빈으로 등록해(ex:@State 같은 어노테이션) 나중에 이와같은 코드를 없애버리자.
             //            self._imageView = view
-            //run websocket
-            //        self.socketManager = WebSocketManager(view: self._imageView!)
-            //            self.detection = Detection((self.previewLayer?.bounds.width)!, (self.previewLayer?.bounds.height)!)
-            let model = try! VNCoreMLModel(for: yolov8s(configuration: MLModelConfiguration()).model)
-            //            let midasModel = try! VNCoreMLModel(for: midas_small(configuration: MLModelConfiguration()).model)
+
             
             if let visionModel = try? VNCoreMLModel(for: midasModel.model) {
-                self.midasVisionModel = visionModel
                 self.midasVisionRequest = VNCoreMLRequest(model: visionModel, completionHandler: self.visionRequestDidComplete)
                 self.midasVisionRequest?.imageCropAndScaleOption = .centerCrop
             } else {
                 fatalError("fail to create vision model")
             }
-            
-            //            self.yoloRequest = VNCoreMLRequest(model: model)
-            
-            self.detectionRequest = VNCoreMLRequest(model: model)
-            //            self.midasVisionRequest = VNCoreMLRequest(model: midasModel/*, completionHandler: self.visionRequestDidComplete*/)
-            //            self.midasVisionRequest?.imageCropAndScaleOption = .centerCrop
             let success = self.setupCameraSession()
             DispatchQueue.main.async {
                 completion(success)
@@ -126,8 +99,7 @@ class CameraSession: NSObject {
             
         }
     }
-    
-    
+    // 카메라 권한 확인
     func checkCameraAuthor() -> Bool{
         var complete = false
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -156,9 +128,7 @@ class CameraSession: NSObject {
     //MARK: -세팅:카메라 세션
     func setupCameraSession() -> Bool {
         self.captureSession.beginConfiguration()
-        self.captureSession.sessionPreset = .photo
-        // input setting
-        
+        self.captureSession.sessionPreset = .photo //.photo, .hd1280x720
         
         //output setting
         setupOutput()
@@ -176,7 +146,6 @@ class CameraSession: NSObject {
             return false
         }
         
-        //        setupRTCCameraDevice(cameraDevice)
         let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.connection?.videoOrientation = .portrait
@@ -219,19 +188,10 @@ class CameraSession: NSObject {
             }
         }
         self.deviceFormat = selectedFormat
-        
-        var maxFrameRate: Float64 = 0.0
-        for fpsRange in  selectedFormat!.videoSupportedFrameRateRanges {
-            maxFrameRate = fmax(maxFrameRate, fpsRange.maxFrameRate)
-        }
-        
-        //        let fps = Int(maxFrameRate)
-        let fps = 10
-        print("fps is \(fps)")
         do {
             try device.lockForConfiguration()
             device.activeFormat = selectedFormat!
-            device.activeVideoMinFrameDuration = CMTimeMake(value: 1, timescale: Int32(fps))
+            device.activeVideoMinFrameDuration = CMTimeMakeWithSeconds(1, preferredTimescale: Int32(10))
             device.unlockForConfiguration()
         } catch(let error) {
             print(error)
@@ -241,52 +201,20 @@ class CameraSession: NSObject {
     
     //output setting method
     private func setupOutput() {
-        let pixelFormats: Set<OSType> = Set([kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,
-                                             kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,
-                                             kCVPixelFormatType_32BGRA
-                                            ])
-        
-        let availablePixelFormats = NSMutableOrderedSet(array: videoOutput.availableVideoPixelFormatTypes)
-        availablePixelFormats.intersectSet(pixelFormats)
-        
-        let pixelFormat = availablePixelFormats.firstObject as? OSType ?? 0
-        self.preferredOutputPixelFormat = pixelFormat
-        
-        if let format = self.deviceFormat {
-            var mediaSubType: FourCharCode = CMFormatDescriptionGetMediaSubType(format.formatDescription)
-            if availablePixelFormats.contains(mediaSubType) {
-                if mediaSubType != preferredOutputPixelFormat {
-                    self.preferredOutputPixelFormat = mediaSubType
-                }
-            } else {
-                mediaSubType = self.preferredOutputPixelFormat
-            }
-        }
-        
-        let settings: [String: Any] = [
-            String(kCVPixelBufferMetalCompatibilityKey): true,
-            String(kCVPixelBufferPixelFormatTypeKey): NSNumber(value: self.preferredOutputPixelFormat),
-        ]
-        self.videoOutput.videoSettings = settings
+        self.videoOutput.videoSettings = .init()
         self.videoOutput.alwaysDiscardsLateVideoFrames = true
         self.videoOutput.setSampleBufferDelegate(self, queue: self.queue)
         
     }
     
     
+    // 카메라 작동 시작
     func startSession() {
         if !self.captureSession.isRunning {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 self?.captureSession.startRunning()
             }
         }
-        
-        
-        // websocket 통신 시작
-        //        self.socketManager?.connect()
-        //        self.socketManager?.connectRtc(clientId)
-        
-        //        self._networkManager.runUploadImageSession()
     }
     
     func stopSession() {
@@ -295,16 +223,14 @@ class CameraSession: NSObject {
                 self?.captureSession.stopRunning()
             }
         }
-//                self.socketManager?.disconnect()
-//                self.socketManager?.disconnectRtc()
     }
     
     
     // MARK: - object detection...
-    var detector = try! VNCoreMLModel(for: mlModel)
+    var yoloDetector = try! VNCoreMLModel(for: mlModel)
     var midasVisionModel : VNCoreMLModel?
     var detectionRequest : VNCoreMLRequest?
-    var currentBuffer: CVPixelBuffer?
+
     var framesDone = 0
     var t0 = 0.0  // inference start
     var t1 = 0.0  // inference dt
@@ -338,35 +264,47 @@ class CameraSession: NSObject {
         }
     }
     
-    // MARK: - without image
     lazy var visionRequest: VNCoreMLRequest = {
-        let request = VNCoreMLRequest(model: detector, completionHandler: {
+        let request = VNCoreMLRequest(model: yoloDetector, completionHandler: {
             [weak self] request, error in
             self?.processObservations(for: request, error: error)
         })
         // NOTE: BoundingBoxView object scaling depends on request.imageCropAndScaleOption https://developer.apple.com/documentation/vision/vnimagecropandscaleoption
-        request.imageCropAndScaleOption = .scaleFill  // .scaleFit, .scaleFill, .centerCrop
+        request.imageCropAndScaleOption = .centerCrop  // .scaleFit, .scaleFill, .centerCrop
         return request
     }()
     
     // MARK: - MIDAS
+    /**
+     입력: 256 *256이미지
+     결과:256*256 grayscale(0~255값)이미지
+     */
     var midasVisionRequest : VNCoreMLRequest!
-    //    var midasDetector = try! VNCoreMLModel(for: midasModel.model)
+    //for test midas
+    var depthPixelBuffer : CVPixelBuffer?
+    
     var depthCIImage: CIImage?
+    var depthCIInput: CIImage?
+    var originalCIImage : CIImage?
+    var originalCGImage : CGImage?
+    var resizedCGImage : CGImage?
+    
+    
+    
     func visionRequestDidComplete(request: VNRequest, error: Error?) {
-        if let predictions = request.results as? [VNPixelBufferObservation],
-           let pixelBuffer = predictions.first?.pixelBuffer {
-            let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-            self.depthCIImage = ciImage
-            let uiImage = UIImage(ciImage: ciImage)
-            
+        // 여기서 pixelbuffer의 크기는 256*256크기임. (마이다스 인풋에 맞게 depthCIInput에 넣어놨기때문)
+        if let predictions = request.results as? [VNPixelBufferObservation]
+            , let pixelBuffer = predictions.first?.pixelBuffer
+            , let bf = currentBuffer {
+            depthPixelBuffer = pixelBuffer
+            depthCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+            let uiImage = UIImage(ciImage: depthCIImage!)
+            let handler = VNImageRequestHandler(ciImage: originalCIImage!)
             do {
-                let handler = VNImageRequestHandler(ciImage: self._ciImage!)
                 DispatchQueue.main.async {
-                    self.secImageView?.image = uiImage
+                    self.midasView!.image = uiImage
                 }
                 try handler.perform([visionRequest])
-                //d
             } catch  {
                 print(error)
             }
@@ -376,55 +314,49 @@ class CameraSession: NSObject {
         self.semaphore.signal()
     }
     
-    
     // MARK: - Yolo
-    /**
-     이미지의 전체 픽셀사이즈를 구하는 법. (cgimage이용)
-     let image = UIImage(named: "test")
-     let width = image?.cgImage.width // Pixel width
-     let height = image?.cgImage.height // Pixel height
-     let imageSize = CGSize(width: width, height: height) //Image Pixel Size
-     print("Image Pixel Size: \(imageSize)")
-     */
-    
-    func predict(_ pixelBuffer: CVImageBuffer){
+    var currentBuffer: CVImageBuffer?
+    func predict(_ cvImageBuffer : CVImageBuffer?){
         // Invoke a VNRequestHandler with that image
-        //        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: imageOrientation, options: [:])
-        self.semaphore.wait()
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer).oriented(forExifOrientation: 6)
-        self._ciImage = ciImage
-        let midasHandler = VNImageRequestHandler(ciImage: ciImage)
-        if UIDevice.current.orientation != .faceUp {  // stop if placed down on a table
-            do {
-                try midasHandler.perform([self.midasVisionRequest])
-                //                try handler.perform([visionRequest])
-            } catch {
-                print(error)
+        if currentBuffer == nil {
+            self.semaphore.wait()
+            currentBuffer = cvImageBuffer
+
+            let ciContext = CIContext()
+            let ciImage = CIImage(cvImageBuffer: cvImageBuffer!)
+                .oriented(forExifOrientation: 6)
+            originalCIImage = ciImage
+//            resizedCGImage = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 640, height: 640))
+            let midasImg = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 256, height: 256))
+            
+            let midasHandler = VNImageRequestHandler(cgImage: midasImg!)
+            if UIDevice.current.orientation != .faceUp {  // stop if placed down on a table
+                do {
+                    try midasHandler.perform([self.midasVisionRequest])
+                } catch {
+                    print(error)
+                }
             }
-        }
-    }
-    
-    func midasProcessObservation(for request: VNRequest, error: Error?){
-        print(request)
-    }
+            currentBuffer = nil
+        } // if end
+    } // predict end
     
     func processObservations(for request: VNRequest, error: Error?) {
         DispatchQueue.main.async {
             if let results = request.results as? [VNRecognizedObjectObservation] {
-                //                print("====predictions\n", results)
                 self.show(predictions: results)
             } else {
                 self.show(predictions: [])
             }
         }
     }
-    
+
+    // MARK:  Show
     func show(predictions: [VNRecognizedObjectObservation]) {
-        let width = self._imageView!.bounds.width  // 375 pix
-        let height = self._imageView!.bounds.height  // 812 pix
-        let midasWidth = self.secImageView!.bounds.width
-        let midasHeight = self.secImageView!.bounds.height
-//        print("view width: \(width), view height : \(height)")
+        let width = previewLayer!.bounds.width
+        let height = previewLayer!.bounds.height
+//        let width = localView!.bounds.width
+//        let height = localView!.bounds.height
 
         var str = ""
         // ratio = videoPreview AR divided by sessionPreset AR
@@ -434,15 +366,6 @@ class CameraSession: NSObject {
         } else {
             ratio = (height / width) / (16.0 / 9.0)  // .hd4K3840x2160, .hd1920x1080, .hd1280x720 etc.
         }
-        
-        // date
-        let date = Date()
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: date)
-        let minutes = calendar.component(.minute, from: date)
-        let seconds = calendar.component(.second, from: date)
-        let nanoseconds = calendar.component(.nanosecond, from: date)
-        let sec_day = Double(hour) * 3600.0 + Double(minutes) * 60.0 + Double(seconds) + Double(nanoseconds) / 1E9  // seconds in the day
         
         for i in 0..<boundingBoxViews.count {
             if i < predictions.count {
@@ -470,106 +393,115 @@ class CameraSession: NSObject {
                         fallthrough
                     default: break
                     }
+//                    print("first rect value : \(rect)")
                     
                     if ratio >= 1 { // iPhone ratio = 1.218
                         let offset = (1 - ratio) * (0.5 - rect.minX)
                         let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: offset, y: -1)
                         rect = rect.applying(transform)
                         rect.size.width *= ratio
-
+                        
                     } else { // iPad ratio = 0.75
                         let offset = (ratio - 1) * (0.5 - rect.maxY)
                         let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: offset - 1)
                         rect = rect.applying(transform)
                         rect.size.height /= ratio
                     }
+//                    print("second rect value : \(rect)")
                     rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
-//                    print("\(self._ciImage?.extent.width), \(self._ciImage?.extent.height)\n Rect info: \(rect.minX), \(rect.minY)")
+//                    print("last rect value: \(rect)")
+                    //                    print("\(self._ciImage?.extent.width), \(self._ciImage?.extent.height)\n Rect info: \(rect.minX), \(rect.minY)")
                     //그리기
-                    let midX = rect.midX
-                    let midY = rect.midY
+//                    print("\(CVPixelBufferGetWidth(depthPixelBuffer!)), \(CVPixelBufferGetHeight(depthPixelBuffer!)), \(CVPixelBufferGetBytesPerRow(depthPixelBuffer!))")
+                    var midX = rect.midX
+                    var midY = rect.midY
+                    // 점 그리기
+                    drawPoint(x: Int(midX), y: Int(midY), view: localView!)
+                    if midX < 0 { midX = 0 }
+                    if midX >= width { midX = width }
+                    if midY < 0 { midY = 0 }
+                    if midY >= height { midY = height }
                     
-                     
-                    var depthValue: CGFloat?
-                    
+                    var depthValue: Float?
+                    let imgWidth = self.midasView!.bounds.width
+                    let imgHeight = self.midasView!.bounds.height
+                    let p_midasX = Int(midX / width * imgWidth)
+                    let p_midasY = Int(midY / height * imgHeight)
+                    let midasX = Int(midX / width * 256)
+                    let midasY = Int(midY / height * 256)
+
+                    depthValue = 0.0
                     // 마이다스 이미지 좌표 지정
                     if self.depthCIImage != nil {
-                        let bf = (self.depthCIImage?.pixelBuffer)!
-                        let imgWidth = CVPixelBufferGetWidth(bf)
-                        let imgHeight = CVPixelBufferGetHeight(bf)
-                        let midasX = Int((midX / width)) * imgWidth
-                        let midasY = Int(midY / height) * imgHeight
-                        //1
-                        let context = CIContext()
-                        let depthPixel = context.createCGImage(self.depthCIImage!,from: CGRect(x: midasX, y: midasY, width: 1, height: 1))
-                        if depthPixel == nil { break }
-                        let pixelData = CFDataGetBytePtr(depthPixel?.dataProvider?.data)
-                        let dalue = pixelData!.pointee
-                        depthValue = CGFloat(dalue) / 255.0
-                        //2
-//                        CVPixelBufferLockBaseAddress(bf, .readOnly)
-//                        let floatBuffer = unsafeBitCast(CVPixelBufferGetBaseAddress(bf), to: UnsafeMutablePointer<Float>.self)
-//
-//                        print(floatBuffer[midasX+midasY])
-//                        CVPixelBufferUnlockBaseAddress(bf, .readOnly)
+                        let bf = (self.depthPixelBuffer)!
+                        let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
+                        let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
+                        //draw start
+                        let radius = 8
+                        let dotPath = UIBezierPath(ovalIn: CGRect(x: midasX, y: midasY, width: radius, height: radius))
+                        let layer = CAShapeLayer()
+                        layer.path = dotPath.cgPath
+                        layer.strokeColor = UIColor.blue.cgColor
+                        self.midasView!.layer.addSublayer(layer)
+                        //draw end
+                        
+                        CVPixelBufferLockBaseAddress(bf, .readOnly)
+                        let baseAddress = CVPixelBufferGetBaseAddress(bf)
+                        let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
+                        let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
+                        // read the data (returns value of type UInt8)
+                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
+                        depthValue = 1.0 - Float(dalue) / 255.0
+                        CVPixelBufferUnlockBaseAddress(bf, .readOnly)
                     }
-                    
-                    // The labels array is a list of VNClassificationObservation objects,
-                    // with the highest scoring class first in the list.
-                    
-//                    if depthValue! >= 0.6 {
-//                        boundingBoxViews[i].hide()
-//                        break
-//                    }
                     let bestClass = prediction.labels[0].identifier
-//                    print("\(bestClass): \(depthValue)")
                     let confidence = prediction.labels[0].confidence
-//                    print(confidence, rect)  // debug (confidence, xywh) with xywh origin top left (pixels)
                     
+//                    // bestClass != 신호등이 아니면서 멀리에 있는 것들
+//                    if  bestClass != "" && depthValue! >= 0.4 {
+//                        boundingBoxViews[i].hide()
+//                        continue
+//                    }
+                    
+                    // 가까운 것들만 내려오면, class와 depthValue값을 배열에 넣고
+                    // depthValue로 정렬해서 prediction end 다음 줄에
+                    // TTS실행 시키는 코드 작성.
                     // Show the bounding box.
                     boundingBoxViews[i].show(frame: rect,
-                                             label: String(format: "%@ %.1f", bestClass, confidence * 100),
+                                             label: String(format: "%@ %.1f %.2f", bestClass, confidence * 100, depthValue!),
                                              color: colors[bestClass] ?? UIColor.white,
                                              alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
-                }
-                
+                } //confidence >= .5 end
             } else {
                 boundingBoxViews[i].hide()
-            }
-        }
+            } // prediction end...
+            
+            //여기다가 TTS 모듈 넣는게 어떨까 싶음.
+            
+        } // show end...
     }
     
-    func drawPoint(x : Int, y: Int, view: AVCaptureVideoPreviewLayer){
+    func drawPoint(x : Int, y: Int, view: UIView){
         let radius = 8
-
         let dotPath = UIBezierPath(ovalIn: CGRect(x: x, y: y, width: radius, height: radius))
 
         let layer = CAShapeLayer()
         layer.path = dotPath.cgPath
         layer.strokeColor = UIColor.blue.cgColor
-        view.addSublayer(layer)
+        view.layer.addSublayer(layer)
     }
 }
 
 //MARK: - captureOutput 설정
 extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-//        startCapture(sampleBuffer)
-        
-        //        guard !CameraSession.isUploaded else { return }
-        //
-        ////        CameraSession.isUploaded = true
-        //
+
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
+        //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
-        let ciImage = CIImage(cvImageBuffer: cvImageBuffer!).oriented(forExifOrientation: 6)
-        predict(cvImageBuffer!)
-
+//        print(CVPixelBufferGetPixelFormatType(cvImageBuffer!), CVPixelBufferGetWidth(cvImageBuffer!), CVPixelBufferGetHeight(cvImageBuffer!))
+        predict(cvImageBuffer)
         delegate?.didWebRTCOutput(sampleBuffer)
-        
-        //CameraSession + WebRTC확인 용으로 넣은 delegate protocol.
-        delegate?.didSampleOutput(ciImage)
-
     }
 }
 
@@ -608,79 +540,27 @@ extension UIImage {
         }
         return image
     }
-
-    func normalized() -> [Float32]? {
-        guard let cgImage = self.cgImage else {
-            return nil
-        }
-        let w = cgImage.width
-        let h = cgImage.height
-        let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel * w
-        let bitsPerComponent = 8
-        var rawBytes: [UInt8] = [UInt8](repeating: 0, count: w * h * 4)
-        rawBytes.withUnsafeMutableBytes { ptr in
-            if let cgImage = self.cgImage,
-                let context = CGContext(data: ptr.baseAddress,
-                                        width: w,
-                                        height: h,
-                                        bitsPerComponent: bitsPerComponent,
-                                        bytesPerRow: bytesPerRow,
-                                        space: CGColorSpaceCreateDeviceRGB(),
-                                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) {
-                let rect = CGRect(x: 0, y: 0, width: w, height: h)
-                context.draw(cgImage, in: rect)
-            }
-        }
-        var normalizedBuffer: [Float32] = [Float32](repeating: 0, count: w * h * 3)
-        // normalize the pixel buffer
-        // see https://pytorch.org/hub/pytorch_vision_resnet/ for more detail
-        for i in 0 ..< w * h {
-            normalizedBuffer[i] = (Float32(rawBytes[i * 4 + 0]) / 255.0 - 0.485) / 0.229 // R
-            normalizedBuffer[w * h + i] = (Float32(rawBytes[i * 4 + 1]) / 255.0 - 0.456) / 0.224 // G
-            normalizedBuffer[w * h * 2 + i] = (Float32(rawBytes[i * 4 + 2]) / 255.0 - 0.406) / 0.225 // B
-        }
-        return normalizedBuffer
-    }
 }
 
-extension CVPixelBuffer {
-    func normalized(_ width: Int, _ height: Int) -> [Float]? {
-        let w = CVPixelBufferGetWidth(self)
-        let h = CVPixelBufferGetHeight(self)
-        let pixelBufferType = CVPixelBufferGetPixelFormatType(self)
-        assert(pixelBufferType == kCVPixelFormatType_32BGRA)
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(self)
-        let bytesPerPixel = 4
-        let croppedImageSize = min(w, h)
-        CVPixelBufferLockBaseAddress(self, .readOnly)
-        let oriX = w > h ? (w - h) / 2 : 0
-        let oriY = h > w ? (h - w) / 2 : 0
-        guard let baseAddr = CVPixelBufferGetBaseAddress(self)?.advanced(by: oriY * bytesPerRow + oriX * bytesPerPixel) else {
-            return nil
-        }
-        var inBuff = vImage_Buffer(data: baseAddr, height: UInt(croppedImageSize), width: UInt(croppedImageSize), rowBytes: bytesPerRow)
-        guard let dstData = malloc(width * height * bytesPerPixel) else {
-            return nil
-        }
-        var outBuff = vImage_Buffer(data: dstData, height: UInt(height), width: UInt(width), rowBytes: width * bytesPerPixel)
-        let err = vImageScale_ARGB8888(&inBuff, &outBuff, nil, vImage_Flags(0))
-        CVPixelBufferUnlockBaseAddress(self, .readOnly)
-        if err != kvImageNoError {
-            free(dstData)
-            return nil
-        }
-        var normalizedBuffer: [Float32] = [Float32](repeating: 0, count: width * height * 3)
-        for i in 0 ..< width * height {
-            normalizedBuffer[i] = Float32(dstData.load(fromByteOffset: i * 4 + 0, as: UInt8.self)) / 255.0  // R
-            normalizedBuffer[width * height + i] = Float32(dstData.load(fromByteOffset: i * 4 + 1, as: UInt8.self)) / 255.0 // G
-            normalizedBuffer[width * height * 2 + i] = Float32(dstData.load(fromByteOffset: i * 4 + 2, as: UInt8.self)) / 255.0 // B
-        }
-        free(dstData)
-        return normalizedBuffer
+
+extension CGImage {
+    func resize(size:CGSize) -> CGImage? {
+        let width: Int = Int(size.width)
+        let height: Int = Int(size.height)
+
+        let bytesPerPixel = self.bitsPerPixel / self.bitsPerComponent
+        let destBytesPerRow = width * bytesPerPixel
+
+
+        guard let colorSpace = self.colorSpace else { return nil }
+        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: self.bitsPerComponent, bytesPerRow: destBytesPerRow, space: colorSpace, bitmapInfo: self.alphaInfo.rawValue) else { return nil }
+
+        context.interpolationQuality = .high
+        context.draw(self, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        return context.makeImage()
     }
 }
-
 /**
  
  https://www.kaggle.com/code/takuyasukegawa/yolov8-midas-find-the-nearest-cars

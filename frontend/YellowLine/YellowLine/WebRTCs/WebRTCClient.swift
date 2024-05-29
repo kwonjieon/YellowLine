@@ -16,6 +16,7 @@ protocol WebRTCClientDelegate: AnyObject {
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState)
     func didReceiveData(data: Data)
     func didReceiveMessage(message: String)
+//    func didBase64ImageArrived(base64: String)
 }
 
 /**
@@ -36,45 +37,55 @@ class WebRTCClient: NSObject{
 //    var isClient = false
     weak var delegate : WebRTCClientDelegate?
     
+    var isProtector = false
+    
     static var factory: RTCPeerConnectionFactory = {
         RTCInitializeSSL()
         let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
         let videoDecoderFactory = RTCDefaultVideoDecoderFactory()
+        
+//        // MARK: Codec (H.264 or VP8)
+        // If you do net set codec, it uses H.264 as a default in iOS 2.0+
+//        if let codecInformation = (RTCDefaultVideoEncoderFactory.supportedCodecs().first { $0.name.elementsEqual("VP8") }) {
+//            videoEncoderFactory.preferredCodec = codecInformation
+//        }
         return RTCPeerConnectionFactory(encoderFactory: videoEncoderFactory, decoderFactory: videoDecoderFactory)
     }()
     private let mediaConstraints = [kRTCMediaConstraintsOfferToReceiveVideo: kRTCMediaConstraintsValueTrue]
-    private var localCandidates = [RTCIceCandidate]()
-    
     private var peerConnection : RTCPeerConnection?
     //local media stream
-    private var localStream: RTCMediaStream?
-    private var remoteStream: RTCMediaStream?
     //local Tracks
+    private var localStream: RTCMediaStream?
     private var localVideoSource : RTCVideoSource?
     private var localVideoTrack : RTCVideoTrack!
     //remote Tracks
     private var remoteVideoTrack : RTCVideoTrack?
-    
     private var videoCapturer : RTCVideoCapturer?
-    
+    private var remoteStream: RTCMediaStream?
+
     //Data channels
     private var localDataChannel: RTCDataChannel?
     private var remoteDataChannel: RTCDataChannel?
     
-    //View
+    //data channel
+    private var dataChannel: RTCDataChannel?
+    //view
+    private var localRenderView: RTCEAGLVideoView?
+    private var localView: UIView!
     private var remoteRenderView: RTCEAGLVideoView?
     private var remoteView: UIView!
     
-    //DI
-//    private let remoteSinks: [RTCVideoRenderer]
-    
+    //camera
+    var cameraDevice: AVCaptureDevice?
     private var hasReceivedSDP = false
+    
 //    weak var device: AVCaptureDevice?
     public private(set) var isConnected: Bool = false
     
     override init() {
         super.init()
         print("WebRTC Client initialized.")
+
     }
     
     deinit {
@@ -82,81 +93,114 @@ class WebRTCClient: NSObject{
         self.peerConnection = nil
     }
     
-    //카메라 세팅하기
-    func setupDevice(/*_ device: AVCaptureDevice*/) {
-        print("setup device")
-//        self.device = device
-        setupLocalTrack()
-        startCapturerLocalVideo(cameraPosition: .back)
+    // MARK: Setting.
+    func setupWithRole(isProtector role: Bool, _ view: UIView) {
+        self.isProtector = role
+        if isProtector {
+            print("보호자 입니다")
+            remoteView = view
+            remoteRenderView = RTCEAGLVideoView(frame: remoteView.frame)
+            remoteRenderView?.delegate = self
+            remoteView.addSubview(remoteRenderView!)
+        } else {
+            print("피보호자 입니다")
+            localView = view
+            setupLocalTrack()
+            startCapturerLocalVideo(cameraPosition: .back)
+            //
+            localRenderView = RTCEAGLVideoView()
+            localRenderView!.delegate = self
+            localView.addSubview(localRenderView!)
+//            self.localVideoTrack?.add(self.localRenderView!)
+        }
+    }
+
+
+    private func setupView() {
+        // local
+        localRenderView = RTCEAGLVideoView()
+        localRenderView!.delegate = self
+//        localView = UIView()
+//        localView.addSubview(localRenderView!)
+        // remote
+        remoteRenderView = RTCEAGLVideoView()
+        remoteRenderView?.delegate = self
+//        remoteView = UIView()
+        remoteView.addSubview(remoteRenderView!)
+    }
+    
+    func localVideoView() -> UIView {
+        return localView
+    }
+    
+    func remoteVideoView() -> UIView {
+        return remoteView
+    }
+    
+    func setupLocalViewFrame(frame: CGRect){
+        localView.frame = frame
+        localRenderView?.frame = localView.frame
     }
     
     func setupRemoteViewFrame(frame: CGRect){
          remoteView.frame = frame
          remoteRenderView?.frame = remoteView.frame
      }
-    
 
     
+
     //MARK: - setup Connection( peerConnection, tracks, videoCapturer)
     func connect(onSuccess: @escaping (RTCSessionDescription) -> Void){
         self.peerConnection = setupPeerConnection()
         self.peerConnection?.delegate = self
+        remoteVideoTrack = peerConnection!.transceivers.first { $0.mediaType == .video }?.receiver.track as? RTCVideoTrack
+        self.dataChannel = self.setupDataChannel()
+        self.dataChannel?.delegate = self
 
-        
         makeOffer(onSuccess: onSuccess)
     }
     
+    // MARK: ERROR 예측지점
     // peerConnection
     private func setupPeerConnection() -> RTCPeerConnection? {
+        let constraints = RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: ["DtlsSrtpKeyAgreement": "true"])
         let config = generateConfig()
-        let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: ["DtlsSrtpKeyAgreement" : kRTCMediaConstraintsValueTrue])
-        let pc = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: nil)
+        let pc = WebRTCClient.factory.peerConnection(with: config, constraints: constraints, delegate: self)
         
         return pc
     }
     
-    private func setupMediaSender() {
-        self.remoteVideoTrack = peerConnection!.transceivers.first { $0.mediaType == .video }?.receiver.track as? RTCVideoTrack
-        
-        // dataChannel생성은 지금 굳이 필요 없을듯 하다. 비디오 외 데이터 전송 시 이용하자.
-        if let dataChannel = createDataChannel() {
-            dataChannel.delegate = self
-            self.localDataChannel = dataChannel
-        }
-    }
-    
+    // localframe 설정 (내가 찍고있는 비디오 화면을 내 화면에 보여줄 때 설정함.)
     func didCaptureLocalFrame(_ videoFrame: RTCVideoFrame) {
         guard let videoSource = self.localVideoSource,
             let videoCapturer = videoCapturer else { return }
-        
-        videoSource.capturer(videoCapturer, didCapture: videoFrame)
-    }
-    private func setupLocalTrack() {
-        debugPrint("call setupLocalTrack")
-//        guard let pc = self.peerConnection else {
-//            print("setupMediaSender is error")
-//            return
-//        }
-        
-        //미디어 스트림 생성
-        self.localStream = WebRTCClient.factory.mediaStream(withStreamId: "media")
-        // 카메라 캡처 세팅
-        // 로컬 비디오 트랙, 로컬 비디오 소스 세팅
-        let videoSource = WebRTCClient.factory.videoSource()
-        self.localVideoSource = videoSource
-        let videoTrack = WebRTCClient.factory.videoTrack(with: videoSource, trackId: "YLUSERv01")
-        self.localVideoTrack = videoTrack
-        // 카메라 캡처 등록
-        self.videoCapturer = RTCCameraVideoCapturer(delegate: videoSource)
-        // local view 등록, 다른 곳에 정의해도 될 듯 하다.
-        self.peerConnection?.add(self.localVideoTrack, streamIds: ["YLUSER01"])
-//         미디어 스트림에 로컬 트랙 추가
-//        self.localStream?.addVideoTrack(self.localVideoTrack!)
+        if !isProtector {
+            videoSource.capturer(videoCapturer, didCapture: videoFrame)
+        }
     }
     
-    //webrtc에 인식시킬 카메라 세팅
+    private func setupDataChannel() -> RTCDataChannel{
+        let dataChannelConfig = RTCDataChannelConfiguration()
+        dataChannelConfig.channelId = 0
+        
+        let _dataChannel = self.peerConnection?.dataChannel(forLabel: "dataChannel", configuration: dataChannelConfig)
+        return _dataChannel!
+    }
+    
+    private func setupLocalTrack() {
+        debugPrint("call setupLocalTrack")
+        let videoSource = WebRTCClient.factory.videoSource()
+        self.videoCapturer = RTCCameraVideoCapturer(delegate: videoSource)
+        self.localStream = WebRTCClient.factory.mediaStream(withStreamId: "stream0")
+        self.localVideoSource = videoSource
+        let videoTrack = WebRTCClient.factory.videoTrack(with: videoSource, trackId: "video0")
+        self.localVideoTrack = videoTrack
+    }
+    
+    // MARK: 카메라 세팅
     private func startCapturerLocalVideo(cameraPosition: AVCaptureDevice.Position/*, videoFormat: [AVCaptureDevice.Format?]*/) {
-        if let videoCapturer = self.videoCapturer as? RTCCameraVideoCapturer {
+        if let capturer = self.videoCapturer as? RTCCameraVideoCapturer {
+            var targetFormat : AVCaptureDevice.Format?
             var targetDevice: AVCaptureDevice?
             // find target device
             let devicies = RTCCameraVideoCapturer.captureDevices()
@@ -166,27 +210,26 @@ class WebRTCClient: NSObject{
                 }
             }
             
-            var targetFormat : AVCaptureDevice.Format?
             let formats = RTCCameraVideoCapturer.supportedFormats(for: targetDevice!)
-            print("==startCaptureLocalVideo setting...")
             formats.forEach { (format) in
                 for _ in format.videoSupportedFrameRateRanges {
                     let description = format.formatDescription as CMFormatDescription
                     let dimensions = CMVideoFormatDescriptionGetDimensions(description)
-                    if dimensions.width ==  1280 && dimensions.height == 720 {
+                    if dimensions.width ==  640 && dimensions.height == 480 {
                         targetFormat = format
                     } else if dimensions.width == 1280 {
                         targetFormat = format
                     }
                 }
             }
-//            let formats = cameraDevice?.formats
-//            videoCapturer.startCapture(with: cameraDevice! , format: targetFormat!, fps: 15)
+            // 예상 error 지점
+            capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
         }
     }
 
     
     func disconnect() {
+        print("disconnect webrtc client")
         self.isConnected = false
         hasReceivedSDP = false
         peerConnection?.close()
@@ -202,12 +245,12 @@ extension WebRTCClient {
     private func generateConfig() -> RTCConfiguration {
         let config = RTCConfiguration()
         //7200초 = 12분유지
-        let wcert = RTCCertificate.generate(withParams: ["expires": NSNumber(value: 7200),
+        let wcert = RTCCertificate.generate(withParams: ["expires": NSNumber(value: 100000),
                                                          "name": "RSASSA-PKCS1-v1_5"])
-        config.iceServers = [RTCIceServer(urlStrings: Config.default.webRTCServers)]
-        config.iceTransportPolicy = .all
-        config.rtcpMuxPolicy = .negotiate
+        config.iceServers = [RTCIceServer(urlStrings: Config.default.webRTCServers), RTCIceServer(urlStrings: ["turn:43.202.136.75:3478"], username: "mysteria", credential: "mysteria")]
         
+        config.iceTransportPolicy = .all
+//        config.rtcpMuxPolicy = .negotiate
         config.sdpSemantics = RTCSdpSemantics.unifiedPlan
         config.certificate = wcert
         
@@ -216,8 +259,7 @@ extension WebRTCClient {
     
     private func createDataChannel() -> RTCDataChannel?{
         let config = RTCDataChannelConfiguration()
-        
-        guard let dataChannel = self.peerConnection?.dataChannel(forLabel: "WebRTCData", configuration: config) else {
+        guard let dataChannel = self.peerConnection!.dataChannel(forLabel: "dataChannel", configuration: config) else {
             debugPrint("Warning: cannot create datachannel.")
             return nil
         }
@@ -231,16 +273,16 @@ extension WebRTCClient {
 extension WebRTCClient {
     //offer를 생성하는 메서드
     private func makeOffer(onSuccess: @escaping (RTCSessionDescription) -> Void) {
-        self.peerConnection?.offer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: nil)) { (sdp, error) in
+        print("makeOffer 실행")
+        self.peerConnection!.offer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: nil)) { (sdp, error) in
             if let error = error {
                 print("error ! ")
                 print(error)
                 return
             }
             
-            
             if let offerSDP = sdp {
-                print("make offer and locak sdp")
+                print("make offer and local sdp")
                 self.peerConnection!.setLocalDescription(offerSDP, completionHandler: { (err) in
                     if let error = err {
                         print(error)
@@ -251,10 +293,11 @@ extension WebRTCClient {
                 })
             }
         }
+        print("makeOffer 종료")
     }
     
     private func makeAnswer(onSuccess : @escaping (RTCSessionDescription) -> Void) {
-        self.peerConnection?.answer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints, optionalConstraints: nil)) { (sdp, error) in
+        self.peerConnection?.answer(for: RTCMediaConstraints(mandatoryConstraints: mediaConstraints , optionalConstraints: nil)) { (sdp, error) in
             if let error = error {
                 print("error ! ")
                 print(error)
@@ -278,18 +321,17 @@ extension WebRTCClient {
     }
 
     func receiveOffer(srcOffer: RTCSessionDescription, onSuccess: @escaping (RTCSessionDescription) -> Void) {
-        print("=receive Offer called")
-        
         if self.peerConnection == nil {
             print("offer received, create peer connection.")
             self.peerConnection = setupPeerConnection()
-            self.peerConnection?.delegate = self
-            
-            setupLocalTrack()
+            self.peerConnection!.delegate = self
+            self.peerConnection!.add(localVideoTrack, streamIds: ["stream-0"])
+            self.dataChannel = self.setupDataChannel()
+            self.dataChannel?.delegate = self
         }
         
         debugPrint("set remote description.")
-        self.peerConnection?.setRemoteDescription(srcOffer) { error in
+        self.peerConnection!.setRemoteDescription(srcOffer) { error in
             if let error = error {
                 debugPrint("Oh, receiveOffer has been problem.")
                 debugPrint(error)
@@ -304,22 +346,33 @@ extension WebRTCClient {
     //offer를 받고 answer SDP를 생성하는 메서드
     //피보호자가 영상을 보내야 하기 때문에 디바이스 세팅.
     func receiveAnswer(descSdp sdp: RTCSessionDescription) {
-        print("=receiveOffer")
-        self.peerConnection?.setRemoteDescription(sdp) { (error) in
+        self.peerConnection!.setRemoteDescription(sdp) { (error) in
             if let error = error {
                 print("failed to set remote offer sdp")
                 print(error)
                 return
             }
-//            print("Success to set remote offer sdp")
-//            self.makeAnswerSdp(onSuccess: onSuccess)
+        }
+    }
+    
+    func receiveCandidate(candidate: RTCIceCandidate) {
+        self.peerConnection!.add(candidate) { error in
+            if let error = error {
+                print("receiveCandidate error ")
+                debugPrint(error)
+                return
+            }
         }
     }
    
     //answer SDP 생성
     private func makeAnswerSdp(onSuccess : @escaping (RTCSessionDescription) -> Void) {
-        let constraints = RTCMediaConstraints(mandatoryConstraints: self.mediaConstraints, optionalConstraints: nil)
-        self.peerConnection?.answer(for: constraints, completionHandler: { (rsdp, err) in
+        print("= makeAnswerSDP")
+        if self.peerConnection == nil {
+            print("야 이거 answer 인데 nil이다 쩝...")
+        }
+        let constraints = RTCMediaConstraints(mandatoryConstraints: nil, optionalConstraints: nil)
+        self.peerConnection!.answer(for: constraints, completionHandler: { (rsdp, err) in
             if let error = err {
                 print("makeAnswerSDP error")
                 print(error)
@@ -328,7 +381,7 @@ extension WebRTCClient {
             
             print("success to create local answer sdp.")
             if let answerSDP = rsdp {
-                self.peerConnection?.setLocalDescription(answerSDP, completionHandler: { (err) in
+                self.peerConnection!.setLocalDescription(answerSDP, completionHandler: { (err) in
                     if let error = err {
                         print("failed to set local description")
                         print(error)
@@ -340,48 +393,66 @@ extension WebRTCClient {
                 })
             }
         })
+        print("= END makeAnswerSDP")
     }
     
-    func receiveCandidate(candidate: RTCIceCandidate) {
-        self.peerConnection!.add(candidate) { error in
-            if let error = error {
-                debugPrint(error)
-                return
-            }
-        }
-    }
+
 
     //render video track data of the remote peer.
     func renderRemoteVideo(to renderer: RTCVideoRenderer) {
-        self.remoteVideoTrack?.add(renderer)
+        self.remoteVideoTrack!.add(renderer)
     }
     
     // MARK: - CONNECTION EVENT
     private func onConnected() {
         print("WebRTCClient onConnected")
         self.isConnected = true
+        
         DispatchQueue.main.async {
-            self.remoteRenderView?.isHidden = false
-            self.delegate?.didConnectWebRTC()
+            if self.isProtector {
+                self.remoteRenderView!.isHidden = false
+                self.delegate?.didConnectWebRTC()
+            }
+
         }
     }
     
     private func onDisConnected() {
         self.isConnected = false
         print("WebRTCClient onDisConnected")
-        self.remoteRenderView?.isHidden = true
-        self.peerConnection!.close()
-        self.peerConnection = nil
-        self.localDataChannel = nil
-        self.delegate?.didDisConnectedWebRTC()
+        DispatchQueue.main.async {
+            self.remoteRenderView?.isHidden = true
+            self.peerConnection!.close()
+            self.peerConnection = nil
+            self.localDataChannel = nil
+            self.delegate?.didDisConnectedWebRTC()
+        }
     }
-    
 }
 
 //MARK: -DataChannel Event
 extension WebRTCClient {
-    func sendMessage(message: Data?) {
-//        if let _dataChannel = self.remoteDataChannel
+    func sendMessage(message: String) {
+        print("self.remoteDataChannel is null == \(self.remoteDataChannel == nil)")
+        if let _dataChannel = self.remoteDataChannel {
+            if _dataChannel.readyState == .open {
+                let buffer = RTCDataBuffer(data: message.data(using: String.Encoding.utf8)!, isBinary: false)
+                _dataChannel.sendData(buffer)
+            }else {
+                print("data channel is not ready state")
+            }
+        }else{
+            print("no data channel")
+        }
+    }
+    
+    func sendData(data: Data){
+        if let _dataChannel = self.remoteDataChannel {
+            if _dataChannel.readyState == .open {
+                let buffer = RTCDataBuffer(data: data, isBinary: true)
+                _dataChannel.sendData(buffer)
+            }
+        }
     }
 }
 
@@ -409,13 +480,19 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
         print("signaling state changed: \(state)")
     }
     
+    // MARK: remote
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
         print("did add stream")
-        self.remoteStream = stream
-        if let track = stream.videoTracks.first {
-            print("video track found!")
-            track.add(remoteRenderView!)
+        if isProtector {
+            self.remoteStream = stream
+            if let track = stream.videoTracks.first {
+                print("video track found!")
+                remoteVideoTrack = track
+                track.add(remoteRenderView!)
+                track.isEnabled = true
+            }
         }
+
     }
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream) {
@@ -426,6 +503,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     }
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
+        print("peerConnection newState = \(newState), self is connected = \(self.isConnected)")
         switch newState {
         case .connected, .completed:
             if !self.isConnected {
@@ -448,6 +526,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
        //send message(video)
+        print("generate Candidate")
         self.delegate?.didGenerateCandidate(iceCandidate: candidate)
     }
     
@@ -458,32 +537,43 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
         self.remoteDataChannel = dataChannel
         self.delegate?.didOpenDataChanel()
-    }
-    
-    private func onConnect() {
-        self.isConnected = true
-
+//        self.sendMessage(message: "hello")
     }
     
 }
 
 extension WebRTCClient: RTCDataChannelDelegate {
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
-        debugPrint("DataChannel did change state \(dataChannel.readyState)")
+        print("data channel did change state")
+        switch dataChannel.readyState {
+        case .closed:
+            print("closed")
+        case .closing:
+            print("closing")
+        case .connecting:
+            print("connecting")
+        case .open:
+            print("open")
+        }
     }
     
     func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
         DispatchQueue.main.async {
             if buffer.isBinary {
+                //이거 안씀...
                 self.delegate?.didReceiveData(data: buffer.data)
 //                debugPrint("DataChannel did receiveMessageWith: \(buffer.data)")
             } else {
+                print("메시지를 받았습니당")
                 let msg = String(data: buffer.data, encoding: String.Encoding.utf8)
                 self.delegate?.didReceiveMessage(message: msg!)
                 
             }
         }
     }
+    
+    
+
 }
 
 //MARK: - RTCVideoView delegate
@@ -492,12 +582,21 @@ extension WebRTCClient: RTCVideoViewDelegate {
         let isLandScape = size.width < size.height
         var renderView: RTCEAGLVideoView?
         var parentView: UIView?
-        
-        if videoView.isEqual(self.remoteRenderView!) {
-            print("remote video size changed to: ", size)
-            renderView = self.remoteRenderView
-            parentView = self.remoteView
+
+        if isProtector {
+            if videoView.isEqual(self.remoteRenderView!) {
+                print("remote video size changed to: ", size)
+                renderView = self.remoteRenderView
+                parentView = self.remoteView
+            }
+        } else {
+            if videoView.isEqual(localRenderView){
+                print("local video size changed")
+                renderView = localRenderView
+                parentView = localView
+            }
         }
+
         guard let _renderView = renderView, let _parentView = parentView else {
             print("webrtc 491 line : something wrong.")
             return
@@ -512,8 +611,6 @@ extension WebRTCClient: RTCVideoViewDelegate {
             _renderView.center.y = _parentView.frame.height/2
         }
     }
-    
-    
 }
 
 
