@@ -225,6 +225,34 @@ def register_or_update_apns_token(request):
             return JsonResponse({'error': 'User does not exist.'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
-    
 
+@csrf_exempt
+def current_protected_info(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')  # 폼 데이터에서 user_id 가져오기
+        
+        try:
+            # 사용자 정보 가져오기
+            user = User.objects.get(id=user_id)
+            user_name = user.name
+            
+            # 사용자의 가장 최근 History 가져오기
+            recent_history = History.objects.filter(user_id=user_id).order_by('-time').first()
+            if recent_history:
+                recent_arrival = recent_history.arrival
+            else:
+                recent_arrival = None  # 기록이 없을 경우
+            
+            response_data = {
+                'user_id': user_id,
+                'user_name': user_name,
+                'recent_arrival': recent_arrival
+            }
+            return JsonResponse(response_data, status=200)
+        
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
     
