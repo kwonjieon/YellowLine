@@ -19,21 +19,22 @@ protocol CameraSessionDelegate {
 }
 
 
-let mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
-// ai 모델
-let midasModel = try! MiDaS()
+
 
 class CameraSession: NSObject {
+    var mlModel : MLModel?
+    // ai 모델
+    var midasModel : MiDaS?
     let semaphore = DispatchSemaphore(value: 1)
     var delegate: CameraSessionDelegate?
     var captureSession = AVCaptureSession()
     var videoOutput = AVCaptureVideoDataOutput()
-    let queue = DispatchQueue(label: "videoQueue", qos: .userInitiated)
+    let queue = DispatchQueue(label: "videoQueue", qos: .userInteractive)
 
     var localView: UIView?
-    
     //for test
     var midasView: UIImageView?
+    
     public var previewLayer: AVCaptureVideoPreviewLayer?
     public var midasPreviewLayer: AVCaptureVideoPreviewLayer?
     
@@ -45,13 +46,11 @@ class CameraSession: NSObject {
 
     
     var isCapturing = false
-    let clientId = "YLUser01"
     
-    init(view: UIView, _ midasView: UIImageView){
+    init(view: UIView/*, _ midasView: UIImageView*/){
         super.init()
         self.localView = view
-        self.midasView = midasView
-        setUpBoundingBoxViews()
+//        self.midasView = midasView
         self.cameraDevice = setupInput(w: 1280, h:720)
     }
     
@@ -59,11 +58,12 @@ class CameraSession: NSObject {
     public func startVideo() {
         setup() { [self] success in
             if success {
+                setUpBoundingBoxViews()
                 // Add the video preview into the UI.
-                if let previewLayer = self.previewLayer {
-                    localView!.layer.addSublayer(previewLayer)
-                    self.previewLayer?.frame = self.localView!.bounds  // resize preview layer
-                }
+//                if let previewLayer = self.previewLayer {
+//                    localView!.layer.addSublayer(previewLayer)
+//                    self.previewLayer!.frame = self.localView!.bounds  // resize preview layer
+//                }
                 
                 // Add the bounding box layers to the UI, on top of the video preview.
                 for box in self.boundingBoxViews {
@@ -78,14 +78,14 @@ class CameraSession: NSObject {
     }
     
     func setup(completion: @escaping (Bool) -> Void) {
+        mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
+        midasModel = try! MiDaS(configuration: MLModelConfiguration())
+        yoloDetector = try! VNCoreMLModel(for: mlModel!)
         queue.async {
             self.captureSession = .init()
             self.videoOutput = .init()
-            // 뷰를 빈으로 등록해(ex:@State 같은 어노테이션) 나중에 이와같은 코드를 없애버리자.
-            //            self._imageView = view
-
             
-            if let visionModel = try? VNCoreMLModel(for: midasModel.model) {
+            if let visionModel = try? VNCoreMLModel(for: self.midasModel!.model) {
                 self.midasVisionRequest = VNCoreMLRequest(model: visionModel, completionHandler: self.visionRequestDidComplete)
                 self.midasVisionRequest?.imageCropAndScaleOption = .centerCrop
             } else {
@@ -128,7 +128,6 @@ class CameraSession: NSObject {
     func setupCameraSession() -> Bool {
         self.captureSession.beginConfiguration()
         self.captureSession.sessionPreset = .photo //.photo, .hd1280x720
-        
         //output setting
         setupOutput()
         
@@ -187,6 +186,8 @@ class CameraSession: NSObject {
             }
         }
         self.deviceFormat = selectedFormat
+        print("deviceFormat : \(selectedFormat)")
+        // fps
         do {
             try device.lockForConfiguration()
             device.activeFormat = selectedFormat!
@@ -207,7 +208,7 @@ class CameraSession: NSObject {
     }
     
     
-    // 카메라 작동 시작
+    // MARK: 카메라 작동 시작
     func startSession() {
         if !self.captureSession.isRunning {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -226,7 +227,7 @@ class CameraSession: NSObject {
     
     
     // MARK: - object detection...
-    var yoloDetector = try! VNCoreMLModel(for: mlModel)
+    var yoloDetector : VNCoreMLModel?
     var midasVisionModel : VNCoreMLModel?
     var detectionRequest : VNCoreMLRequest?
 
@@ -248,7 +249,7 @@ class CameraSession: NSObject {
         }
         
         // Retrieve class labels directly from the CoreML model's class labels, if available.
-        guard let classLabels = mlModel.modelDescription.classLabels as? [String] else {
+        guard let classLabels = mlModel!.modelDescription.classLabels as? [String] else {
             fatalError("Class labels are missing from the model description")
         }
         
@@ -264,12 +265,12 @@ class CameraSession: NSObject {
     }
     
     lazy var visionRequest: VNCoreMLRequest = {
-        let request = VNCoreMLRequest(model: yoloDetector, completionHandler: {
+        let request = VNCoreMLRequest(model: yoloDetector!, completionHandler: {
             [weak self] request, error in
             self?.processObservations(for: request, error: error)
         })
         // NOTE: BoundingBoxView object scaling depends on request.imageCropAndScaleOption https://developer.apple.com/documentation/vision/vnimagecropandscaleoption
-        request.imageCropAndScaleOption = .centerCrop  // .scaleFit, .scaleFill, .centerCrop
+        request.imageCropAndScaleOption = .scaleFill  // .scaleFit, .scaleFill, .centerCrop
         return request
     }()
     
@@ -299,10 +300,11 @@ class CameraSession: NSObject {
             depthCIImage = CIImage(cvPixelBuffer: pixelBuffer)
             let uiImage = UIImage(ciImage: depthCIImage!)
             let handler = VNImageRequestHandler(ciImage: originalCIImage!)
+//            let handler = VNImageRequestHandler(cgImage: resizedCGImage!)
             do {
-                DispatchQueue.main.async {
-                    self.midasView!.image = uiImage
-                }
+//                DispatchQueue.main.async {
+//                    self.midasView!.image = uiImage
+//                }
                 try handler.perform([visionRequest])
             } catch  {
                 print(error)
@@ -352,8 +354,8 @@ class CameraSession: NSObject {
 
     // MARK:  Show
     func show(predictions: [VNRecognizedObjectObservation]) {
-        let width = previewLayer!.bounds.width
-        let height = previewLayer!.bounds.height
+        let width = localView!.bounds.width
+        let height = localView!.bounds.height
 //        let width = localView!.bounds.width
 //        let height = localView!.bounds.height
 
@@ -406,43 +408,25 @@ class CameraSession: NSObject {
                         rect = rect.applying(transform)
                         rect.size.height /= ratio
                     }
-//                    print("second rect value : \(rect)")
                     rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
-//                    print("last rect value: \(rect)")
-                    //                    print("\(self._ciImage?.extent.width), \(self._ciImage?.extent.height)\n Rect info: \(rect.minX), \(rect.minY)")
-                    //그리기
-//                    print("\(CVPixelBufferGetWidth(depthPixelBuffer!)), \(CVPixelBufferGetHeight(depthPixelBuffer!)), \(CVPixelBufferGetBytesPerRow(depthPixelBuffer!))")
+
                     var midX = rect.midX
                     var midY = rect.midY
-                    // 점 그리기
-                    drawPoint(x: Int(midX), y: Int(midY), view: localView!)
                     if midX < 0 { midX = 0 }
                     if midX >= width { midX = width }
                     if midY < 0 { midY = 0 }
                     if midY >= height { midY = height }
                     
                     var depthValue: Float?
-                    let imgWidth = self.midasView!.bounds.width
-                    let imgHeight = self.midasView!.bounds.height
-                    let p_midasX = Int(midX / width * imgWidth)
-                    let p_midasY = Int(midY / height * imgHeight)
                     let midasX = Int(midX / width * 256)
                     let midasY = Int(midY / height * 256)
 
                     depthValue = 0.0
-                    // 마이다스 이미지 좌표 지정
+                    // 마이다스 이미지버퍼 상대적 좌표 지정
                     if self.depthCIImage != nil {
                         let bf = (self.depthPixelBuffer)!
                         let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
                         let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
-                        //draw start
-                        let radius = 8
-                        let dotPath = UIBezierPath(ovalIn: CGRect(x: midasX, y: midasY, width: radius, height: radius))
-                        let layer = CAShapeLayer()
-                        layer.path = dotPath.cgPath
-                        layer.strokeColor = UIColor.blue.cgColor
-                        self.midasView!.layer.addSublayer(layer)
-                        //draw end
                         
                         CVPixelBufferLockBaseAddress(bf, .readOnly)
                         let baseAddress = CVPixelBufferGetBaseAddress(bf)
@@ -494,50 +478,12 @@ class CameraSession: NSObject {
 //MARK: - captureOutput 설정
 extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
 //        print(CVPixelBufferGetPixelFormatType(cvImageBuffer!), CVPixelBufferGetWidth(cvImageBuffer!), CVPixelBufferGetHeight(cvImageBuffer!))
         predict(cvImageBuffer)
         delegate?.didWebRTCOutput(sampleBuffer)
-    }
-}
-
-extension UIImage {
-    func resize(_ width: Int, _ height: Int) -> UIImage {
-        // Keep aspect ratio
-        let maxSize = CGSize(width: width, height: height)
-
-        let availableRect = AVFoundation.AVMakeRect(
-            aspectRatio: self.size,
-            insideRect: .init(origin: .zero, size: maxSize)
-        )
-        let targetSize = availableRect.size
-
-        // Set scale of renderer so that 1pt == 1px
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
-
-        // Resize the image
-        let resized = renderer.image { _ in
-            self.draw(in: CGRect(origin: .zero, size: targetSize))
-        }
-//        print("화면 배율: \(UIScreen.main.scale)")// 배수
-//        print("origin: \(self), resize: \(resized)")
-        return resized
-    }
-    
-    // 사용법: image!.resized(to: CGSize(width: 250, height: 250))
-    func resized(to newSize: CGSize, scale: CGFloat = 1) -> UIImage {
-        let format = UIGraphicsImageRendererFormat.default()
-        format.scale = scale
-        let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
-        let image = renderer.image { _ in
-            draw(in: CGRect(origin: .zero, size: newSize))
-        }
-        return image
     }
 }
 

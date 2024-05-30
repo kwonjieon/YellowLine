@@ -16,3 +16,4 @@ struct ResultData: Codable {
     let phoneNum: String
     let latest_state : String
 }
+

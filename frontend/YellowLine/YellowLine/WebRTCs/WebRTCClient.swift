@@ -37,6 +37,7 @@ class WebRTCClient: NSObject{
     weak var delegate : WebRTCClientDelegate?
     
     var isProtector = false
+    var isDataChannel = false
     
     static var factory: RTCPeerConnectionFactory = {
         RTCInitializeSSL()
@@ -110,6 +111,7 @@ class WebRTCClient: NSObject{
             localRenderView = RTCEAGLVideoView()
             localRenderView!.delegate = self
             localView.addSubview(localRenderView!)
+            localVideoTrack.add(localRenderView!)
         }
     }
 
@@ -194,7 +196,7 @@ class WebRTCClient: NSObject{
                     }
                 }
             }
-            capturer.startCapture(with: cameraDevice!, format: targetFormat!, fps: 30)
+            capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
         }
     }
 
@@ -409,6 +411,7 @@ extension WebRTCClient {
             if _dataChannel.readyState == .open {
                 let buffer = RTCDataBuffer(data: message.data(using: String.Encoding.utf8)!, isBinary: false)
                 _dataChannel.sendData(buffer)
+
             }else {
                 print("data channel is not ready state")
             }
@@ -507,6 +510,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
         self.remoteDataChannel = dataChannel
+        self.isDataChannel = true
         self.delegate?.didOpenDataChanel()
     }
     

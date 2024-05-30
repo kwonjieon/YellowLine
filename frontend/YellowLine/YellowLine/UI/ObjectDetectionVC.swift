@@ -11,14 +11,28 @@ class ObjectDetectionVC: UIViewController {
     @IBOutlet weak var backBtn: UIButton!
     @IBOutlet weak var navigationBar: UIView!
     @IBOutlet weak var titleLabel: UILabel!
+    // 물체탐지 레이어
+    @IBOutlet var localView: UIView!
+    var webRTCManager: WebRTCManager?
+    var cameraSession: CameraSession?
     
+    // 피보호자 아이디
+    var protectedId = "YLUSER01"
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
+        self.webRTCManager!.webRTCClient.disconnect()
+        self.cameraSession?.stopSession()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        webRTCManager = WebRTCManager(uiView: localView, protectedId)
         
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.cameraSession?.stopSession()
     }
     
     func setNavigationBar() {

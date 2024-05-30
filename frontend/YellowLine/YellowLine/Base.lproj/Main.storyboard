@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="8dh-tq-WHG">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="YxG-V6-b0a">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
@@ -583,19 +583,25 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemPinkColor"/>
                             </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V14-yA-GYK">
+                                <rect key="frame" x="16" y="193" width="361" height="541"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" name="AccentColor"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4GS-Ed-iyc"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
                         <outlet property="backBtn" destination="Z1p-Vz-ajk" id="YDo-Nz-k6a"/>
+                        <outlet property="localView" destination="V14-yA-GYK" id="lA5-pW-4Ny"/>
                         <outlet property="navigationBar" destination="jr8-eE-YM4" id="gP6-pV-q5R"/>
                         <outlet property="titleLabel" destination="Dr8-TK-bM6" id="zNr-BT-QPy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RZA-Ac-eeb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2723" y="-718"/>
+            <point key="canvasLocation" x="2722.9007633587785" y="-718.30985915492965"/>
         </scene>
         <!--Search DestinationVC-->
         <scene sceneID="ugq-Nz-i6J">

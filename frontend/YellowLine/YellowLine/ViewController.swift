@@ -31,7 +31,7 @@ class ViewController: UIViewController{
     }
     
     override func viewDidLoad() {
-        webRTCManager = WebRTCManager(uiView: localView, midasView ,"YLUSER01")
+        webRTCManager = WebRTCManager(uiView: localView,"YLUSER01")
     }
 
     

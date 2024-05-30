@@ -48,3 +48,9 @@ enum Coordinates: Codable {
 struct Geometries: Codable {
     let coordinates: Coordinates
 }
+
+struct NaviProtectedPoint: Codable {
+    let Lat: Double?
+    let Lng: Double?
+    let dest: String?
+}

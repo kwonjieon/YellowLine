@@ -24,10 +24,10 @@ class WebRTCManager {
     
     var localView: UIView?
     
-    init(uiView : UIView, _ midasView : UIImageView ,_ userName: String) {
+    init(uiView : UIView,_ userName: String) {
         self.userName = userName
         self.localView = uiView
-        cameraSession = CameraSession(view: uiView, midasView)
+        cameraSession = CameraSession(view: uiView)
         cameraSession?.delegate = self
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
@@ -43,11 +43,24 @@ class WebRTCManager {
             self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
                 if self.webRTCClient.isConnected || self.isSocketConnected {
                     print("socket connected!")
+                    if self.webRTCClient.isDataChannel {
+                        let params: NaviProtectedPoint = .init(Lat: 37.55218662936631, Lng: 127.07382541881452, dest: "세종대학교")
+                        do {
+                            let postData = try JSONEncoder().encode(params)
+                            print(postData.count)
+                            self.webRTCClient.sendData(data: postData)
+                        } catch {
+                            return
+                        }
+
+                    }
                     return
                 }
                 print("Request socket connect")
                 self.socket.connect()
             })
+
+            
         }
     }
 
@@ -225,7 +238,6 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
-            
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         
@@ -239,3 +251,4 @@ extension WebRTCManager: CameraSessionDelegate {
  https://velog.io/@mquat/django-webRTC-websocket-django-channel-1
  
  */
+

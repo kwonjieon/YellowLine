@@ -23,7 +23,6 @@ class ShowObjectDetectionVC: UIViewController {
     
     var socket: WebSocket!
     var webRTCClient: WebRTCClient!
-    var webRTCManager: WebRTCManager?
     var tryToConnectWebSocket: Timer!
     var isSocketConnected = false
     
@@ -209,7 +208,14 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
     
     func didReceiveData(data: Data) {
         // data channel 을 연결했을 때 여기에 데이터가 옴. 추가기능임.
-        print("Data received...! \(data)")
+//        print("Data received...! \(data)")
+
+        do {
+            let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
+            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
+        } catch {
+            return
+        }
     }
     
     func didReceiveMessage(message: String) {
