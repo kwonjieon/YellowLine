@@ -26,8 +26,17 @@ class ObjectDetectionVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setNavigationBar()
         webRTCManager = WebRTCManager(uiView: localView, protectedId)
         
+        setLabel()
+        setBtn()
+    }
+    
+    func setBtn() {
+        backBtn.translatesAutoresizingMaskIntoConstraints = false
+        backBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 33).isActive = true
+        backBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 70).isActive = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -37,8 +46,7 @@ class ObjectDetectionVC: UIViewController {
     
     func setNavigationBar() {
         navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 120)
-        navigationBar.layer.backgroundColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1).cgColor
-        navigationBar.layer.cornerRadius = 20
+        navigationBar.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
 
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
@@ -46,7 +54,13 @@ class ObjectDetectionVC: UIViewController {
     }
     
     func setLabel() {
-        
+        titleLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        titleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 20)
+        titleLabel.textAlignment = .center
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 75).isActive = true
     }
 
 }

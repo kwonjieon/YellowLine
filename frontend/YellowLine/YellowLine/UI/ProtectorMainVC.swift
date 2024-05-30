@@ -9,6 +9,8 @@ import UIKit
 import Alamofire
 
 class ProtectorMainVC: UIViewController {
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var relationBtn: UIButton!
     @IBAction func clickRelationBtn(_ sender: Any) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpRelationTextField") as! PopUpRelationTextField
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
@@ -123,6 +125,14 @@ class ProtectorMainVC: UIViewController {
         } //Alamofire request end...
     }
     
+    func setRelationBtn() {
+        relationBtn.translatesAutoresizingMaskIntoConstraints = false
+        relationBtn.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        relationBtn.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        relationBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 289).isActive = true
+        relationBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 712).isActive = true
+    }
+    
     func setNavivgationBar() {
         navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 109)
         navigationBar.layer.backgroundColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1).cgColor
@@ -132,6 +142,15 @@ class ProtectorMainVC: UIViewController {
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
         navigationBar.heightAnchor.constraint(equalToConstant: 109).isActive = true
+        
+
+        titleLabel.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        titleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 20)
+        titleLabel.textAlignment = .center
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 65).isActive = true
     }
     
     func setBtn(cell : UIButton) {
@@ -169,24 +188,27 @@ class ProtectorMainVC: UIViewController {
         
     }
     
+   
     func loadShowObjectDetection() {
         
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         self.present(nextVC, animated: true)
-        
-        print("엥?")
     }
     
+   // cell 의 버튼 클릭 시 네비 or 물체탐지 경우 확인 후 페이지 로드
     @objc func checkBoxButtonTapped(sender: UIButton) {
         if sender.titleLabel?.text == "도보 카메라 확인" {
-            guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
+            let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") as! ShowObjectDetectionVC
             nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            // 피보호자 이름 전달
+            nextVC.name = protectedList[sender.tag].name
             self.present(nextVC, animated: true)
         }
         else if sender.titleLabel?.text == "네비게이션 및 도보 카메라 확인" {
-            guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowNavigationVC") else {return}
+            let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowNavigationVC") as! ShowNavigationVC
             nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            nextVC.name = protectedList[sender.tag].name
             self.present(nextVC, animated: true)
         }
     }
@@ -219,7 +241,6 @@ extension ProtectorMainVC: UITableViewDelegate, UITableViewDataSource {
         // 버튼 구별
         cell.statusBtn.tag = indexPath.row
         cell.statusBtn.addTarget(self, action: #selector(checkBoxButtonTapped(sender:)), for: .touchUpInside)
-        
         
         // 피보호자가 오프라인 상태인 경우
         if (protectedList[indexPath.row].latest_state == "Offline") {
