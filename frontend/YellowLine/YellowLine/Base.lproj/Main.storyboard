@@ -200,9 +200,6 @@
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <state key="normal" title="Button"/>
                                                             <buttonConfiguration key="configuration" style="gray" title="Button"/>
-                                                            <connections>
-                                                                <action selector="clickCheckBtn:" destination="xW2-BT-cO9" eventType="touchUpInside" id="7Dk-0c-smx"/>
-                                                            </connections>
                                                         </button>
                                                     </subviews>
                                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -378,13 +375,26 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="목적지" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BFc-vV-M7V">
-                                        <rect key="frame" x="174" y="86" width="45" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" spacing="18" translatesAutoresizingMaskIntoConstraints="NO" id="17A-Lw-FNo">
+                                        <rect key="frame" x="137.00000000000003" y="85" width="142.66666666666666" height="20.333333333333329"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="현위치" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FRC-nD-eZU">
+                                                <rect key="frame" x="0.0" y="0.0" width="44.333333333333336" height="20.333333333333332"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="direction2.png" translatesAutoresizingMaskIntoConstraints="NO" id="SvW-3b-YUK">
+                                                <rect key="frame" x="62.333333333333343" y="0.0" width="18" height="20.333333333333332"/>
+                                            </imageView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="목적지" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BFc-vV-M7V">
+                                                <rect key="frame" x="98.333333333333314" y="0.0" width="44.333333333333343" height="20.333333333333332"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemPinkColor"/>
                             </view>
@@ -399,6 +409,9 @@
                     </view>
                     <connections>
                         <outlet property="backBtn" destination="K7F-tS-1Tu" id="d0P-KS-TLR"/>
+                        <outlet property="destinationLabel" destination="BFc-vV-M7V" id="79w-UW-6Mq"/>
+                        <outlet property="nameLabel" destination="oCo-x0-jNV" id="Yc5-mw-ZQl"/>
+                        <outlet property="navigationBar" destination="xeG-7k-RCP" id="Ipn-R5-JTu"/>
                         <outlet property="objectDetectionView" destination="mZl-yU-QH5" id="5fD-uf-o3S"/>
                     </connections>
                 </viewController>
@@ -983,16 +996,16 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" alignment="center" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="hW2-nN-Pw0">
-                                        <rect key="frame" x="49" y="65" width="149.66666666666666" height="44.333333333333343"/>
+                                        <rect key="frame" x="49" y="65" width="150" height="43"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="목적지에 도착했어요!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vwv-MT-8ey">
-                                                <rect key="frame" x="0.0" y="0.0" width="149.66666666666666" height="21.666666666666668"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="150" height="21"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeoL00" family="AppleSDGothicNeoL00" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="안내를 종료합니다." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mbb-JE-Ldi">
-                                                <rect key="frame" x="8.3333333333333286" y="22.666666666666686" width="133.33333333333337" height="21.666666666666671"/>
+                                                <rect key="frame" x="7.6666666666666714" y="22" width="134.66666666666663" height="21"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeoL00" family="AppleSDGothicNeoL00" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>

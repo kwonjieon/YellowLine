@@ -14,8 +14,9 @@ class ShowObjectDetectionVC: UIViewController {
     @IBOutlet weak var backBtn: UIButton!
     @IBOutlet weak var objectDetectionView: UIView!
     
+    var name: String?
+    
     @IBAction func clickBackBtn(_ sender: Any) {
-        print("eㅟ로")
         self.dismiss(animated: true)
         
     }
@@ -53,12 +54,13 @@ class ShowObjectDetectionVC: UIViewController {
     }
     
     func setNameLabel() {
+        nameLabel.text = name
         nameLabel.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
         nameLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 20)
         nameLabel.textAlignment = .center
 
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 171).isActive = true
+        nameLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         nameLabel.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 76).isActive = true
     }
     
