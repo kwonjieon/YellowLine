@@ -19,6 +19,8 @@ class ProtectorMainVC: UIViewController {
     // 서버에서 받을 피보호자 JSON 데이터
     var protectedModel : ProtectedModel?
     
+    //
+    
     // JSON 데이터를 디코딩한 피보호자 데이터 리스트
     var protectedList : [ResultData] = []
     
@@ -163,12 +165,12 @@ class ProtectorMainVC: UIViewController {
         layer1.bounds = shapes.bounds
         layer1.position = shapes.center
         shapes.layer.addSublayer(layer1)
-
         shapes.layer.cornerRadius = 10
-
+        
     }
     
     func loadShowObjectDetection() {
+        
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         self.present(nextVC, animated: true)

@@ -85,6 +85,7 @@ class LoginVC: UIViewController {
                         // 로그인 성공시 메인 화면(보호자)으로 이동
                         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ProtectorMainVC") else {return}
                         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+                        
                         self.present(nextVC, animated: true)
                         
                         break

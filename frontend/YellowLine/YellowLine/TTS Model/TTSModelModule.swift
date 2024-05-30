@@ -14,10 +14,12 @@ import AVFoundation
  */
 
 class TTSModelModule {
-    let synthesizer = AVSpeechSynthesizer()
+    static let ttsModule = TTSModelModule()
     
+    let synthesizer = AVSpeechSynthesizer()
     func speakText(_ text: String?, _ volume: Float, _ rate: Float, _ avoid: Bool) {
         let audioSession = AVAudioSession()
+        
         // handle audio session first, before trying to read the text
         do {
             //다른 오디오랑 혼합하려면 option = .mixWithOthers
@@ -27,18 +29,18 @@ class TTSModelModule {
             }else {
                 try audioSession.setCategory(.playback, mode: .default, options: .mixWithOthers)
             }
-            try audioSession.setActive(false)
+            try audioSession.setActive(true)
         } catch let error {
             print("❓", error.localizedDescription)
         }
         
-//        let utterance = AVSpeechUtterance(string: text!)
+        //        let utterance = AVSpeechUtterance(string: text!)
         guard let text = text else {return}
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "ko-KR")
         utterance.rate = rate
         utterance.volume = volume
-        self.synthesizer.stopSpeaking(at: .immediate)
+        self.synthesizer.stopSpeaking(at: .word)
         self.synthesizer.speak(utterance)
     }
     

@@ -18,10 +18,10 @@ class WebRTCManager {
     var webRTCClient: WebRTCClient!
     var socket: WebSocket!
     var tryToConnectWebSocket: Timer!
-    let ipAddress: String = Config.urls.signaling
     var cameraSession: CameraSession?
     var isSocketConnected = false
     
+    // 내 화면 보여주는 uiview
     var localView: UIView?
     
     init(uiView : UIView,_ userName: String) {
@@ -34,32 +34,31 @@ class WebRTCManager {
         webRTCClient.cameraDevice = cameraSession!.cameraDevice
         webRTCClient.setupWithRole(isProtector: false, uiView)
         if cameraSession?.checkCameraAuthor() == true{
-            cameraSession!.startVideo()
-            let request = URLRequest(url: URL(string: ipAddress + "\(self.userName!)/")!)
+            //socket 연결요청
+            let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.userName!)/")!)
             socket = WebSocket(request: request)
             socket.delegate = self
-            
-            // socket 반복요청
             self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
                 if self.webRTCClient.isConnected || self.isSocketConnected {
                     print("socket connected!")
-                    if self.webRTCClient.isDataChannel {
-                        let params: NaviProtectedPoint = .init(Lat: 37.55218662936631, Lng: 127.07382541881452, dest: "세종대학교")
-                        do {
-                            let postData = try JSONEncoder().encode(params)
-                            print(postData.count)
-                            self.webRTCClient.sendData(data: postData)
-                        } catch {
-                            return
-                        }
-
-                    }
+//                    if self.webRTCClient.isDataChannel {
+//                        let params: NaviProtectedPoint = .init(Lat: 37.55218662936631, Lng: 127.07382541881452, dest: "세종대학교")
+//                        do {
+//                            let postData = try JSONEncoder().encode(params)
+//                            print(postData.count)
+//                            self.webRTCClient.sendData(data: postData)
+//                        } catch {
+//                            return
+//                        }
+//                    }
                     return
                 }
                 print("Request socket connect")
                 self.socket.connect()
             })
-
+            
+            // 카메라 실행
+            cameraSession!.startVideo()
             
         }
     }
@@ -238,7 +237,7 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
-            self.webRTCClient?.didCaptureLocalFrame(videoFrame)
+//            self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         
     }

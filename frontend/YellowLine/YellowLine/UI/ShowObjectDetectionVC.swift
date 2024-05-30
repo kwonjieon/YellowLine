@@ -18,7 +18,8 @@ class ShowObjectDetectionVC: UIViewController {
     @IBOutlet weak var backBtn: UIButton!
     @IBOutlet weak var objectDetectionView: UIView! // remote view
     
-    private var protectedId = "YLUSER01" //보호자 아이디
+//    private var protectedId = "YLUSER01" //보호자 아이디
+    var protectedId : String?
     private var ipAddress: String = Config.urls.signaling
     
     var socket: WebSocket!
@@ -27,9 +28,7 @@ class ShowObjectDetectionVC: UIViewController {
     var isSocketConnected = false
     
     @IBAction func clickBackBtn(_ sender: Any) {
-        print("eㅟ로")
         self.dismiss(animated: true)
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {

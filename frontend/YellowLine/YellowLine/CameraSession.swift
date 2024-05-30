@@ -59,6 +59,7 @@ class CameraSession: NSObject {
         setup() { [self] success in
             if success {
                 setUpBoundingBoxViews()
+                self.filtRect = makeRectFilter(localView!.bounds.width, localView!.bounds.height, 0.07)
                 // Add the video preview into the UI.
 //                if let previewLayer = self.previewLayer {
 //                    localView!.layer.addSublayer(previewLayer)
@@ -103,14 +104,11 @@ class CameraSession: NSObject {
         var complete = false
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            //            setupCameraSession()
             complete = true
             self.isCapturing = true
-            //            self.setupCameraSession()
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
                 if granted {
-                    //                    setupCameraSession()
                     complete = true
                     self.isCapturing = true
                 }
@@ -121,9 +119,6 @@ class CameraSession: NSObject {
         return complete
     }
     
-    private func setupRTCCameraDevice(_ device: AVCaptureDevice?) {
-        //        socketManager?.webRtcClient.setupDevice(device!)
-    }
     //MARK: -세팅:카메라 세션
     func setupCameraSession() -> Bool {
         self.captureSession.beginConfiguration()
@@ -211,7 +206,7 @@ class CameraSession: NSObject {
     // MARK: 카메라 작동 시작
     func startSession() {
         if !self.captureSession.isRunning {
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            DispatchQueue.global(qos: .default).async { [weak self] in
                 self?.captureSession.startRunning()
             }
         }
@@ -219,7 +214,7 @@ class CameraSession: NSObject {
     
     func stopSession() {
         if self.captureSession.isRunning {
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            DispatchQueue.global(qos: .default).async { [weak self] in
                 self?.captureSession.stopRunning()
             }
         }
@@ -289,8 +284,6 @@ class CameraSession: NSObject {
     var originalCGImage : CGImage?
     var resizedCGImage : CGImage?
     
-    
-    
     func visionRequestDidComplete(request: VNRequest, error: Error?) {
         // 여기서 pixelbuffer의 크기는 256*256크기임. (마이다스 인풋에 맞게 depthCIInput에 넣어놨기때문)
         if let predictions = request.results as? [VNPixelBufferObservation]
@@ -312,17 +305,17 @@ class CameraSession: NSObject {
         } else {
             print("ERROR: visionRequestdidcomplete")
         }
-        self.semaphore.signal()
     }
     
     // MARK: - Yolo
+    let ttsModule = TTSModelModule()
+    //MARK: 속도 올리기 1. semaphore해제, 2. fps 증가, 3. 이미지 resize사용하지 않기.
     var currentBuffer: CVImageBuffer?
     func predict(_ cvImageBuffer : CVImageBuffer?){
         // Invoke a VNRequestHandler with that image
         if currentBuffer == nil {
-            self.semaphore.wait()
             currentBuffer = cvImageBuffer
-
+            self.semaphore.wait()
             let ciContext = CIContext()
             let ciImage = CIImage(cvImageBuffer: cvImageBuffer!)
                 .oriented(forExifOrientation: 6)
@@ -330,18 +323,31 @@ class CameraSession: NSObject {
 //            resizedCGImage = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 640, height: 640))
             let midasImg = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 256, height: 256))
             
-            let midasHandler = VNImageRequestHandler(cgImage: midasImg!)
+//            let midasHandler = VNImageRequestHandler(cgImage: midasImg!)
+            
+            //fast test for yolo
+            let handler = VNImageRequestHandler(ciImage: originalCIImage!)
             if UIDevice.current.orientation != .faceUp {  // stop if placed down on a table
                 do {
-                    try midasHandler.perform([self.midasVisionRequest])
+//                    try midasHandler.perform([self.midasVisionRequest])
+                    try handler.perform([visionRequest])
+                    if !self.closeObjects.isEmpty {
+                        print(self.closeObjects.count, self.closeObjects)
+                    }
+//                    if !self.closeObjects.isEmpty{
+//                        TTSModelModule.ttsModule.speakText("전방에 장애물입니다.", 10, 0.4, false)
+//                        self.closeObjects.removeAll()
+//                    }
                 } catch {
                     print(error)
                 }
             }
+            self.semaphore.signal()
             currentBuffer = nil
         } // if end
     } // predict end
     
+
     func processObservations(for request: VNRequest, error: Error?) {
         DispatchQueue.main.async {
             if let results = request.results as? [VNRecognizedObjectObservation] {
@@ -349,15 +355,22 @@ class CameraSession: NSObject {
             } else {
                 self.show(predictions: [])
             }
+            if !self.closeObjects.isEmpty {
+                TTSModelModule.ttsModule.speakText("전방에 장애물입니다.", 10, 0.4, false)
+            }
+            self.closeObjects.removeAll()
         }
     }
 
+    // 가까운 거리 판별 사각형
+    var filtRect : CGRect?
+    var closeObjects : Set<String> = []// 탐지 물체들 넣는 객체
+    var exceptObjects = ["crosswalk_yl", "red_yl", "green_yl"]
+    
     // MARK:  Show
     func show(predictions: [VNRecognizedObjectObservation]) {
         let width = localView!.bounds.width
         let height = localView!.bounds.height
-//        let width = localView!.bounds.width
-//        let height = localView!.bounds.height
 
         var str = ""
         // ratio = videoPreview AR divided by sessionPreset AR
@@ -371,7 +384,7 @@ class CameraSession: NSObject {
         for i in 0..<boundingBoxViews.count {
             if i < predictions.count {
                 let prediction = predictions[i]
-                if prediction.confidence >= 0.5 {
+                if prediction.confidence >= 0.4 {
                     var rect = prediction.boundingBox  // normalized xywh, origin lower left
                     switch UIDevice.current.orientation {
                     case .portraitUpsideDown:
@@ -409,60 +422,74 @@ class CameraSession: NSObject {
                         rect.size.height /= ratio
                     }
                     rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
+//                    depthValue = 0.0
 
-                    var midX = rect.midX
-                    var midY = rect.midY
-                    if midX < 0 { midX = 0 }
-                    if midX >= width { midX = width }
-                    if midY < 0 { midY = 0 }
-                    if midY >= height { midY = height }
-                    
-                    var depthValue: Float?
-                    let midasX = Int(midX / width * 256)
-                    let midasY = Int(midY / height * 256)
-
-                    depthValue = 0.0
-                    // 마이다스 이미지버퍼 상대적 좌표 지정
-                    if self.depthCIImage != nil {
-                        let bf = (self.depthPixelBuffer)!
-                        let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
-                        let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
-                        
-                        CVPixelBufferLockBaseAddress(bf, .readOnly)
-                        let baseAddress = CVPixelBufferGetBaseAddress(bf)
-                        let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
-                        let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
-                        // read the data (returns value of type UInt8)
-                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
-                        depthValue = 1.0 - Float(dalue) / 255.0
-                        CVPixelBufferUnlockBaseAddress(bf, .readOnly)
-                    }
+//
+//                    var midX = rect.midX
+//                    var midY = rect.midY
+//                    if midX < 0 { midX = 0 }
+//                    if midX >= width { midX = width }
+//                    if midY < 0 { midY = 0 }
+//                    if midY >= height { midY = height }
+//                    
+//                    var depthValue: Float?
+//                    let midasX = Int(midX / width * 256)
+//                    let midasY = Int(midY / height * 256)
+//
+//                    // 마이다스 이미지버퍼 상대적 좌표 지정
+//                    if self.depthCIImage != nil {
+//                        let bf = (self.depthPixelBuffer)!
+//                        let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
+//                        let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
+//                        
+//                        CVPixelBufferLockBaseAddress(bf, .readOnly)
+//                        let baseAddress = CVPixelBufferGetBaseAddress(bf)
+//                        let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
+//                        let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
+//                        // read the data (returns value of type UInt8)
+//                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
+//                        depthValue = 1.0 - Float(dalue) / 255.0
+//                        CVPixelBufferUnlockBaseAddress(bf, .readOnly)
+//                    }
                     let bestClass = prediction.labels[0].identifier
                     let confidence = prediction.labels[0].confidence
+                    var flag = true
                     
-//                    // bestClass != 신호등이 아니면서 멀리에 있는 것들
-//                    if  bestClass != "" && depthValue! >= 0.4 {
-//                        boundingBoxViews[i].hide()
-//                        continue
-//                    }
+                    // filter boundary visualizing...
+//                    let redSquare = UIView()
+//                    redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
+//                    redSquare.frame = filtRect!
+//                    localView?.addSubview(redSquare)
                     
-                    // 가까운 것들만 내려오면, class와 depthValue값을 배열에 넣고
-                    // depthValue로 정렬해서 prediction end 다음 줄에
-                    // TTS실행 시키는 코드 작성.
+                    // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
+//                    print("bestClass is : \(bestClass)")
+                    if filtRect!.intersects(rect) {
+                        for obj in exceptObjects {
+                            // 제외 물체들이 아니라면 TTS안내 해야 할 물체들로 기록 (제외물체 : 횡단보도, 빨-초 신호)
+                            print("\(bestClass) == \(obj) : \(bestClass == obj)")
+                            if bestClass == obj {
+                                flag = false
+                            }
+                        }
+                        if flag {
+                            closeObjects.insert(bestClass)
+                        }
+                    }
+
                     // Show the bounding box.
                     boundingBoxViews[i].show(frame: rect,
-                                             label: String(format: "%@ %.1f %.2f", bestClass, confidence * 100, depthValue!),
+                                             label: String(format: "%@ %.1f", bestClass, confidence * 100),
                                              color: colors[bestClass] ?? UIColor.white,
                                              alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
-                } //confidence >= .5 end
+                } //confidence >= .4 end
             } else {
                 boundingBoxViews[i].hide()
-            } // prediction end...
-            
-            //여기다가 TTS 모듈 넣는게 어떨까 싶음.
-            
-        } // show end...
-    }
+            } // if prediction end...
+        } // for end...
+        // 여기다가 TTS 모듈 넣는게 어떨까 싶음
+        
+        print(self.closeObjects)
+    } // show end...
     
     func drawPoint(x : Int, y: Int, view: UIView){
         let radius = 8
@@ -473,6 +500,14 @@ class CameraSession: NSObject {
         layer.strokeColor = UIColor.blue.cgColor
         view.layer.addSublayer(layer)
     }
+    
+    private func makeRectFilter(_ w : CGFloat, _ h: CGFloat, _ ofs: CGFloat) -> CGRect {
+        let widthLen = w * (1 - ofs)
+        let heightLen = h * ofs
+        let x = w * (ofs / 2)
+        let y = h * (0.97 - ofs)
+        return CGRect(origin: CGPoint(x: x, y: y), size: CGSize(width: widthLen, height: heightLen))
+    }
 }
 
 //MARK: - captureOutput 설정
@@ -482,8 +517,8 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
 //        print(CVPixelBufferGetPixelFormatType(cvImageBuffer!), CVPixelBufferGetWidth(cvImageBuffer!), CVPixelBufferGetHeight(cvImageBuffer!))
-        predict(cvImageBuffer)
         delegate?.didWebRTCOutput(sampleBuffer)
+        predict(cvImageBuffer)
     }
 }
 
