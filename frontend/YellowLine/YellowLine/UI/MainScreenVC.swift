@@ -18,6 +18,9 @@ class MainScreenVC: UIViewController {
     // 객체탐지 버튼 클릭 시 실행되는 함수
     @objc func clickobjectDetectBtn(_ gesture: UITapGestureRecognizer) {
         sendStartWalk()
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ObjectDetectionVC") else {return}
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(nextVC, animated: true)
     }
     
     // 피보호자가 물체탐지 이용 중이라는 상태를 서버에 업데이트

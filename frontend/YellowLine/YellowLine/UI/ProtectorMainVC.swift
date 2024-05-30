@@ -9,6 +9,8 @@ import UIKit
 import Alamofire
 
 class ProtectorMainVC: UIViewController {
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var relationBtn: UIButton!
     @IBAction func clickRelationBtn(_ sender: Any) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpRelationTextField") as! PopUpRelationTextField
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
@@ -121,6 +123,14 @@ class ProtectorMainVC: UIViewController {
         } //Alamofire request end...
     }
     
+    func setRelationBtn() {
+        relationBtn.translatesAutoresizingMaskIntoConstraints = false
+        relationBtn.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        relationBtn.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        relationBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 289).isActive = true
+        relationBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 712).isActive = true
+    }
+    
     func setNavivgationBar() {
         navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 109)
         navigationBar.layer.backgroundColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1).cgColor
@@ -130,6 +140,15 @@ class ProtectorMainVC: UIViewController {
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
         navigationBar.heightAnchor.constraint(equalToConstant: 109).isActive = true
+        
+
+        titleLabel.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        titleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 20)
+        titleLabel.textAlignment = .center
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 65).isActive = true
     }
     
     func setBtn(cell : UIButton) {

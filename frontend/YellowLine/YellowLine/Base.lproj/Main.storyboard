@@ -219,18 +219,27 @@
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="105"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vBg-xX-5Os">
-                                        <rect key="frame" x="290" y="39" width="83" height="35"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="피보호자 리스트" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lJK-vv-MlD">
+                                        <rect key="frame" x="143" y="64" width="108" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" title="관계추가"/>
-                                        <connections>
-                                            <action selector="clickRelationBtn:" destination="gQy-ox-PYk" eventType="touchUpInside" id="Bbs-2t-YgU"/>
-                                        </connections>
-                                    </button>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemCyanColor"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vBg-xX-5Os">
+                                <rect key="frame" x="275" y="709" width="100" height="100"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain">
+                                    <backgroundConfiguration key="background" image="addRelationBtn.png" imageContentMode="scaleAspectFit"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="clickRelationBtn:" destination="gQy-ox-PYk" eventType="touchUpInside" id="Bbs-2t-YgU"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="17b-PC-3nD"/>
                         <color key="backgroundColor" name="ContentColor"/>
@@ -238,6 +247,8 @@
                     <connections>
                         <outlet property="navigationBar" destination="Onk-bZ-Txh" id="3La-Cu-est"/>
                         <outlet property="protectedTableView" destination="8j6-fE-ENs" id="4Pu-N0-JF8"/>
+                        <outlet property="relationBtn" destination="vBg-xX-5Os" id="5UH-SD-rXu"/>
+                        <outlet property="titleLabel" destination="lJK-vv-MlD" id="igb-YE-pi0"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="avx-yV-fzJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -318,7 +329,7 @@
                                         <rect key="frame" x="21" y="67" width="36" height="34"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" image="backButton.png" title=""/>
+                                        <buttonConfiguration key="configuration" style="plain" image="backBtnWhite.png" title=""/>
                                         <connections>
                                             <action selector="clickBackBtn:" destination="8dh-tq-WHG" eventType="touchUpInside" id="hLg-S4-hAB"/>
                                         </connections>
@@ -362,7 +373,7 @@
                                         <rect key="frame" x="19" y="67" width="36" height="34"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" image="backButton.png" title=""/>
+                                        <buttonConfiguration key="configuration" style="plain" image="backBtnWhite.png" title=""/>
                                         <connections>
                                             <action selector="clickBackBtn:" destination="YxG-V6-b0a" eventType="touchUpInside" id="XiW-ir-eym"/>
                                             <action selector="clickBackBtn:" destination="dX3-TG-pFO" eventType="touchUpInside" id="fDp-g7-pQA"/>
@@ -376,7 +387,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" spacing="18" translatesAutoresizingMaskIntoConstraints="NO" id="17A-Lw-FNo">
-                                        <rect key="frame" x="137.00000000000003" y="85" width="142.66666666666666" height="20.333333333333329"/>
+                                        <rect key="frame" x="137.00000000000006" y="85" width="142.66666666666669" height="20.333333333333329"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="현위치" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FRC-nD-eZU">
                                                 <rect key="frame" x="0.0" y="0.0" width="44.333333333333336" height="20.333333333333332"/>
@@ -384,11 +395,11 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="direction2.png" translatesAutoresizingMaskIntoConstraints="NO" id="SvW-3b-YUK">
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="directionWhite.png" translatesAutoresizingMaskIntoConstraints="NO" id="SvW-3b-YUK">
                                                 <rect key="frame" x="62.333333333333343" y="0.0" width="18" height="20.333333333333332"/>
                                             </imageView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="목적지" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BFc-vV-M7V">
-                                                <rect key="frame" x="98.333333333333314" y="0.0" width="44.333333333333343" height="20.333333333333332"/>
+                                                <rect key="frame" x="98.333333333333329" y="0.0" width="44.333333333333329" height="20.333333333333332"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -403,6 +414,10 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemYellowColor"/>
                             </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XtM-tC-SUl">
+                                <rect key="frame" x="0.0" y="124" width="393" height="407"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="lsE-pE-Pck"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -410,9 +425,12 @@
                     <connections>
                         <outlet property="backBtn" destination="K7F-tS-1Tu" id="d0P-KS-TLR"/>
                         <outlet property="destinationLabel" destination="BFc-vV-M7V" id="79w-UW-6Mq"/>
+                        <outlet property="mapContainerView" destination="XtM-tC-SUl" id="opU-IR-Fon"/>
                         <outlet property="nameLabel" destination="oCo-x0-jNV" id="Yc5-mw-ZQl"/>
                         <outlet property="navigationBar" destination="xeG-7k-RCP" id="Ipn-R5-JTu"/>
                         <outlet property="objectDetectionView" destination="mZl-yU-QH5" id="5fD-uf-o3S"/>
+                        <outlet property="stackView" destination="17A-Lw-FNo" id="b4R-Ls-IoW"/>
+                        <outlet property="standardLabel" destination="FRC-nD-eZU" id="bpL-Ya-w2N"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LZ4-9p-Ddx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -577,15 +595,6 @@
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="148"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z1p-Vz-ajk">
-                                        <rect key="frame" x="23" y="82" width="36" height="34"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" image="backButton.png" title=""/>
-                                        <connections>
-                                            <action selector="clickBackBtn:" destination="YxG-V6-b0a" eventType="touchUpInside" id="8tc-QV-vhQ"/>
-                                        </connections>
-                                    </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="물체탐지" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dr8-TK-bM6">
                                         <rect key="frame" x="167" y="64" width="59" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -596,6 +605,15 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemPinkColor"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z1p-Vz-ajk">
+                                <rect key="frame" x="20" y="60" width="36" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="backButton.png" title=""/>
+                                <connections>
+                                    <action selector="clickBackBtn:" destination="YxG-V6-b0a" eventType="touchUpInside" id="1er-jz-5OT"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4GS-Ed-iyc"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -823,38 +841,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wWg-Zb-XIP">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="537"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="위치거리" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LoW-fy-aEZ">
-                                        <rect key="frame" x="34" y="789" width="175" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="경도" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rie-Iq-IBT">
-                                        <rect key="frame" x="34" y="760" width="184" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="위도" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="748-WJ-M3j">
-                                        <rect key="frame" x="34" y="736" width="189" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="경로이탈 확인" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fWa-gQ-gGD">
-                                        <rect key="frame" x="273" y="771" width="93" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6j0-r3-DLE">
@@ -899,21 +887,23 @@
                                     </label>
                                 </subviews>
                             </stackView>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yWV-H4-77O">
+                                <rect key="frame" x="0.0" y="496" width="393" height="356"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemYellowColor"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Wd4-j4-66P"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
                         <outlet property="destinationText" destination="zbC-u4-bjX" id="hlH-m8-ASs"/>
-                        <outlet property="latitudeText" destination="748-WJ-M3j" id="ELv-Lq-fmE"/>
-                        <outlet property="longitudeText" destination="rie-Iq-IBT" id="Odc-m6-Rpm"/>
                         <outlet property="mapContainerView" destination="wWg-Zb-XIP" id="BaF-bV-zdI"/>
                         <outlet property="navigationBar" destination="6j0-r3-DLE" id="dy2-7j-8sT"/>
-                        <outlet property="offTrackText" destination="fWa-gQ-gGD" id="QLp-Ho-Iaq"/>
+                        <outlet property="objectDetectionView" destination="yWV-H4-77O" id="RSO-pP-1uc"/>
                         <outlet property="routineInform" destination="XDX-dc-aNb" id="o8g-dK-Ow8"/>
                         <outlet property="stackView" destination="XPB-0L-eTH" id="uMZ-ap-pqW"/>
                         <outlet property="standardText" destination="l8D-Pe-53m" id="7IL-tO-8Fp"/>
-                        <outlet property="twoPointsDistance" destination="LoW-fy-aEZ" id="PwL-Rg-vJz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NF6-0c-467" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -996,16 +986,16 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" alignment="center" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="hW2-nN-Pw0">
-                                        <rect key="frame" x="49" y="65" width="150" height="43"/>
+                                        <rect key="frame" x="49" y="65" width="149.66666666666666" height="44.333333333333343"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="목적지에 도착했어요!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vwv-MT-8ey">
-                                                <rect key="frame" x="0.0" y="0.0" width="150" height="21"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="149.66666666666666" height="21.666666666666668"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeoL00" family="AppleSDGothicNeoL00" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="안내를 종료합니다." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mbb-JE-Ldi">
-                                                <rect key="frame" x="7.6666666666666714" y="22" width="134.66666666666663" height="21"/>
+                                                <rect key="frame" x="8.3333333333333286" y="22.666666666666686" width="133.33333333333337" height="21.666666666666671"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeoL00" family="AppleSDGothicNeoL00" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -1050,8 +1040,11 @@
         </scene>
     </scenes>
     <resources>
+        <image name="addRelationBtn.png" width="80" height="80"/>
+        <image name="backBtnWhite.png" width="12" height="20"/>
         <image name="backButton.png" width="12" height="20"/>
         <image name="direction2.png" width="18" height="16"/>
+        <image name="directionWhite.png" width="18" height="16"/>
         <namedColor name="AccentColor">
             <color red="1" green="0.84313725490196079" blue="0.43529411764705883" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
