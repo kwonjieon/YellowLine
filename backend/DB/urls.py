@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import DestinationArrival, home, insertSearch, makeRelations, recentSearch, register_or_update_apns_token, relations_view, signup, startNavi, startWalk, user_login, user_logout
+from .views import DestinationArrival, current_protected_info, home, insertSearch, makeRelations, recentSearch, register_or_update_apns_token, relations_view, signup, startNavi, startWalk, user_login, user_logout
 
 
 urlpatterns = [
@@ -19,6 +19,9 @@ urlpatterns = [
 
 
     path('startnavi/',startNavi,name='startNavi'),
+
+    path('protected-info/',current_protected_info,name='protected-info'),
+
     path('startwalk/',startWalk,name='startWalk'),
     path('arrival/',DestinationArrival,name='DestinationArrival'),
 
