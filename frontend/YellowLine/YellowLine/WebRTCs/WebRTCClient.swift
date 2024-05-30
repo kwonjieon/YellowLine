@@ -218,7 +218,7 @@ extension WebRTCClient {
         //7200초 = 12분유지
         let wcert = RTCCertificate.generate(withParams: ["expires": NSNumber(value: 100000),
                                                          "name": "RSASSA-PKCS1-v1_5"])
-        config.iceServers = [RTCIceServer(urlStrings: Config.default.webRTCServers), RTCIceServer(urlStrings: ["turn:43.202.136.75:3478"], username: "mysteria", credential: "mysteria")]
+        config.iceServers = [RTCIceServer(urlStrings: Config.urls.webRTCServers), RTCIceServer(urlStrings: ["turn:43.202.136.75:3478"], username: "mysteria", credential: "mysteria")]
         
         config.iceTransportPolicy = .all
 //        config.rtcpMuxPolicy = .negotiate

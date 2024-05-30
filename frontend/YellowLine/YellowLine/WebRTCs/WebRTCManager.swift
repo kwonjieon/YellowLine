@@ -18,7 +18,7 @@ class WebRTCManager {
     var webRTCClient: WebRTCClient!
     var socket: WebSocket!
     var tryToConnectWebSocket: Timer!
-    let ipAddress: String = Config.default.urls.signaling
+    let ipAddress: String = Config.urls.signaling
     var cameraSession: CameraSession?
     var isSocketConnected = false
     

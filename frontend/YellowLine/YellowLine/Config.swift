@@ -18,7 +18,7 @@ fileprivate let defaultIceServers = ["stun:stun.l.google.com:19302",
 
 struct Config {
     let webRTCServers: [String]
-    let login : String?
+    let login : String
     let signaling : String
     let local : String
 

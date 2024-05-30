@@ -60,7 +60,7 @@ class LoginVC: UIViewController {
         //guard let tmpPw = PWField.text, isValidPassword(pwd: tmpPw) else { return }
         
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
-        let loginURL = Config.default.urls.login
+        let loginURL = Config.urls.login
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(self.IDField.text!.data(using:.utf8)!, withName: "id")
             multipartFormData.append(self.PWField.text!.data(using:.utf8)!, withName: "password")
