@@ -8,8 +8,18 @@
 import UIKit
 import TMapSDK
 import CoreData
+import WebRTC
+import Starscream
 // 보호자가 보는 피보호자의 네비+물체감지 화면
-class ShowNavigationVC: UIViewController, TMapViewDelegate {
+class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, WebRTCClientDelegate {
+    
+    //WebRTC
+    var socket: WebSocket!
+    var webRTCClient: WebRTCClient!
+    var tryToConnectWebSocket: Timer!
+    var isSocketConnected = false
+    var protectedId: String?
+    
     // tmap 지도
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
@@ -33,12 +43,34 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate {
     @IBOutlet weak var backBtn: UIButton!
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
+        if webRTCClient.isConnected {
+            webRTCClient.disconnect()
+        }
     }
     
     var name: String?
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        //WebRTC
+        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.protectedId)/")!)
+        socket = WebSocket(request: request)
+        socket.delegate = self
+        // socket 반복요청
+        self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: { (timer) in
+            if self.webRTCClient.isConnected || self.isSocketConnected {
+                print("socket connected!")
+                if !self.webRTCClient.isConnected {
+                    self.webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
+                        self.sendSDP(sessionDescription: offerSDP)
+                    })
+                }
+                return
+            }
+            print("Request socket connect")
+            self.socket.connect()
+        })
         
         self.mapView = TMapView(frame: mapContainerView.frame)
         self.mapView?.delegate = self
@@ -69,6 +101,10 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate {
         setNameLabel()
         setNavigationBar()
         setLabel()
+        
+        webRTCClient = WebRTCClient()
+        webRTCClient.delegate = self
+        webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -76,7 +112,9 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate {
         print("isReadyLoadMap : \(isReadyLoadMap)")
         // 현재 위치로 지도 이동
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
+        
     }
+    
     
     // 피보호자의 현재위치 마커 표기 업데이트
     func updateCurrentPositionMarker(currentLatitude: CLLocationDegrees, currentLongitude: CLLocationDegrees) {
@@ -187,4 +225,170 @@ extension ShowNavigationVC: CLLocationManagerDelegate {
         func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
             print(error)
         }
+    
+    
+    //MARK: private WebRTC
+    //MARK: - private
+    private func sendSDP(sessionDescription: RTCSessionDescription) {
+        var type = ""
+        if sessionDescription.type == .offer {
+            type = "offer"
+        }else if sessionDescription.type == .answer {
+            print("sendSDP: sendSDP type answer...")
+            type = "answer"
+        }
+        
+        let sdp = SDP.init(sdp: sessionDescription.sdp)
+        let signalingMessage = SignalingMessage.init(type: type, sessionDescription: sdp, candidate: nil)
+        do {
+            let data = try JSONEncoder().encode(signalingMessage)
+            let message = String(data: data, encoding: String.Encoding.utf8)!
+            
+            if self.isSocketConnected {
+                print("self.isSocketConnected 입니다! 지금부터 sendSDP를 실행합니다!")
+                self.socket.write(string: message)
+            }
+        }catch{
+            print(error)
+        }
+    }
+    
+    private func sendCandidate(iceCandidate: RTCIceCandidate){
+        let candidate = Candidate.init(sdp: iceCandidate.sdp, sdpMLineIndex: iceCandidate.sdpMLineIndex, sdpMid: iceCandidate.sdpMid!)
+        let signalingMessage = SignalingMessage.init(type: "candidate", sessionDescription: nil, candidate: candidate)
+        do {
+            let data = try JSONEncoder().encode(signalingMessage)
+            let message = String(data: data, encoding: String.Encoding.utf8)!
+            
+            if self.isSocketConnected {
+                print("self.isSocketConnected 입니다! 지금부터 sendCandidate를 실행합니다!")
+                self.socket.write(string: message)
+            }
+        }catch{
+            print(error)
+        }
+    }
 }
+
+// WEBRTC Delegate
+extension ShowNavigationVC{
+    func didOpenDataChanel() {
+        print("did open data channel")
+    }
+    
+    func didGenerateCandidate(iceCandidate: RTCIceCandidate) {
+        self.sendCandidate(iceCandidate: iceCandidate)
+    }
+    
+    func didConnectWebRTC() {
+        //peer to peer 연결이 완료되면 socket연결은 필요없음.
+        self.socket.disconnect()
+    }
+    
+    func didDisConnectedWebRTC() {}
+    
+    func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
+        var state = ""
+        
+        switch iceConnectionState {
+        case .checking:
+            state = "checking..."
+        case .closed:
+            state = "closed"
+        case .completed:
+            state = "completed"
+        case .connected:
+            state = "connected"
+        case .count:
+            state = "count..."
+        case .disconnected:
+            state = "disconnected"
+        case .failed:
+            state = "failed"
+        case .new:
+            state = "new..."
+        default:
+            state = "something wrong default value."
+        }
+        print("ice candidation state changed: \(state)")
+    }
+    
+    func didReceiveData(data: Data) {
+        // data channel 을 연결했을 때 여기에 데이터가 옴. 추가기능임.
+//        print("Data received...! \(data)")
+
+        do {
+            let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
+            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
+        } catch {
+            return
+        }
+    }
+    
+    func didReceiveMessage(message: String) {
+        // 위와 마찬가지 data channel용.
+//        let converted = UIImage(base64: message, withPrefix: false)
+//        DispatchQueue.main.async {
+//            self.imageView!.image = converted
+//        }
+        print(message)
+        
+    }
+}
+
+//MARK: - Socket Delegate
+extension ShowNavigationVC {
+    func didReceive(event: Starscream.WebSocketEvent, client: any Starscream.WebSocketClient) {
+        switch event {
+        case .connected(let headers):
+            self.isSocketConnected = true
+            print("websocket is connected: \(headers)")
+        case .disconnected(let reason, let code):
+            self.isSocketConnected = false
+            print("websocket is disconnected: \(reason) with code: \(code)")
+        case .text(let string):
+            do{
+                let message = try JSONDecoder().decode(Message.self, from: string.data(using: .utf8)!)
+                let signalingMessage = message.message!
+                
+                if signalingMessage.type == "offer" {
+                    webRTCClient.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
+                        
+                        self.sendSDP(sessionDescription: answerSDP)
+                    })
+                }else if signalingMessage.type == "answer" {
+                    webRTCClient.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
+                    
+                }else if signalingMessage.type == "candidate" {
+                    let candidate = signalingMessage.candidate!
+                    webRTCClient.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
+                }
+            }catch{
+                print("=ERROR didReceive Error 발생")
+                print(error)
+            }
+//            print("Received text: \(string)")
+        case .binary(let data):
+            print("Websocket: Received data: \(data.count)")
+        case .ping(_):
+            break
+        case .pong(_):
+            break
+        case .viabilityChanged(_):
+            break
+        case .reconnectSuggested(_):
+            break
+        case .cancelled:
+            print("cancelled...")
+            self.isSocketConnected = false
+        case .error(let error):
+            self.isSocketConnected = false
+//            handleError(error)
+            print("202 Error 발생.")
+            print(error)
+        case .peerClosed:
+               break
+        }
+    }
+}
+
