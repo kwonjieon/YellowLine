@@ -105,10 +105,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         setNameLabel()
         setNavigationBar()
         setLabel()
-        
-        webRTCClient = WebRTCClient()
-        webRTCClient.delegate = self
-        webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
