@@ -53,7 +53,10 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //WebRTC
+        //WebRT        
+        webRTCClient = WebRTCClient()
+        webRTCClient.delegate = self
+        webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
         let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.protectedId)/")!)
         socket = WebSocket(request: request)
         socket.delegate = self
@@ -72,6 +75,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
             self.socket.connect()
         })
         
+        //Navi
         self.mapView = TMapView(frame: mapContainerView.frame)
         self.mapView?.delegate = self
         self.mapView?.setApiKey(apiKey)
