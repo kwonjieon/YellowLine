@@ -1,0 +1,38 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <!-- 다른 네비게이션 링크들... -->
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><span>{{ user.username }}</span></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'signup' %}">Register</a></li>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <li><span>{{ user.id }}</span></li>
+                <li><span>{{ user.name }}</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <h2>로그인</h2>
+    <form method="post">
+        {% csrf_token %}
+        <!-- 아이디 필드를 'id'로 설정 -->
+        <label for="id">ID:</label>
+        <input type="id" id="id" name="id" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">로그인</button>
+    </form>
+</body>
+</html>
