@@ -21,7 +21,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.btn2Text = "안내 중단"
         nextVC.titletext = "안내 중단"
         nextVC.descriptionText = "경로 안내를 중단할까요?"
-        
+        //webrtc, camera 종료
+        self.webRTCManager!.webRTCClient.disconnect()
+        self.cameraSession?.stopSession()
         self.present(nextVC, animated: true)
     }
 
@@ -73,6 +75,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
     let tts = TTSModelModule()
     var isFirstTTSInform = true
     
+    // Object Detection variables
+    var webRTCManager: WebRTCManager?
+    var cameraSession: CameraSession?
+    var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
+    
+    //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
         // 맵 화면에 로드
@@ -94,7 +102,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
-
+        
+        webRTCManager = WebRTCManager(uiView: objectDetectionView, "YLUSER01")
         
         getTMapAPINavigationInform()
         
@@ -117,6 +126,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         //locationManager.startMonitoringSignificantLocationChanges()
         //locationManager.startUpdatingLocation()
+    }
+    
+    //종료 시 
+    override func viewDidDisappear(_ animated: Bool) {
+        self.viewDidDisappear(true)
+        self.webRTCManager!.webRTCClient.disconnect()
+        self.cameraSession?.stopSession()
     }
     
     func setObjectDetectionView() {
@@ -508,4 +524,8 @@ extension MapViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("locationManager >> didFailWithError 🐥 ")
     }
+}
+
+extension MapViewController {
+    
 }

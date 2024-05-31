@@ -41,6 +41,7 @@ class ObjectDetectionVC: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        self.webRTCManager!.webRTCClient.disconnect()
         self.cameraSession?.stopSession()
     }
     

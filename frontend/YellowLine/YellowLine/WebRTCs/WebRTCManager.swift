@@ -237,7 +237,7 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
-//            self.webRTCClient?.didCaptureLocalFrame(videoFrame)
+            self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         
     }
