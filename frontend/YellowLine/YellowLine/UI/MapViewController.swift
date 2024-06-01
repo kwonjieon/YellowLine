@@ -58,6 +58,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     // 최종적으로 사용할 좌/우 회전해야 하는 위치 정보 리스트
     var pointerDataList: [LocationData] = []
+    var pointMarkers:Array<TMapMarker> = []
     
     // 경로 중 좌, 우회전 해야하는 경/위도 리스트
     var naviPointList : [String] = []
@@ -130,6 +131,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         // 경로 데이터
         getTMapAPINavigationInform()
+        
+        
  
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
     }
@@ -331,6 +334,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
                                 }
                                 self.pointerDataList.append(inputData)
                                 
+                                DispatchQueue.main.async {
+                                    // 임시 좌/우 회전 포인터 마커들 표기
+                                    let pointMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: inputData.latitude, longitude: inputData.longitude))
+                                    pointMarker.map = self.mapView
+                                    self.pointMarkers.append(pointMarker)
+                                }
                             }
                         case .twoDimensional(let array): break
                         }
@@ -343,6 +352,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     self.pointerDataList.append(destinationData)
                     print("navigationList : \(self.navigationList)")
                     print("naviDestinationList : \(self.naviDestinationList)")
+                    for i in 0...self.pointerDataList.count-1 {
+                        print ("pointerDataList 이름 :\(self.pointerDataList[i].name)")
+                    }
                 }catch{
                     print(error)
                 }
@@ -357,12 +369,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
     func checkCurrentLoactionRotate() {
         for (index,location) in pointerDataList.enumerated() {
             let distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
-            if distance < 0.00003429 {
+            if distance < 0.0000343 {
                 // 최종 목적지에 도착
+                
                 if (location.name == "finishLine2749") {
                     print("경로안내 종료")
                     // 음성안내
-                    let speechText = location.direction + "에 도착했습니다. 경로안내를 종료합니다."
+                    let speechText = destinationName! + "에 도착했습니다. 경로안내를 종료합니다."
                     tts.speakText(speechText, 1.0, 0.4, true)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
@@ -378,7 +391,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 }
                 // 방향을 꺾어야 하는 위치에 도달
                 else {
-                    routineInform.text = location.direction
+                    routineInform.text = location.name
                     
                     // 음성안내
                     // speakText(내용, 볼륨, 속도, 옵션)
@@ -387,6 +400,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     print("가야하는 방향: \(location.direction)")
                     
                     // 한번 도착한 경로는 포지션 리스트에서 삭제
+                    
                     pointerDataList.remove(at: index)
                 }
             }
