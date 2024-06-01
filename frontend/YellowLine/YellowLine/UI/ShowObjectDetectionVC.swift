@@ -18,9 +18,6 @@ class ShowObjectDetectionVC: UIViewController {
     @IBOutlet weak var backBtn: UIButton!
     @IBOutlet weak var objectDetectionView: UIView! // remote view
     
-//    private var protectedId = "YLUSER01" //보호자 아이디
-    var protectedId : String?
-    private var ipAddress: String = Config.urls.signaling
     
     var socket: WebSocket!
     var webRTCClient: WebRTCClient!
@@ -35,13 +32,14 @@ class ShowObjectDetectionVC: UIViewController {
         self.dismiss(animated: true)
         if webRTCClient.isConnected {
             webRTCClient.disconnect()
+            tryToConnectWebSocket.invalidate()
         }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupUI()   // ui setting
-        let request = URLRequest(url: URL(string: ipAddress + "\(self.protectedId)/")!)
+        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id)/")!)
         socket = WebSocket(request: request)
         socket.delegate = self
         // socket 반복요청
@@ -65,11 +63,6 @@ class ShowObjectDetectionVC: UIViewController {
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
         webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
-//        if isSocketConnected && !webRTCClient.isConnected {
-//            webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
-//                self.sendSDP(sessionDescription: offerSDP)
-//            })
-//        }
     }
     
     private func setupUI() {

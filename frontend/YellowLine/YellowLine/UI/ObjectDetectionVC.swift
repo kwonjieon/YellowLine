@@ -16,7 +16,7 @@ class ObjectDetectionVC: UIViewController {
     var webRTCManager: WebRTCManager?
     
     // 피보호자 아이디
-    var protectedId = "YLUSER01"
+    var protectedId : String?
     
     // 오프라인 상태
     var mapViewController = MapViewController()
@@ -29,8 +29,9 @@ class ObjectDetectionVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.protectedId = UserDefaults.standard.string(forKey: "uid")!
         setNavigationBar()
-        webRTCManager = WebRTCManager(uiView: localView, protectedId)
+        webRTCManager = WebRTCManager(uiView: localView, protectedId!)
         setLabel()
         setBtn()
     }

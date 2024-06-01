@@ -19,7 +19,6 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     var webRTCClient: WebRTCClient!
     var tryToConnectWebSocket: Timer!
     var isSocketConnected = false
-    var protectedId: String = "YLUSER01"
     
     // tmap 지도
     var mapView:TMapView?
@@ -46,11 +45,12 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         self.dismiss(animated: true)
         if webRTCClient.isConnected {
             webRTCClient.disconnect()
+            tryToConnectWebSocket.invalidate()
         }
     }
     
     // 피보호자 아이디, 이름 정보
-    var id : String = "YLUSER01"
+    var id : String?
     var name: String = ""
     var destination : String = ""
     
@@ -61,12 +61,12 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
         webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
-        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.protectedId)/")!)
+        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id)/")!)
         socket = WebSocket(request: request)
         socket.delegate = self
         // socket 반복요청
         self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: { (timer) in
-            if self.webRTCClient.isConnected || self.isSocketConnected {
+            if !self.webRTCClient.isConnected || self.isSocketConnected {
                 print("socket connected!")
                 if !self.webRTCClient.isConnected {
                     self.webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
@@ -126,7 +126,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         print ("id : \(id)")
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let URL = "http://43.202.136.75/user/protected-info/"
-        let tmpData : [String : String] = ["user_id" : id]
+        let tmpData : [String : String] = ["user_id" : id!]
         AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
             multipartFormData.append(val.data(using: .utf8)!, withName: key)
         }
