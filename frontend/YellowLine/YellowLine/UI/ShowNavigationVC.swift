@@ -26,11 +26,6 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
     var currentMarker:TMapMarker?
     @IBOutlet weak var mapContainerView: UIView!
-    
-    // 현재위치
-    var locationManger = CLLocationManager()
-    var currentLat : Double = 0.0
-    var currentLongi : Double = 0.0
     var isReadyLoadMap = false
     
     @IBOutlet weak var stackView: UIStackView!
@@ -86,7 +81,10 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         self.mapView?.delegate = self
         self.mapView?.setApiKey(apiKey)
         mapContainerView.addSubview(self.mapView!)
+        // 확대 레벨 기본 설정
+        self.mapView?.setZoom(18)
         
+        /*
         // 델리게이트 설정
         locationManger.delegate = self
         // 거리 정확도 설정
@@ -103,8 +101,8 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
             print("위치 서비스 Off 상태")
         }
         
-        // 확대 레벨 기본 설정
-        self.mapView?.setZoom(18)
+         */
+
         setLabel()
         setObjectDetectionView()
         setBackBtn()
@@ -240,35 +238,6 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     }
 }
 
-extension ShowNavigationVC: CLLocationManagerDelegate {
-    // 위치 정보 계속 업데이트 -> 위도 경도 받아옴
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("didUpdateLocations")
-        if let location = locations.first {
-            print("위도: \(location.coordinate.latitude)")
-            print("경도: \(location.coordinate.longitude)")
-            currentLat = location.coordinate.latitude
-            currentLongi = location.coordinate.longitude
-        }
-        
-        if isReadyLoadMap == true {
-            // 현재 위치 마커로 표기
-            //updateCurrentPositionMarker(currentLatitude: currentLat, currentLongitude: currentLongi)
-            
-            // 현재 위치로 지도 이동
-            //self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
-            
-            // 확대 레벨 기본 설정
-            // self.mapView?.setZoom(18)
-        }
-    }
-    
-    // 위도 경도 받아오기 에러
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
-    }
-    
-}
 
 //MARK: - private WebRTC Func
 
