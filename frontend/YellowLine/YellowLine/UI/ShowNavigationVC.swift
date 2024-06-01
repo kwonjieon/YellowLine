@@ -19,7 +19,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     var webRTCClient: WebRTCClient!
     var tryToConnectWebSocket: Timer!
     var isSocketConnected = false
-    var protectedId: String?
+    var protectedId: String = "YLUSER01"
     
     // tmap 지도
     var mapView:TMapView?
@@ -50,9 +50,9 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     }
     
     // 피보호자 아이디, 이름 정보
-    var id : String?
-    var name: String?
-    var destination : String?
+    var id : String = "YLUSER01"
+    var name: String = ""
+    var destination : String = ""
     
     
     override func viewDidLoad() {
@@ -126,7 +126,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         print ("id : \(id)")
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let URL = "http://43.202.136.75/user/protected-info/"
-        let tmpData : [String : String] = ["user_id" : id!]
+        let tmpData : [String : String] = ["user_id" : id]
         AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
             multipartFormData.append(val.data(using: .utf8)!, withName: key)
         }
