@@ -14,6 +14,7 @@ import Alamofire
 class MapViewController: UIViewController, TMapViewDelegate {
     @IBOutlet weak var objectDetectionView: UIView!
     @IBOutlet weak var mapContainerView: UIView!
+    // MARK: 종료버튼
     @IBAction func backBtn(_ sender: Any) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpStopNavi") as! PopUpStopNavi
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen

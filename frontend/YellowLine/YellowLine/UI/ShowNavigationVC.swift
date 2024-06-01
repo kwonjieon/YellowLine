@@ -37,6 +37,12 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     @IBOutlet weak var objectDetectionView: UIView!
     @IBOutlet weak var backBtn: UIButton!
     @IBAction func clickBackBtn(_ sender: Any) {
+        tryToConnectWebSocket.invalidate()
+        tryToConnectWebSocket = nil
+        socket = nil
+        webRTCClient.onDisConnected()
+        webRTCClient = nil
+        isSocketConnected = false
         self.dismiss(animated: true)
     }
     
@@ -299,7 +305,13 @@ extension ShowNavigationVC{
     func didDisConnectedWebRTC() {
         print("피보호자와의 종료되었습니다.")
         if webRTCClient.isConnected {
-            self.tryToConnectWebSocket.invalidate()
+            tryToConnectWebSocket.invalidate()
+            tryToConnectWebSocket = nil
+            socket = nil
+            webRTCClient.onDisConnected()
+            webRTCClient = nil
+            isSocketConnected = false
+            self.dismiss(animated: true)
         }
     }
     

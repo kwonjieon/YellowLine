@@ -29,19 +29,20 @@ class ShowObjectDetectionVC: UIViewController {
     var id : String?
     
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.dismiss(animated: true)
-        if webRTCClient.isConnected {
-            self.webRTCClient.onDisConnected()
-            self.tryToConnectWebSocket.invalidate()
-
-        }
+        self.tryToConnectWebSocket.invalidate()
+        self.tryToConnectWebSocket = nil
+        self.webRTCClient.onDisConnected()
+        webRTCClient = nil
+        socket.disconnect()
+        socket = nil
+        isSocketConnected = false
         self.dismiss(animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupUI()   // ui setting
-        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id)/")!)
+        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id!)/")!)
         socket = WebSocket(request: request)
         socket.delegate = self
         // socket 반복요청
