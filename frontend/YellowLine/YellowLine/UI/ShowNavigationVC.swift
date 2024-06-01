@@ -52,6 +52,11 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     var destination : String = ""
     
     
+    deinit {
+        print("***ShowNavigationVC deinit...")
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //WebRT        

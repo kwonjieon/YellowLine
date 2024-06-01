@@ -28,6 +28,10 @@ class ShowObjectDetectionVC: UIViewController {
     var name: String?
     var id : String?
     
+    deinit {
+        print("**Show ObjectDetectionVC deinit...")
+    }
+    
     @IBAction func clickBackBtn(_ sender: Any) {
 
 

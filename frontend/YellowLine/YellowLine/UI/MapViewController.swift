@@ -60,6 +60,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
     // 경로 중 좌, 우회전 해야하는 경/위도 리스트
     var naviPointList : [String] = []
     
+    deinit {
+        print("*MapViewController deinit....")
+    }
+    
     // 현재위치
     var longitude:Double = 0.0
     var latitude:Double = 0.0

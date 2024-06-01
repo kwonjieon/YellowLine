@@ -48,6 +48,9 @@ class SearchDestinationViewController: UIViewController, TMapViewDelegate {
     
     @IBOutlet weak var navigationBar: UIView!
     
+    deinit {
+        print("*SearchDestination Deinit...")
+    }
 
     
     override func viewDidLoad() {
