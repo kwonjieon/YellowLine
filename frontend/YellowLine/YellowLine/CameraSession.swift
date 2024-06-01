@@ -82,7 +82,9 @@ class CameraSession: NSObject {
     }
     
     func setup(completion: @escaping (Bool) -> Void) {
-        mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
+//        mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
+        mlModel = try! yolov8v2(configuration: MLModelConfiguration()).model
+        
         if useMidas {
             midasModel = try! MiDaS(configuration: MLModelConfiguration())
         }
@@ -353,19 +355,24 @@ class CameraSession: NSObject {
                 self.show(predictions: [])
             }
         }
-            // TTS 실행.
-            if !self.closeObjects.isEmpty {
-                // 장애물이 탐지된 프레임이라면 +1
-                TTSModelModule.ttsModule.objectCounts += 1
-                self.queue.async {
-                    TTSModelModule.ttsModule.processTTS(type: false, text: "전방에 장애물입니다.")
-                }
-            } else {
-                TTSModelModule.ttsModule.objectCounts = 0
+        // TTS 실행.
+        if !self.closeObjects.isEmpty {
+            // 장애물이 탐지된 프레임이라면 +1
+            TTSModelModule.ttsModule.objectCounts += 1
+            self.queue.async {
+                TTSModelModule.ttsModule.processTTS(type: "Objects", text: "전방에 장애물입니다.")
             }
-            print("---")
-            self.closeObjects.removeAll()
+        } else {
+            TTSModelModule.ttsModule.objectCounts = 0
+        }
+        self.closeObjects.removeAll()
 
+        if lights.red {
+            TTSModelModule.ttsModule.processTTS(type: "red", text: "빨간불입니다")
+        } else if lights.green {
+            TTSModelModule.ttsModule.processTTS(type: "green", text: "초록불입니다")
+        }
+        
     }
 
     // 가까운 거리 판별 사각형
@@ -373,11 +380,13 @@ class CameraSession: NSObject {
     var closeObjects : Set<String> = []// 탐지 물체들 넣는 객체
     var exceptObjects : Set<String> = ["crosswalk_yl", "red_yl", "green_yl"]
     
+    var lights: (red : Bool, green : Bool) = (false, false)
+
     // MARK:  Show
     func show(predictions: [VNRecognizedObjectObservation]) {
         let width = localView!.bounds.width
         let height = localView!.bounds.height
-
+        lights = (false, false)
         var str = ""
         // ratio = videoPreview AR divided by sessionPreset AR
         var ratio: CGFloat = 1.0
@@ -479,7 +488,17 @@ class CameraSession: NSObject {
                 }
                 
                 if bestClass == "red_yl" || bestClass == "green_yl" {
-                    delegate?.didRedOrGreen(bestClass)
+//                    delegate?.didRedOrGreen(bestClass)
+                }
+                
+                if bestClass == "red_yl" {
+                    lights.green = false
+                    lights.red = true
+                }
+                
+                if bestClass == "green_yl" {
+                    lights.red = false
+                    lights.green = true
                 }
 
                 // Show the bounding box.
@@ -491,7 +510,6 @@ class CameraSession: NSObject {
                 boundingBoxViews[i].hide()
             } // if prediction end...
         } // for end...
-//        print(self.closeObjects)
     } // show end...
     
     func drawPoint(x : Int, y: Int, view: UIView){

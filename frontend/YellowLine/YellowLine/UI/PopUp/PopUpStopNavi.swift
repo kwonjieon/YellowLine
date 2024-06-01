@@ -30,7 +30,7 @@ class PopUpStopNavi: UIViewController {
     
     @IBAction func clickStopBtn(_ sender: Any) {
         mapViewController.sendChangeToOffline()
-        mapViewController.locationManager.stopUpdatingLocation()
+//        mapViewController.locationManager.stopUpdatingLocation()
         if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController?.presentingViewController {
             webRTCManager!.disconnect()
             webRTCManager = nil

@@ -53,6 +53,7 @@
 		B92DDC292C075413005820BA /* ylyolov8s.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B92DDC282C075413005820BA /* ylyolov8s.mlmodel */; };
 		B92DDC362C076670005820BA /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92DDC322C076633005820BA /* TMapSDK.framework */; };
 		B92DDC372C076670005820BA /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B92DDC322C076633005820BA /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B944E14E2C0B759C00ECBD4D /* yolov8v2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B944E14D2C0B759C00ECBD4D /* yolov8v2.mlmodel */; };
 		B954C48F2BCBC38A009D6834 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */; };
 		B956CA032BCE70AA00188A09 /* WebRTCiOSSDK in Frameworks */ = {isa = PBXBuildFile; productRef = B956CA022BCE70AA00188A09 /* WebRTCiOSSDK */; };
 		B956CA072BCEA7C800188A09 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B956CA062BCEA7C800188A09 /* WebRTCManager.swift */; };
@@ -130,6 +131,7 @@
 		57FC78512BC7CED500C81CA1 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		B92DDC282C075413005820BA /* ylyolov8s.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = ylyolov8s.mlmodel; sourceTree = "<group>"; };
 		B92DDC322C076633005820BA /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TMapSDK.framework; sourceTree = "<group>"; };
+		B944E14D2C0B759C00ECBD4D /* yolov8v2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = yolov8v2.mlmodel; sourceTree = "<group>"; };
 		B954C48E2BCBC38A009D6834 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
 		B956CA062BCEA7C800188A09 /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
 		B962DBE22BF4AE1900F86729 /* BoundingBoxView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoundingBoxView.swift; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 		B962DBDF2BF4AE0E00F86729 /* Object Detection */ = {
 			isa = PBXGroup;
 			children = (
+				B944E14D2C0B759C00ECBD4D /* yolov8v2.mlmodel */,
 				B92DDC282C075413005820BA /* ylyolov8s.mlmodel */,
 				B9741B9A2C00CF8400E87A72 /* MiDaS.mlmodel */,
 			);
@@ -456,6 +459,7 @@
 				57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */,
 				5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */,
 				B92DDC292C075413005820BA /* ylyolov8s.mlmodel in Sources */,
+				B944E14E2C0B759C00ECBD4D /* yolov8v2.mlmodel in Sources */,
 				57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */,
 				57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */,
 			);

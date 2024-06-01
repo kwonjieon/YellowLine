@@ -59,16 +59,23 @@ class WebRTCManager {
     func disconnect() {
         self.tryToConnectWebSocket.invalidate()
         DispatchQueue.global(qos: .userInteractive).async {
-//            if self.cameraSession!.isCapturing {
-//                self.cameraSession!.stopSession()
-//            }
             self.webRTCClient.stopCapture()
         }
         self.webRTCClient.onDisConnected()
         webRTCClient = nil
         tryToConnectWebSocket = nil
         cameraSession = nil
-        isSocketConnected = false
+        if self.isSocketConnected {
+            isSocketConnected = false
+            socket = nil
+        }
+        
+        if self.isSocketConnected {
+            self.socket.disconnect()
+            self.isSocketConnected = false
+            self.socket = nil
+        }
+        
     }
 
 }

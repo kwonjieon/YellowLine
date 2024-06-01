@@ -17,9 +17,10 @@ class TTSModelModule {
     static let ttsModule = TTSModelModule()
     var ttsSemaphore = DispatchSemaphore(value: 2)
     var objectCounts = 0
+    var redCounts = 0
+    var greenCounts = 0
     let synthesizer = AVSpeechSynthesizer()
-    private var ttsQueue : [String] = []
-    private var channels: (navi: Bool, camera: Bool) = (false, false)
+    private var channels: (navi: Bool, camera: Bool, red: Bool, green: Bool) = (false, false, false, false)
     func speakText(_ text: String?, _ volume: Float, _ rate: Float, _ avoid: Bool) {
         let audioSession = AVAudioSession()
         // handle audio session first, before trying to read the text
@@ -48,7 +49,9 @@ class TTSModelModule {
     
     func speakTTS(text: String) {
         // 네비의 TTS이거나 TTS가 말하고 있지 않을 때 수행.
-        if channels.navi || !synthesizer.isSpeaking {
+        if channels.navi ||
+            channels.green || channels.red ||
+            !synthesizer.isSpeaking {
             // handle audio session first, before trying to read the text
             do {
                 //다른 오디오랑 혼합하려면 option = .mixWithOthers
@@ -68,28 +71,41 @@ class TTSModelModule {
         }
     }
     
-    // type true = navi ,  = camera
+    // type = navi , objects, red, green
     // TTS 실행하기. 네비게이션에서 TTS를 실행한다면 type true 로
     // TTS실행 시 Main 큐 외의 DispatchQueue에서 돌리기 ex) 359 line of CameraSession.
-    func processTTS(type: Bool, text: String) {
-        if type { // 네비면 바로 실행.
+    func processTTS(type: String, text: String) {
+        switch type {
+        case "navi" :
             channels.navi = true
             speakTTS(text: text)
             channels.navi = false
-        } else { // 카메라면 5프레임 이상 찍혀야 실행.
+        case "objects":
             guard objectCounts >= 5 else { return }
-            self.ttsQueue.append(text)
             speakTTS(text: text)
-        }
-    }
-    
-    func checkTtsQueue() {
-        if !ttsQueue.isEmpty {
-            guard let text = ttsQueue.first else { return }
+        case "red":
+            redCounts += 1
+            guard redCounts >= 10 else { return }
+            channels.red = true
+            greenCounts = 0
             speakTTS(text: text)
+            channels.green = false
+            channels.red = false
+        case "green":
+            greenCounts += 1
+            guard greenCounts >= 8 else { return }
+            channels.green = true
+            speakTTS(text: text)
+            channels.red = false
+            channels.green = false
+            redCounts = 0
+            greenCounts = 0
+            
+        default:
+            break
         }
-    }
 
+    }
     
     // 만약 현재 TTS가 재생중이라면, 즉시종료
     func stopTTS() {
