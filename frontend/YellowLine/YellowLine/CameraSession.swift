@@ -323,17 +323,17 @@ class CameraSession: NSObject {
 //            resizedCGImage = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 640, height: 640))
             let midasImg = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 256, height: 256))
             
-//            let midasHandler = VNImageRequestHandler(cgImage: midasImg!)
+            let midasHandler = VNImageRequestHandler(cgImage: midasImg!)
             
             //fast test for yolo
             let handler = VNImageRequestHandler(ciImage: originalCIImage!)
             if UIDevice.current.orientation != .faceUp {  // stop if placed down on a table
                 do {
-//                    try midasHandler.perform([self.midasVisionRequest])
-                    try handler.perform([visionRequest])
-                    if !self.closeObjects.isEmpty {
-                        print(self.closeObjects.count, self.closeObjects)
-                    }
+                    try midasHandler.perform([self.midasVisionRequest])
+                    //try handler.perform([visionRequest])
+//                    if !self.closeObjects.isEmpty {
+//                        print(self.closeObjects.count, self.closeObjects)
+//                    }
 //                    if !self.closeObjects.isEmpty{
 //                        TTSModelModule.ttsModule.speakText("전방에 장애물입니다.", 10, 0.4, false)
 //                        self.closeObjects.removeAll()
@@ -425,32 +425,32 @@ class CameraSession: NSObject {
 //                    depthValue = 0.0
 
 //
-//                    var midX = rect.midX
-//                    var midY = rect.midY
-//                    if midX < 0 { midX = 0 }
-//                    if midX >= width { midX = width }
-//                    if midY < 0 { midY = 0 }
-//                    if midY >= height { midY = height }
+                    var midX = rect.midX
+                    var midY = rect.midY
+                    if midX < 0 { midX = 0 }
+                    if midX >= width { midX = width }
+                    if midY < 0 { midY = 0 }
+                    if midY >= height { midY = height }
 //                    
-//                    var depthValue: Float?
-//                    let midasX = Int(midX / width * 256)
-//                    let midasY = Int(midY / height * 256)
+                    var depthValue: Float?
+                    let midasX = Int(midX / width * 256)
+                    let midasY = Int(midY / height * 256)
 //
 //                    // 마이다스 이미지버퍼 상대적 좌표 지정
-//                    if self.depthCIImage != nil {
-//                        let bf = (self.depthPixelBuffer)!
-//                        let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
-//                        let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
-//                        
-//                        CVPixelBufferLockBaseAddress(bf, .readOnly)
-//                        let baseAddress = CVPixelBufferGetBaseAddress(bf)
-//                        let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
-//                        let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
-//                        // read the data (returns value of type UInt8)
-//                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
-//                        depthValue = 1.0 - Float(dalue) / 255.0
-//                        CVPixelBufferUnlockBaseAddress(bf, .readOnly)
-//                    }
+                    if self.depthCIImage != nil {
+                        let bf = (self.depthPixelBuffer)!
+                        let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
+                        let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
+                        
+                        CVPixelBufferLockBaseAddress(bf, .readOnly)
+                        let baseAddress = CVPixelBufferGetBaseAddress(bf)
+                        let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
+                        let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
+                        // read the data (returns value of type UInt8)
+                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
+                        depthValue = 1.0 - Float(dalue) / 255.0
+                        CVPixelBufferUnlockBaseAddress(bf, .readOnly)
+                    }
                     let bestClass = prediction.labels[0].identifier
                     let confidence = prediction.labels[0].confidence
                     var flag = true
@@ -463,22 +463,24 @@ class CameraSession: NSObject {
                     
                     // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
 //                    print("bestClass is : \(bestClass)")
-                    if filtRect!.intersects(rect) {
-                        for obj in exceptObjects {
-                            // 제외 물체들이 아니라면 TTS안내 해야 할 물체들로 기록 (제외물체 : 횡단보도, 빨-초 신호)
-                            print("\(bestClass) == \(obj) : \(bestClass == obj)")
-                            if bestClass == obj {
-                                flag = false
-                            }
-                        }
-                        if flag {
-                            closeObjects.insert(bestClass)
-                        }
-                    }
+                    
+                    //  필터링 사각형
+//                    if filtRect!.intersects(rect) {
+//                        for obj in exceptObjects {
+//                            // 제외 물체들이 아니라면 TTS안내 해야 할 물체들로 기록 (제외물체 : 횡단보도, 빨-초 신호)
+//                            print("\(bestClass) == \(obj) : \(bestClass == obj)")
+//                            if bestClass == obj {
+//                                flag = false
+//                            }
+//                        }
+//                        if flag {
+//                            closeObjects.insert(bestClass)
+//                        }
+//                    }
 
                     // Show the bounding box.
                     boundingBoxViews[i].show(frame: rect,
-                                             label: String(format: "%@ %.1f", bestClass, confidence * 100),
+                                             label: String(format: "%@ %.1f %.2f", bestClass, confidence * 100, depthValue!),
                                              color: colors[bestClass] ?? UIColor.white,
                                              alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
                 } //confidence >= .4 end

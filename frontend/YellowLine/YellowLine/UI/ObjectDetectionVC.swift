@@ -18,10 +18,16 @@ class ObjectDetectionVC: UIViewController {
     
     // 피보호자 아이디
     var protectedId = "YLUSER01"
+    
+    // 오프라인 상태
+    var mapViewController = MapViewController()
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.dismiss(animated: true)
         self.webRTCManager!.webRTCClient.disconnect()
         self.cameraSession?.stopSession()
+        
+        // 도보 -> 오프라인 상태로 변경
+        mapViewController.sendChangeToOffline()
+        self.dismiss(animated: true)
     }
     
     override func viewDidLoad() {

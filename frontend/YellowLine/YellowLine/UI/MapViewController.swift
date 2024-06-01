@@ -410,7 +410,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     tts.speakText(speechText, 1.0, 0.4, true)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
-                    sendNaviFinish()
+                    sendChangeToOffline()
                     
                     // 도착 안내 화면으로 이동
                     let nextVC = self.storyboard?.instantiateViewController(identifier: "ArrivalDestinationVC") as! ArrivalDestinationVC
@@ -437,7 +437,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     }
     
     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
-    func sendNaviFinish() {
+    func sendChangeToOffline() {
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let loginURL = "http://43.202.136.75/user/arrival/"
         

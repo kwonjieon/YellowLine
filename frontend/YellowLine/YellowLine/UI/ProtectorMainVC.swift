@@ -201,17 +201,65 @@ class ProtectorMainVC: UIViewController {
         if sender.titleLabel?.text == "도보 카메라 확인" {
             let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") as! ShowObjectDetectionVC
             nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-            // 피보호자 이름 전달
+            
+            // 피보호자 이름, 아이디 전달
             nextVC.name = protectedList[sender.tag].name
+            nextVC.id = protectedList[sender.tag].id
+        
             self.present(nextVC, animated: true)
         }
         else if sender.titleLabel?.text == "네비게이션 및 도보 카메라 확인" {
             let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowNavigationVC") as! ShowNavigationVC
             nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            getProtectedDestination(id: protectedList[sender.tag].id)
+            
+            // 피보호자 이름, 아이디 전달
             nextVC.name = protectedList[sender.tag].name
+            nextVC.id = protectedList[sender.tag].id
+            
             self.present(nextVC, animated: true)
         }
     }
+    
+    func getProtectedDestination(id : String) {
+        print ("id : \(id)")
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let URL = "http://43.202.136.75/user/protected-info/"
+        let tmpData : [String : String] = ["user_id" : id]
+        AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
+            multipartFormData.append(val.data(using: .utf8)!, withName: key)
+        }
+        },to: URL, method: .post, headers: header)
+        .responseDecodable(of: DestinationResult.self){ response in
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    print("불러오기 성공")
+                    let result = response
+                    // error가 없으면 통과
+                    guard let resOption = result.recent_arrival else {
+                        return
+                    }
+                    print(resOption)
+                    let cType = resOption
+                    
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
+    }
+}
+
+struct DestinationResult : Codable {
+    let user_id : String?
+    let user_name : String?
+    let recent_arrival : String?
 }
 
 struct MakeRelationResult : Codable {

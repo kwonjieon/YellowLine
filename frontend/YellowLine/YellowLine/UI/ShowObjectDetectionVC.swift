@@ -27,7 +27,9 @@ class ShowObjectDetectionVC: UIViewController {
     var tryToConnectWebSocket: Timer!
     var isSocketConnected = false
     
+    // 피보호자 정보
     var name: String?
+    var id : String?
     
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
