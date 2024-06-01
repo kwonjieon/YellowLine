@@ -199,6 +199,11 @@ class WebRTCClient: NSObject{
             capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
         }
     }
+    private func stopCapture() {
+        if let capturer = self.videoCapturer as? RTCCameraVideoCapturer {
+            capturer.stopCapture()
+        }
+    }
 
     
     func disconnect() {
@@ -210,7 +215,9 @@ class WebRTCClient: NSObject{
         localVideoTrack = nil
         localVideoSource = nil
         remoteVideoTrack = nil
+        stopCapture()
         videoCapturer = nil
+        
     }
 }
 

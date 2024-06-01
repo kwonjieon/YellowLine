@@ -56,18 +56,18 @@ class WebRTCManager {
                 print("Request socket connect")
                 self.socket.connect()
             })
-            
             // 카메라 실행
             cameraSession!.startVideo()
             
         }
     }
-
-    func exitButtonTapped() {
-        if webRTCClient.isConnected {
-            webRTCClient.disconnect()
-        }
+    
+    func disconnect() {
+        webRTCClient.disconnect()
+        cameraSession!.stopSession()
+        tryToConnectWebSocket.invalidate()
     }
+
 }
 
 //MARK: - private WebRTC Signaling, RTCIceCandidate
