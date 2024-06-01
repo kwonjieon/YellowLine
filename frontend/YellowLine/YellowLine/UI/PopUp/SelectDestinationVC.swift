@@ -25,10 +25,15 @@ class SelectDestinationVC: UIViewController {
         self.dismiss(animated: true)
     }
     @IBAction func clickStartBtn(_ sender: Any) {
-        // 최근경로가 아닌 직접 검색을 통한 목적지 검색일 때만 검색 기록 저장
+        
+        saveSearchHistory()
+        
+        // 최근경로가 아닌 직접 검색을 통한 목적지 검색일 때만 검색 기록 저장하려면 아래 코드 주석 해제
+        /*
         if isRecentSeleted == false {
             saveSearchHistory()
         }
+        */
         
         sendStartNavi()
         

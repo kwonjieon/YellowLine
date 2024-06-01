@@ -39,7 +39,7 @@ class WebRTCManager {
             socket = WebSocket(request: request)
             socket.delegate = self
             self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
-                if !self.webRTCClient.isConnected || self.isSocketConnected {
+                if self.webRTCClient.isConnected || self.isSocketConnected {
                     print("socket connected!")
                     return
                 }
