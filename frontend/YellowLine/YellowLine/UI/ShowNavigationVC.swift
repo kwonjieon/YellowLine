@@ -117,9 +117,8 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     
     override func viewDidAppear(_ animated: Bool) {
         isReadyLoadMap = true
-        print("isReadyLoadMap : \(isReadyLoadMap)")
         // 현재 위치로 지도 이동
-        self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
+        //self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
         
     }
     
@@ -163,7 +162,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         if let existingMarker = currentMarker {
             existingMarker.map = nil
         }
-
+        
         // 새로운 위치에 마커 생성 및 추가
         currentMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLatitude, longitude: currentLongitude))
         currentMarker?.map = mapView
@@ -243,31 +242,31 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
 
 extension ShowNavigationVC: CLLocationManagerDelegate {
     // 위치 정보 계속 업데이트 -> 위도 경도 받아옴
-        func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            print("didUpdateLocations")
-            if let location = locations.first {
-                print("위도: \(location.coordinate.latitude)")
-                print("경도: \(location.coordinate.longitude)")
-                currentLat = location.coordinate.latitude
-                currentLongi = location.coordinate.longitude
-            }
-            
-            if isReadyLoadMap == true {
-                // 현재 위치 마커로 표기
-                updateCurrentPositionMarker(currentLatitude: currentLat, currentLongitude: currentLongi)
-                
-                // 현재 위치로 지도 이동
-                self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
-                
-                // 확대 레벨 기본 설정
-                self.mapView?.setZoom(18)
-            }
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print("didUpdateLocations")
+        if let location = locations.first {
+            print("위도: \(location.coordinate.latitude)")
+            print("경도: \(location.coordinate.longitude)")
+            currentLat = location.coordinate.latitude
+            currentLongi = location.coordinate.longitude
         }
         
-        // 위도 경도 받아오기 에러
-        func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-            print(error)
+        if isReadyLoadMap == true {
+            // 현재 위치 마커로 표기
+            //updateCurrentPositionMarker(currentLatitude: currentLat, currentLongitude: currentLongi)
+            
+            // 현재 위치로 지도 이동
+            //self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
+            
+            // 확대 레벨 기본 설정
+            // self.mapView?.setZoom(18)
         }
+    }
+    
+    // 위도 경도 받아오기 에러
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
     
     
     //MARK: private WebRTC
@@ -363,6 +362,21 @@ extension ShowNavigationVC{
         do {
             let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
             print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
+            
+            // 지도 로드가 된 후에 마커 표기 시작가능
+            if  isReadyLoadMap == true {
+                guard let latData = received.Lat else{return}
+                guard let lngData = received.Lng else{return}
+                
+                // 지정된 위치로 마커 업데이트
+                updateCurrentPositionMarker(currentLatitude: latData, currentLongitude: lngData)
+                
+                // 지정된 위치로 지도 중심 지정
+                self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latData, longitude: lngData))
+                
+                // 확대 레벨 설정
+                self.mapView?.setZoom(18)
+            }
         } catch {
             return
         }
