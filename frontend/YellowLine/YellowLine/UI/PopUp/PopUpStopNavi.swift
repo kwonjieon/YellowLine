@@ -30,7 +30,6 @@ class PopUpStopNavi: UIViewController {
         mapViewController.sendChangeToOffline()
         if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController?.presentingViewController {
             webRTCManager!.disconnect()
-            webRTCManager = nil
             // 메인화면으로 돌아감
             presentingVC.dismiss(animated: true, completion: nil)
         }

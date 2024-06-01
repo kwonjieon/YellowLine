@@ -194,7 +194,7 @@ class WebRTCClient: NSObject{
             capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
         }
     }
-    private func stopCapture() {
+    func stopCapture() {
         if let capturer = self.videoCapturer as? RTCCameraVideoCapturer {
             capturer.stopCapture()
         }
@@ -491,9 +491,10 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
                 self.onConnected()
             }
         default:
-            if self.isConnected{
-                self.onDisConnected()
-            }
+            break
+//            if self.isConnected{
+//                self.onDisConnected()
+//            }
         }
         
         DispatchQueue.main.async {

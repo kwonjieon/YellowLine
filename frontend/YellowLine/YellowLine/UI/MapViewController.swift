@@ -25,7 +25,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.webRTCManager = webRTCManager
         //webrtc, camera 종료
 
-//        self.webRTCManager!.disconnect()
         self.present(nextVC, animated: true)
     }
 
