@@ -24,7 +24,6 @@ class WebRTCManager {
     var cameraSession: CameraSession?
     var isSocketConnected = false
     var delegate: WebRTCManagerDelegate?
-    
     // 내 화면 보여주는 uiview
     var localView: UIView?
     
@@ -42,14 +41,7 @@ class WebRTCManager {
             let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.userName!)/")!)
             socket = WebSocket(request: request)
             socket?.delegate = self
-            self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
-                if (self.webRTCClient?.isConnected)! || self.isSocketConnected {
-                    print("socket connected!")
-                    return
-                }
-                print("Request socket connect")
-                self.socket?.connect()
-            })
+            startTimer()
             // 카메라 실행
             cameraSession!.startVideo()
         }
@@ -57,20 +49,31 @@ class WebRTCManager {
     
     func disconnect() {
         self.tryToConnectWebSocket?.invalidate()
+        self.tryToConnectWebSocket = nil
 //        self.webRTCClient.stopCapture()
-        self.webRTCClient?.onDisConnected()
+        if (self.webRTCClient?.isConnected)! {
+            self.webRTCClient?.onDisConnected()
+        } else {
+            self.webRTCClient?.disconnect()
+        }
+        self.webRTCClient = nil
         if self.isSocketConnected {
             self.isSocketConnected = false
         }
+        self.socket = nil
         self.cameraSession = nil
-        self.webRTCClient = nil
-
-//            self.tryToConnectWebSocket = nil
-////            self.cameraSession = nil
-//            self.socket = nil
-
-
-
+    }
+    
+    private func startTimer() {
+        guard self.tryToConnectWebSocket == nil else { return }
+        self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
+            if (self.webRTCClient?.isConnected)! || self.isSocketConnected {
+                print("socket connected!")
+                return
+            }
+            print("Request socket connect")
+            self.socket?.connect()
+        })
     }
 
 }
@@ -194,6 +197,8 @@ extension WebRTCManager: WebRTCClientDelegate {
     }
     
     func didDisConnectedWebRTC() {
+//        webRTCClient?.disconnect()
+        self.disconnect()
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
