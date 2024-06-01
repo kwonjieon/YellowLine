@@ -384,8 +384,7 @@ extension WebRTCClient {
         }
     }
 
-    
-    func onDisConnected() {
+    func disconnect() {
         self.isConnected = false
         self.peerConnection?.close()
         self.peerConnection = nil
@@ -401,6 +400,10 @@ extension WebRTCClient {
             self.videoCapturer = nil
         }
         self.stopCapture()
+    }
+    
+    func onDisConnected() {
+        delegate?.didDisConnectedWebRTC()
     }
 }
 

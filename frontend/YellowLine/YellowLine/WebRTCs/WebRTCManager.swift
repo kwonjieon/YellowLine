@@ -18,9 +18,9 @@ protocol WebRTCManagerDelegate: AnyObject {
 
 class WebRTCManager {
     var userName: String?
-    var webRTCClient: WebRTCClient!
-    var socket: WebSocket!
-    var tryToConnectWebSocket: Timer!
+    var webRTCClient: WebRTCClient?
+    var socket: WebSocket?
+    var tryToConnectWebSocket: Timer?
     var cameraSession: CameraSession?
     var isSocketConnected = false
     var delegate: WebRTCManagerDelegate?
@@ -34,21 +34,21 @@ class WebRTCManager {
         cameraSession = CameraSession(view: uiView)
         cameraSession?.delegate = self
         webRTCClient = WebRTCClient()
-        webRTCClient.delegate = self
-        webRTCClient.cameraDevice = cameraSession!.cameraDevice
-        webRTCClient.setupWithRole(isProtector: false, uiView)
+        webRTCClient?.delegate = self
+        webRTCClient?.cameraDevice = cameraSession!.cameraDevice
+        webRTCClient?.setupWithRole(isProtector: false, uiView)
         if cameraSession?.checkCameraAuthor() == true{
             //socket 연결요청
             let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.userName!)/")!)
             socket = WebSocket(request: request)
-            socket.delegate = self
+            socket?.delegate = self
             self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
-                if self.webRTCClient.isConnected || self.isSocketConnected {
+                if (self.webRTCClient?.isConnected)! || self.isSocketConnected {
                     print("socket connected!")
                     return
                 }
                 print("Request socket connect")
-                self.socket.connect()
+                self.socket?.connect()
             })
             // 카메라 실행
             cameraSession!.startVideo()
@@ -56,14 +56,12 @@ class WebRTCManager {
     }
     
     func disconnect() {
-        self.tryToConnectWebSocket.invalidate()
-        
+        self.tryToConnectWebSocket?.invalidate()
 //        self.webRTCClient.stopCapture()
-        self.webRTCClient.onDisConnected()
-            if self.isSocketConnected {
-                self.isSocketConnected = false
-            }
-        
+        self.webRTCClient?.onDisConnected()
+        if self.isSocketConnected {
+            self.isSocketConnected = false
+        }
         self.cameraSession = nil
         self.webRTCClient = nil
 
@@ -95,7 +93,7 @@ extension WebRTCManager {
             let message = String(data: data, encoding: String.Encoding.utf8)!
             
             if self.isSocketConnected {
-                self.socket.write(string: message)
+                self.socket?.write(string: message)
             }
         }catch{
             print(error)
@@ -110,7 +108,7 @@ extension WebRTCManager {
             let message = String(data: data, encoding: String.Encoding.utf8)!
             
             if self.isSocketConnected {
-                self.socket.write(string: message)
+                self.socket?.write(string: message)
             }
         }catch{
             print(error)
@@ -138,15 +136,15 @@ extension WebRTCManager: WebSocketDelegate {
                 let signalingMessage = message.message!
 
                 if signalingMessage.type == "offer" {
-                    webRTCClient.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
+                    webRTCClient?.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
                         self.sendSDP(sessionDescription: answerSDP)
                     })
                 }else if signalingMessage.type == "answer" {
-                    webRTCClient.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
+                    webRTCClient?.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
                     
                 }else if signalingMessage.type == "candidate" {
                     let candidate = signalingMessage.candidate!
-                    webRTCClient.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
+                    webRTCClient?.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
                 }
             }catch{
                 print("didReceive Error 발생")
@@ -192,10 +190,11 @@ extension WebRTCManager: WebRTCClientDelegate {
     
     func didConnectWebRTC() {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
-        self.socket.disconnect()
+        self.socket?.disconnect()
     }
     
-    func didDisConnectedWebRTC() {}
+    func didDisConnectedWebRTC() {
+    }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
         var state = ""
@@ -248,6 +247,7 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
+            print("cam")
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         

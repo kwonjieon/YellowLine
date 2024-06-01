@@ -15,9 +15,9 @@ import Alamofire
 class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, WebRTCClientDelegate {
     
     //WebRTC
-    var socket: WebSocket!
-    var webRTCClient: WebRTCClient!
-    var tryToConnectWebSocket: Timer!
+    var socket: WebSocket?
+    var webRTCClient: WebRTCClient?
+    var tryToConnectWebSocket: Timer? = nil
     var isSocketConnected = false
     
     // tmap 지도
@@ -37,12 +37,12 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     @IBOutlet weak var objectDetectionView: UIView!
     @IBOutlet weak var backBtn: UIButton!
     @IBAction func clickBackBtn(_ sender: Any) {
-        tryToConnectWebSocket.invalidate()
-        tryToConnectWebSocket = nil
-        socket = nil
-        webRTCClient.onDisConnected()
-        webRTCClient = nil
         isSocketConnected = false
+        socket = nil
+        self.tryToConnectWebSocket?.invalidate()
+        tryToConnectWebSocket = nil
+        webRTCClient?.onDisConnected()
+        webRTCClient = nil
         self.dismiss(animated: true)
     }
     
@@ -61,28 +61,16 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         super.viewDidLoad()
         //WebRT        
         webRTCClient = WebRTCClient()
-        webRTCClient.delegate = self
-        webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
+        webRTCClient?.delegate = self
+        webRTCClient?.setupWithRole(isProtector: true, objectDetectionView)
         let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id!)/")!)
         socket = WebSocket(request: request)
-        socket.delegate = self
+        socket?.delegate = self
         // socket 반복요청
-
-        self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: { (timer) in
-            if self.webRTCClient.isConnected || self.isSocketConnected {
-                print("socket connected!")
-                if !self.webRTCClient.isConnected {
-                    self.webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
-                        self.sendSDP(sessionDescription: offerSDP)
-                    })
-                }
-                return
-            }
-            print("Request socket connect")
-            self.socket.connect()
-        })
         
-       getProtectedDestination()
+        startTimer()
+        
+        getProtectedDestination()
         
         //Navi
         self.mapView = TMapView(frame: mapContainerView.frame)
@@ -119,6 +107,22 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         
     }
     
+    private func startTimer() {
+        guard self.tryToConnectWebSocket == nil else { return }
+        self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: { (timer) in
+            if (self.webRTCClient?.isConnected)! || self.isSocketConnected {
+                print("socket connected!")
+                if !(self.webRTCClient?.isConnected)! {
+                    self.webRTCClient?.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
+                        self.sendSDP(sessionDescription: offerSDP)
+                    })
+                }
+                return
+            }
+            print("Request socket connect")
+            self.socket?.connect()
+        })
+    }
     
     
     override func viewDidAppear(_ animated: Bool) {
@@ -267,7 +271,7 @@ extension ShowNavigationVC {
             
             if self.isSocketConnected {
                 print("self.isSocketConnected 입니다! 지금부터 sendSDP를 실행합니다!")
-                self.socket.write(string: message)
+                self.socket?.write(string: message)
             }
         }catch{
             print(error)
@@ -283,7 +287,7 @@ extension ShowNavigationVC {
             
             if self.isSocketConnected {
                 print("self.isSocketConnected 입니다! 지금부터 sendCandidate를 실행합니다!")
-                self.socket.write(string: message)
+                self.socket?.write(string: message)
             }
         }catch{
             print(error)
@@ -303,12 +307,18 @@ extension ShowNavigationVC{
     
     func didConnectWebRTC() {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
-        self.socket.disconnect()
+        self.socket?.disconnect()
     }
     
     //webrtc 연결이 상호 종료된다면?
     func didDisConnectedWebRTC() {
         print("피보호자와의 종료되었습니다.")
+        isSocketConnected = false
+        socket = nil
+        self.tryToConnectWebSocket?.invalidate()
+        tryToConnectWebSocket = nil
+        webRTCClient?.disconnect()
+        webRTCClient = nil
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
@@ -386,16 +396,16 @@ extension ShowNavigationVC {
                 let signalingMessage = message.message!
                 
                 if signalingMessage.type == "offer" {
-                    webRTCClient.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
+                    webRTCClient?.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
                         
                         self.sendSDP(sessionDescription: answerSDP)
                     })
                 }else if signalingMessage.type == "answer" {
-                    webRTCClient.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
+                    webRTCClient?.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
                     
                 }else if signalingMessage.type == "candidate" {
                     let candidate = signalingMessage.candidate!
-                    webRTCClient.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
+                    webRTCClient?.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
                 }
             }catch{
                 print("=ERROR didReceive Error 발생")
