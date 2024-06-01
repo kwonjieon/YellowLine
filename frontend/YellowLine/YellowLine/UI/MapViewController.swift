@@ -130,12 +130,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
         //locationManager.startUpdatingLocation()
     }
     
-    //종료 시 
-    override func viewDidDisappear(_ animated: Bool) {
-        self.viewDidDisappear(true)
-        self.webRTCManager!.webRTCClient.disconnect()
-        self.cameraSession?.stopSession()
-    }
     
     func setObjectDetectionView() {
         objectDetectionView.frame = CGRect(x: 0, y: 0, width: 393, height: 356)
@@ -354,65 +348,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
             print(error)
         }
     }
-
-    // 네비게이션 경로 범위 내 위치인지 확인
-    func checkNavigationDistance() {
-        var isOffCourse: Bool = false
-        var differenceLati: Double
-        var differenceLong: Double
-        var leastDifferenceSum: Double
-        // 현재 위치와 가장 가까운 경로 포인트
-        var proximatePoint: Int = LocationPT
-        
-        guard let naviPointList = polyline?.path else {
-            return
-        }
-        // 경로 이탈 판단
-        // 경로 안내 시작한 직후를 제외하고 판단
-        if (LocationPT != 0 && LocationPT != naviPointList.count - 1) {
-            //가장 적은값의 오차 비교값 초기 세팅
-            leastDifferenceSum = (naviPointList[LocationPT].latitude - latitude) + (naviPointList[LocationPT].longitude - longitude)
-            
-            for i in LocationPT - 1...LocationPT + 1 {
-                differenceLati = naviPointList[i].latitude - latitude
-                differenceLong = naviPointList[i].longitude - longitude
-                
-                // 절대값으로 변환
-                if differenceLati < 0 {
-                    differenceLati = -differenceLati
-                }
-                if differenceLong < 0 {
-                    differenceLong = -differenceLong
-                }
-                print ("위도 차이 : \(differenceLati)")
-                print ("경도 차이 : \(differenceLong)")
-                
-                // 경로 이탈 여부 확인
-                if  differenceLati < 0.00018 && differenceLong < 0.00018 {
-                    // 현재 위치 포인터 수정 여부 확인
-                    // 경로포인터-1 보다 지금의 경로포인터가 더 현재와 근접하다면 포인터 현재 위치로 변경
-                    if leastDifferenceSum > differenceLati + differenceLong {
-                        proximatePoint = i
-                        leastDifferenceSum = differenceLati + differenceLong
-                    }
-                }
-                else {
-                    isOffCourse = true
-                    print("경로 이탈")
-                    break
-                }
-            }
-            
-            if isOffCourse == false {
-                print("경로 범위 이내")
-                print("LocationPT: \(LocationPT)")
-                LocationPT = proximatePoint
-            }
-        }
-        else {
-            LocationPT = 1
-        }
-    }
     
     //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
     func checkCurrentLoactionRotate() {
@@ -475,6 +410,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         }
     }
     
+    // 보호자에게 피보호자의 위치 및 목적지 정보 실시간 전송
     func sendCurrentPosition() {
         if self.webRTCManager!.webRTCClient.isDataChannel {
             let params: NaviProtectedPoint = .init(Lat: latitude, Lng: longitude, dest: destinationName!)
