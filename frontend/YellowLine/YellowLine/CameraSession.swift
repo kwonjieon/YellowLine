@@ -222,9 +222,9 @@ class CameraSession: NSObject {
     
     func stopSession() {
         if self.captureSession.isRunning {
-//            DispatchQueue.global(qos: .default).async { [weak self] in
-                self.captureSession.stopRunning()
-//            }
+            DispatchQueue.global(qos: .default).async { [weak self] in
+                self?.captureSession.stopRunning()
+            }
         }
     }
     

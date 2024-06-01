@@ -21,7 +21,7 @@ class ObjectDetectionVC: UIViewController {
     // 오프라인 상태
     var mapViewController = MapViewController()
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.webRTCManager?.disconnect()
+        self.webRTCManager!.disconnect()
         // 도보 -> 오프라인 상태로 변경
         mapViewController.sendChangeToOffline()
         self.dismiss(animated: true)
@@ -31,7 +31,6 @@ class ObjectDetectionVC: UIViewController {
         super.viewDidLoad()
         setNavigationBar()
         webRTCManager = WebRTCManager(uiView: localView, protectedId)
-        
         setLabel()
         setBtn()
     }

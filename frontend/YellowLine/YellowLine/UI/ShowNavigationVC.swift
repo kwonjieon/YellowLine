@@ -268,9 +268,11 @@ extension ShowNavigationVC: CLLocationManagerDelegate {
         print(error)
     }
     
-    
-    //MARK: private WebRTC
-    //MARK: - private
+}
+
+//MARK: - private WebRTC Func
+
+extension ShowNavigationVC {
     private func sendSDP(sessionDescription: RTCSessionDescription) {
         var type = ""
         if sessionDescription.type == .offer {
@@ -312,7 +314,7 @@ extension ShowNavigationVC: CLLocationManagerDelegate {
     }
 }
 
-// WEBRTC Delegate
+// MARK: - WEBRTC Delegate
 extension ShowNavigationVC{
     func didOpenDataChanel() {
         print("did open data channel")
@@ -383,11 +385,6 @@ extension ShowNavigationVC{
     }
     
     func didReceiveMessage(message: String) {
-        // 위와 마찬가지 data channel용.
-//        let converted = UIImage(base64: message, withPrefix: false)
-//        DispatchQueue.main.async {
-//            self.imageView!.image = converted
-//        }
         print(message)
         
     }
