@@ -35,6 +35,8 @@ class CameraSession: NSObject {
     //for test
     var midasView: UIImageView?
     
+    let useMidas = false
+    
     public var previewLayer: AVCaptureVideoPreviewLayer?
     public var midasPreviewLayer: AVCaptureVideoPreviewLayer?
     
@@ -80,18 +82,24 @@ class CameraSession: NSObject {
     
     func setup(completion: @escaping (Bool) -> Void) {
         mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
-        midasModel = try! MiDaS(configuration: MLModelConfiguration())
+        if useMidas {
+            midasModel = try! MiDaS(configuration: MLModelConfiguration())
+        }
+
         yoloDetector = try! VNCoreMLModel(for: mlModel!)
         queue.async {
             self.captureSession = .init()
             self.videoOutput = .init()
             
-            if let visionModel = try? VNCoreMLModel(for: self.midasModel!.model) {
-                self.midasVisionRequest = VNCoreMLRequest(model: visionModel, completionHandler: self.visionRequestDidComplete)
-                self.midasVisionRequest?.imageCropAndScaleOption = .centerCrop
-            } else {
-                fatalError("fail to create vision model")
+            if self.useMidas {
+                if let visionModel = try? VNCoreMLModel(for: self.midasModel!.model) {
+                    self.midasVisionRequest = VNCoreMLRequest(model: visionModel, completionHandler: self.visionRequestDidComplete)
+                    self.midasVisionRequest?.imageCropAndScaleOption = .centerCrop
+                } else {
+                    fatalError("fail to create vision model")
+                }
             }
+
             let success = self.setupCameraSession()
             DispatchQueue.main.async {
                 completion(success)
@@ -226,13 +234,6 @@ class CameraSession: NSObject {
     var midasVisionModel : VNCoreMLModel?
     var detectionRequest : VNCoreMLRequest?
 
-    var framesDone = 0
-    var t0 = 0.0  // inference start
-    var t1 = 0.0  // inference dt
-    var t2 = 0.0  // inference dt smoothed
-    var t3 = CACurrentMediaTime()  // FPS start
-    var t4 = 0.0  // FPS dt smoothed
-    
     let maxBoundingBoxViews = 100
     var boundingBoxViews = [BoundingBoxView]()
     var colors: [String: UIColor] = [:]
@@ -308,7 +309,6 @@ class CameraSession: NSObject {
     }
     
     // MARK: - Yolo
-    let ttsModule = TTSModelModule()
     //MARK: 속도 올리기 1. semaphore해제, 2. fps 증가, 3. 이미지 resize사용하지 않기.
     var currentBuffer: CVImageBuffer?
     func predict(_ cvImageBuffer : CVImageBuffer?){
@@ -321,23 +321,20 @@ class CameraSession: NSObject {
                 .oriented(forExifOrientation: 6)
             originalCIImage = ciImage
 //            resizedCGImage = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 640, height: 640))
-            let midasImg = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 256, height: 256))
-            
-            let midasHandler = VNImageRequestHandler(cgImage: midasImg!)
+
+            lazy var midasImg = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 256, height: 256))
+            lazy var midasHandler = VNImageRequestHandler(cgImage: midasImg!)
             
             //fast test for yolo
-            let handler = VNImageRequestHandler(ciImage: originalCIImage!)
+            lazy var handler = VNImageRequestHandler(ciImage: originalCIImage!)
             if UIDevice.current.orientation != .faceUp {  // stop if placed down on a table
                 do {
-                    try midasHandler.perform([self.midasVisionRequest])
-                    //try handler.perform([visionRequest])
-//                    if !self.closeObjects.isEmpty {
-//                        print(self.closeObjects.count, self.closeObjects)
-//                    }
-//                    if !self.closeObjects.isEmpty{
-//                        TTSModelModule.ttsModule.speakText("전방에 장애물입니다.", 10, 0.4, false)
-//                        self.closeObjects.removeAll()
-//                    }
+                    if useMidas {
+                        try midasHandler.perform([self.midasVisionRequest])
+                    } else {
+                        try handler.perform([visionRequest])
+
+                    }
                 } catch {
                     print(error)
                 }
@@ -356,16 +353,22 @@ class CameraSession: NSObject {
                 self.show(predictions: [])
             }
             if !self.closeObjects.isEmpty {
-                TTSModelModule.ttsModule.speakText("전방에 장애물입니다.", 10, 0.4, false)
+                TTSModelModule.ttsModule.objectCounts += 1
+                self.queue.async {
+                    TTSModelModule.ttsModule.processTTS(type: false, text: "전방에 장애물입니다.")
+                }
+            } else {
+                TTSModelModule.ttsModule.objectCounts = 0
             }
             self.closeObjects.removeAll()
+
         }
     }
 
     // 가까운 거리 판별 사각형
     var filtRect : CGRect?
     var closeObjects : Set<String> = []// 탐지 물체들 넣는 객체
-    var exceptObjects = ["crosswalk_yl", "red_yl", "green_yl"]
+    var exceptObjects : Set<String> = ["crosswalk_yl", "red_yl", "green_yl"]
     
     // MARK:  Show
     func show(predictions: [VNRecognizedObjectObservation]) {
@@ -384,59 +387,59 @@ class CameraSession: NSObject {
         for i in 0..<boundingBoxViews.count {
             if i < predictions.count {
                 let prediction = predictions[i]
-                if prediction.confidence >= 0.4 {
-                    var rect = prediction.boundingBox  // normalized xywh, origin lower left
-                    switch UIDevice.current.orientation {
-                    case .portraitUpsideDown:
-                        rect = CGRect(x: 1.0 - rect.origin.x - rect.width,
-                                      y: 1.0 - rect.origin.y - rect.height,
-                                      width: rect.width,
-                                      height: rect.height)
-                    case .landscapeLeft:
-                        rect = CGRect(x: rect.origin.y,
-                                      y: 1.0 - rect.origin.x - rect.width,
-                                      width: rect.height,
-                                      height: rect.width)
-                    case .landscapeRight:
-                        rect = CGRect(x: 1.0 - rect.origin.y - rect.height,
-                                      y: rect.origin.x,
-                                      width: rect.height,
-                                      height: rect.width)
-                    case .unknown:
-                        print("The device orientation is unknown, the predictions may be affected")
-                        fallthrough
-                    default: break
-                    }
+                var rect = prediction.boundingBox  // normalized xywh, origin lower left
+                switch UIDevice.current.orientation {
+                case .portraitUpsideDown:
+                    rect = CGRect(x: 1.0 - rect.origin.x - rect.width,
+                                  y: 1.0 - rect.origin.y - rect.height,
+                                  width: rect.width,
+                                  height: rect.height)
+                case .landscapeLeft:
+                    rect = CGRect(x: rect.origin.y,
+                                  y: 1.0 - rect.origin.x - rect.width,
+                                  width: rect.height,
+                                  height: rect.width)
+                case .landscapeRight:
+                    rect = CGRect(x: 1.0 - rect.origin.y - rect.height,
+                                  y: rect.origin.x,
+                                  width: rect.height,
+                                  height: rect.width)
+                case .unknown:
+                    print("The device orientation is unknown, the predictions may be affected")
+                    fallthrough
+                default: break
+                }
 //                    print("first rect value : \(rect)")
+                
+                if ratio >= 1 { // iPhone ratio = 1.218
+                    let offset = (1 - ratio) * (0.5 - rect.minX)
+                    let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: offset, y: -1)
+                    rect = rect.applying(transform)
+                    rect.size.width *= ratio
                     
-                    if ratio >= 1 { // iPhone ratio = 1.218
-                        let offset = (1 - ratio) * (0.5 - rect.minX)
-                        let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: offset, y: -1)
-                        rect = rect.applying(transform)
-                        rect.size.width *= ratio
-                        
-                    } else { // iPad ratio = 0.75
-                        let offset = (ratio - 1) * (0.5 - rect.maxY)
-                        let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: offset - 1)
-                        rect = rect.applying(transform)
-                        rect.size.height /= ratio
-                    }
-                    rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
+                } else { // iPad ratio = 0.75
+                    let offset = (ratio - 1) * (0.5 - rect.maxY)
+                    let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: offset - 1)
+                    rect = rect.applying(transform)
+                    rect.size.height /= ratio
+                }
+                rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
 //                    depthValue = 0.0
 
 //
-                    var midX = rect.midX
-                    var midY = rect.midY
-                    if midX < 0 { midX = 0 }
-                    if midX >= width { midX = width }
-                    if midY < 0 { midY = 0 }
-                    if midY >= height { midY = height }
-//                    
-                    var depthValue: Float?
-                    let midasX = Int(midX / width * 256)
-                    let midasY = Int(midY / height * 256)
+                var midX = rect.midX
+                var midY = rect.midY
+                if midX < 0 { midX = 0 }
+                if midX >= width { midX = width }
+                if midY < 0 { midY = 0 }
+                if midY >= height { midY = height }
+//
+                var depthValue: Float?
+                let midasX = Int(midX / width * 256)
+                let midasY = Int(midY / height * 256)
 //
 //                    // 마이다스 이미지버퍼 상대적 좌표 지정
+                if useMidas {
                     if self.depthCIImage != nil {
                         let bf = (self.depthPixelBuffer)!
                         let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
@@ -451,46 +454,37 @@ class CameraSession: NSObject {
                         depthValue = 1.0 - Float(dalue) / 255.0
                         CVPixelBufferUnlockBaseAddress(bf, .readOnly)
                     }
-                    let bestClass = prediction.labels[0].identifier
-                    let confidence = prediction.labels[0].confidence
-                    var flag = true
-                    
-                    // filter boundary visualizing...
+                }
+
+                let bestClass = prediction.labels[0].identifier
+                let confidence = prediction.labels[0].confidence
+                
+                // filter boundary visualizing...
 //                    let redSquare = UIView()
 //                    redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
 //                    redSquare.frame = filtRect!
 //                    localView?.addSubview(redSquare)
-                    
-                    // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
+                
 //                    print("bestClass is : \(bestClass)")
-                    
-                    //  필터링 사각형
-//                    if filtRect!.intersects(rect) {
-//                        for obj in exceptObjects {
-//                            // 제외 물체들이 아니라면 TTS안내 해야 할 물체들로 기록 (제외물체 : 횡단보도, 빨-초 신호)
-//                            print("\(bestClass) == \(obj) : \(bestClass == obj)")
-//                            if bestClass == obj {
-//                                flag = false
-//                            }
-//                        }
-//                        if flag {
-//                            closeObjects.insert(bestClass)
-//                        }
-//                    }
+                
+                // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
+                //  필터링 사각형
+                if filtRect!.intersects(rect) {
+                    if !exceptObjects.contains(bestClass) {
+                        closeObjects.insert(bestClass)
+                    }
+                }
 
-                    // Show the bounding box.
-                    boundingBoxViews[i].show(frame: rect,
-                                             label: String(format: "%@ %.1f %.2f", bestClass, confidence * 100, depthValue!),
-                                             color: colors[bestClass] ?? UIColor.white,
-                                             alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
-                } //confidence >= .4 end
+                // Show the bounding box.
+                boundingBoxViews[i].show(frame: rect,
+                                         label: String(format: "%@", bestClass),
+                                         color: colors[bestClass] ?? UIColor.white,
+                                         alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
             } else {
                 boundingBoxViews[i].hide()
             } // if prediction end...
         } // for end...
-        // 여기다가 TTS 모듈 넣는게 어떨까 싶음
-        
-        print(self.closeObjects)
+//        print(self.closeObjects)
     } // show end...
     
     func drawPoint(x : Int, y: Int, view: UIView){
