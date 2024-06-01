@@ -22,8 +22,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.titletext = "안내 중단"
         nextVC.descriptionText = "경로 안내를 중단할까요?"
         //webrtc, camera 종료
+
         self.webRTCManager!.disconnect()
-        
         self.present(nextVC, animated: true)
     }
 
@@ -105,7 +105,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
         
+        //WebRTCManager
         webRTCManager = WebRTCManager(uiView: objectDetectionView, protectedId!)
+        webRTCManager?.delegate = self
         
         setDestinationText()
         
@@ -127,8 +129,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
  
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
         
-        //locationManager.startMonitoringSignificantLocationChanges()
-        //locationManager.startUpdatingLocation()
+//        locationManager.startMonitoringSignificantLocationChanges()
+//        locationManager.startUpdatingLocation()
     }
     
     
@@ -481,6 +483,20 @@ extension MapViewController: CLLocationManagerDelegate {
     }
 }
 
-extension MapViewController {
+extension MapViewController : WebRTCManagerDelegate {
+    func didRedOrGreenLight(_ text: String) {
+        /**
+         red_yl / green_yl인지만 판별하는 코드.
+         사용하려면
+         만약 red_yl이 들어온다면  n프레임 정도 들어오는지 확인한 후
+         flag = true로 변경하고 UI를 띄운다.
+         만약 green_yl일 경우
+         green_yl이 n프레임 들어온다면
+        빨간불 ui를 파란불 ui로 변경한다.
+         
+         ...와 비슷하게만 동작하면 될 것 같습니다.
+         */
+    }
+    
     
 }

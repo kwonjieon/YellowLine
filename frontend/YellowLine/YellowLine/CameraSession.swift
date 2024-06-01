@@ -16,6 +16,7 @@ import Vision
 
 protocol CameraSessionDelegate {
     func didWebRTCOutput(_ sampleBuffer: CMSampleBuffer)
+    func didRedOrGreen(_ type: String)
 }
 
 
@@ -222,9 +223,9 @@ class CameraSession: NSObject {
     
     func stopSession() {
         if self.captureSession.isRunning {
-            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-                self?.captureSession.stopRunning()
-            }
+//            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+                self.captureSession.stopRunning()
+//            }
         }
     }
     
@@ -476,6 +477,10 @@ class CameraSession: NSObject {
                         closeObjects.insert(bestClass)
                     }
                 }
+                
+                if bestClass == "red_yl" || bestClass == "green_yl" {
+                    delegate?.didRedOrGreen(bestClass)
+                }
 
                 // Show the bounding box.
                 boundingBoxViews[i].show(frame: rect,
@@ -500,6 +505,14 @@ class CameraSession: NSObject {
     }
     
     private func makeRectFilter(_ w : CGFloat, _ h: CGFloat, _ ofs: CGFloat) -> CGRect {
+        /**
+         })
+         let ofs = 0.07
+         let widthLen = width * (1 - ofs)
+         let heightLen = height * (ofs)
+         let x = width * (ofs / 2)
+         let y = height * (0.97 - ofs)
+         */
         let widthLen = w * (1 - ofs)
         let heightLen = h * ofs
         let x = w * (ofs / 2)

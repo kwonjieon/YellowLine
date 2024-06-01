@@ -40,7 +40,6 @@ class ProtectorMainVC: UIViewController {
     
     // 피보호자 리스트 불러오기
     func loadRecipients() {
-        
         let headers = ["Accept": "application/json"]
         let requestStr: String = "http://43.202.136.75/user/relations/"
         

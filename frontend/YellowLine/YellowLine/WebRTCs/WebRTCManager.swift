@@ -12,6 +12,9 @@ import Starscream
 
 
 
+protocol WebRTCManagerDelegate: AnyObject {
+    func didRedOrGreenLight(_ text: String)
+}
 
 class WebRTCManager {
     var userName: String?
@@ -20,6 +23,7 @@ class WebRTCManager {
     var tryToConnectWebSocket: Timer!
     var cameraSession: CameraSession?
     var isSocketConnected = false
+    var delegate: WebRTCManagerDelegate?
     
     // 내 화면 보여주는 uiview
     var localView: UIView?
@@ -39,7 +43,7 @@ class WebRTCManager {
             socket = WebSocket(request: request)
             socket.delegate = self
             self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
-                if !self.webRTCClient.isConnected || self.isSocketConnected {
+                if self.webRTCClient.isConnected || self.isSocketConnected {
                     print("socket connected!")
                     return
                 }
@@ -53,9 +57,12 @@ class WebRTCManager {
     }
     
     func disconnect() {
-        webRTCClient.disconnect()
-        cameraSession!.stopSession()
-        tryToConnectWebSocket.invalidate()
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.cameraSession!.stopSession()
+            self.webRTCClient.disconnect()
+            self.tryToConnectWebSocket.invalidate()
+        }
+
     }
 
 }
@@ -220,6 +227,10 @@ extension WebRTCManager: WebRTCClientDelegate {
 
 // MARK: Render local view
 extension WebRTCManager: CameraSessionDelegate {
+    func didRedOrGreen(_ type: String) {
+        delegate?.didRedOrGreenLight(type)
+    }
+    
     // video view에 표시하는 함수임.
     func didWebRTCOutput(_ sampleBuffer: CMSampleBuffer) {
         if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {

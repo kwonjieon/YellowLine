@@ -205,7 +205,7 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
 
         do {
             let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
-            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
+//            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
         } catch {
             return
         }

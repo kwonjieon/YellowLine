@@ -39,8 +39,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
         if webRTCClient.isConnected {
-            webRTCClient.disconnect()
-            tryToConnectWebSocket.invalidate()
+            self.dismiss(animated: true)
         }
     }
     
@@ -56,12 +55,13 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
         webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
-        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id)/")!)
+        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id!)/")!)
         socket = WebSocket(request: request)
         socket.delegate = self
         // socket 반복요청
+
         self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: { (timer) in
-            if !self.webRTCClient.isConnected || self.isSocketConnected {
+            if self.webRTCClient.isConnected || self.isSocketConnected {
                 print("socket connected!")
                 if !self.webRTCClient.isConnected {
                     self.webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
@@ -298,7 +298,17 @@ extension ShowNavigationVC{
         self.socket.disconnect()
     }
     
-    func didDisConnectedWebRTC() {}
+    //webrtc 연결이 상호 종료된다면?
+    func didDisConnectedWebRTC() {
+        print("WebRTC연결이 종료되었습니다.")
+        if webRTCClient.isConnected {
+            DispatchQueue.global(qos: .userInteractive).async {
+                self.tryToConnectWebSocket.invalidate()
+                self.webRTCClient.disconnect()
+//                self.dismiss(animated: true)
+            }
+        }
+    }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
         var state = ""
@@ -332,7 +342,7 @@ extension ShowNavigationVC{
 
         do {
             let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
-            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
+//            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
             
             // 지도 로드가 된 후에 마커 표기 시작가능
             if  isReadyLoadMap == true {

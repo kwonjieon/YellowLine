@@ -44,11 +44,6 @@ class WebRTCClient: NSObject{
         let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
         let videoDecoderFactory = RTCDefaultVideoDecoderFactory()
         
-//        // MARK: Codec (H.264 or VP8)
-        // If you do net set codec, it uses H.264 as a default in iOS 2.0+
-//        if let codecInformation = (RTCDefaultVideoEncoderFactory.supportedCodecs().first { $0.name.elementsEqual("VP8") }) {
-//            videoEncoderFactory.preferredCodec = codecInformation
-//        }
         return RTCPeerConnectionFactory(encoderFactory: videoEncoderFactory, decoderFactory: videoDecoderFactory)
     }()
     private let mediaConstraints = [kRTCMediaConstraintsOfferToReceiveVideo: kRTCMediaConstraintsValueTrue]
@@ -207,17 +202,16 @@ class WebRTCClient: NSObject{
 
     
     func disconnect() {
-        print("disconnect webrtc client")
+        print("disconnect webrtc client")       
+        TTSModelModule.ttsModule.stopTTS()
         self.isConnected = false
         hasReceivedSDP = false
-        peerConnection?.close()
-        peerConnection = nil
         localVideoTrack = nil
         localVideoSource = nil
         remoteVideoTrack = nil
-        stopCapture()
         videoCapturer = nil
-        
+        peerConnection?.close()
+        peerConnection = nil
     }
 }
 

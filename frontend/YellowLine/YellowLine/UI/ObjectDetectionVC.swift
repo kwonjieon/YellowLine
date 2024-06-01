@@ -24,8 +24,19 @@ class ObjectDetectionVC: UIViewController {
         self.webRTCManager!.disconnect()
         // 도보 -> 오프라인 상태로 변경
         mapViewController.sendChangeToOffline()
-        self.dismiss(animated: true)
+        self.dismiss(animated: true) {
+            print("종료합니다.")
+        }
     }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        print("will disappear")
+//    }
+//    
+//    override func viewDidDisappear(_ animated: Bool) {
+//        print("did disappear")
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
