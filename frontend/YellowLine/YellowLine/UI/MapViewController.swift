@@ -79,7 +79,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     // Object Detection variables
     var webRTCManager: WebRTCManager?
-    var cameraSession: CameraSession?
     var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
     
     //MARK: - Definition Funcs

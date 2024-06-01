@@ -400,8 +400,6 @@ extension WebRTCClient {
             self.peerConnection = nil
             self.localDataChannel = nil
             self.delegate?.didDisConnectedWebRTC()
-            TTSModelModule.ttsModule.stopTTS()
-            self.isConnected = false
             self.hasReceivedSDP = false
             self.localVideoTrack = nil
             self.localVideoSource = nil

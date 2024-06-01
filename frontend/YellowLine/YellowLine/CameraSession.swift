@@ -215,7 +215,7 @@ class CameraSession: NSObject {
     // MARK: 카메라 작동 시작
     func startSession() {
         if !self.captureSession.isRunning {
-            DispatchQueue.global(qos: .default).async { [weak self] in
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 self?.captureSession.startRunning()
             }
         }
@@ -223,9 +223,9 @@ class CameraSession: NSObject {
     
     func stopSession() {
         if self.captureSession.isRunning {
-//            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-                self.captureSession.stopRunning()
-//            }
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                self?.captureSession.stopRunning()
+            }
         }
     }
     
@@ -352,6 +352,7 @@ class CameraSession: NSObject {
             } else {
                 self.show(predictions: [])
             }
+        }
             // TTS 실행.
             if !self.closeObjects.isEmpty {
                 // 장애물이 탐지된 프레임이라면 +1
@@ -365,7 +366,6 @@ class CameraSession: NSObject {
             print("---")
             self.closeObjects.removeAll()
 
-        }
     }
 
     // 가까운 거리 판별 사각형

@@ -29,14 +29,21 @@ class ShowObjectDetectionVC: UIViewController {
     var id : String?
     
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.tryToConnectWebSocket.invalidate()
-        self.tryToConnectWebSocket = nil
-        self.webRTCClient.onDisConnected()
-        webRTCClient = nil
-        socket.disconnect()
-        socket = nil
-        isSocketConnected = false
-        self.dismiss(animated: true)
+
+
+        self.dismiss(animated: true) {
+                self.tryToConnectWebSocket.invalidate()
+                self.tryToConnectWebSocket = nil
+                if self.isSocketConnected {
+                    self.socket.disconnect()
+                    self.isSocketConnected = false
+                self.socket = nil
+                self.webRTCClient.onDisConnected()
+                self.webRTCClient = nil
+            }
+        }
+
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
