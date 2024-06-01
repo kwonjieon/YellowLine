@@ -80,9 +80,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var cameraSession: CameraSession?
     var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
     
-    // webRTC
-    var webRTCClient: WebRTCClient!
-    
     //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,14 +98,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
 
         
         // 위치 정보 허용 확인
-        checkAuthorizationStatus()
+        //checkAuthorizationStatus()
+        locationManager.startUpdatingLocation()
         
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
         
         webRTCManager = WebRTCManager(uiView: objectDetectionView, "YLUSER01")
-        
-        getTMapAPINavigationInform()
         
         setDestinationText()
         
@@ -124,6 +120,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         // 현재위치~목적지 경로 루트 표시
         showDestinationRoute()
+        
+        // 경로 데이터
+        getTMapAPINavigationInform()
  
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
         
@@ -267,8 +266,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
             // 가츠시 127.07570314407349 37.54633818154831
             // 알바 37.54089617063285 127.22094921007677
             // 어대공 6번출구 37.54885914948882, 127.07501188046824
-            "startX": 127.07412355017871,
-            "startY": 37.551447232646765,
+            "startX": longitude,
+            "startY": latitude,
             "angle": 20,
             "speed": 30,
             "endPoiId": "10001",
@@ -477,12 +476,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
     }
     
     func sendCurrentPosition() {
-        if self.webRTCClient.isDataChannel {
+        if self.webRTCManager!.webRTCClient.isDataChannel {
             let params: NaviProtectedPoint = .init(Lat: latitude, Lng: longitude, dest: destinationName!)
             do {
                 let postData = try JSONEncoder().encode(params)
                 print(postData.count)
-                self.webRTCClient.sendData(data: postData)
+                self.webRTCManager!.webRTCClient.sendData(data: postData)
             } catch {
                 return
             }
