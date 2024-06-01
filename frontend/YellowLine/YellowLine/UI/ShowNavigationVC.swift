@@ -38,9 +38,6 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     @IBOutlet weak var backBtn: UIButton!
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
-        if webRTCClient.isConnected {
-            self.dismiss(animated: true)
-        }
     }
     
     // 피보호자 아이디, 이름 정보
@@ -303,7 +300,6 @@ extension ShowNavigationVC{
         print("피보호자와의 종료되었습니다.")
         if webRTCClient.isConnected {
             self.tryToConnectWebSocket.invalidate()
-            self.webRTCClient.onDisConnected()
         }
     }
     
