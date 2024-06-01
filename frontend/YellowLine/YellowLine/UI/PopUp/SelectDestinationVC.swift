@@ -22,7 +22,6 @@ class SelectDestinationVC: UIViewController {
     @IBOutlet weak var descriptionLabel: UILabel!
     
     @IBAction func clickCancelBtn(_ sender: Any) {
-        print("cccccclick")
         self.dismiss(animated: true)
     }
     @IBAction func clickStartBtn(_ sender: Any) {

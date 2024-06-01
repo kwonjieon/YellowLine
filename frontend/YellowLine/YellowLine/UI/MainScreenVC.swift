@@ -8,6 +8,7 @@
 import UIKit
 import Alamofire
 class MainScreenVC: UIViewController {
+    var userID: String?
     // 네비게이션 버튼 클릭 시 실행되는 함수
     @objc func clickNaviBtn(_ gesture: UITapGestureRecognizer) {
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "SearchDestinationViewController") else {return}
@@ -18,6 +19,9 @@ class MainScreenVC: UIViewController {
     // 객체탐지 버튼 클릭 시 실행되는 함수
     @objc func clickobjectDetectBtn(_ gesture: UITapGestureRecognizer) {
         sendStartWalk()
+        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ObjectDetectionVC") else {return}
+        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(nextVC, animated: true)
     }
     
     // 피보호자가 물체탐지 이용 중이라는 상태를 서버에 업데이트
@@ -30,7 +34,6 @@ class MainScreenVC: UIViewController {
                    encoding: JSONEncoding(options: []),
                    headers: ["Content-Type":"application/json", "Accept":"application/json"])
             .responseJSON { response in
-
             /** 서버로부터 받은 데이터 활용 */
             switch response.result {
             case .success(let data):

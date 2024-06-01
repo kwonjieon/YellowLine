@@ -21,12 +21,16 @@ class PopUpStopNavi: UIViewController {
     var btn2Text : String?
     var function : String?
     
+    var webRTCManager : WebRTCManager?
+    
     @IBAction func clickCancelBtn(_ sender: Any) {
         self.dismiss(animated: true)
     }
     @IBAction func clickStopBtn(_ sender: Any) {
-        mapViewController.sendNaviFinish()
+        mapViewController.sendChangeToOffline()
         if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController?.presentingViewController {
+            webRTCManager!.disconnect()
+            webRTCManager = nil
             // 메인화면으로 돌아감
             presentingVC.dismiss(animated: true, completion: nil)
         }
@@ -37,7 +41,6 @@ class PopUpStopNavi: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setBasicInfo()
-        
         setLabel()
         setPopUpView()
         setCancelBtn()

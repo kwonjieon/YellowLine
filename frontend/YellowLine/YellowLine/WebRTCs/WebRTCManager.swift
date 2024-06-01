@@ -12,6 +12,9 @@ import Starscream
 
 
 
+protocol WebRTCManagerDelegate: AnyObject {
+    func didRedOrGreenLight(_ text: String)
+}
 
 class WebRTCManager {
     var userName: String?
@@ -20,6 +23,7 @@ class WebRTCManager {
     var tryToConnectWebSocket: Timer!
     var cameraSession: CameraSession?
     var isSocketConnected = false
+    var delegate: WebRTCManagerDelegate?
     
     // 내 화면 보여주는 uiview
     var localView: UIView?
@@ -41,33 +45,29 @@ class WebRTCManager {
             self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
                 if self.webRTCClient.isConnected || self.isSocketConnected {
                     print("socket connected!")
-//                    if self.webRTCClient.isDataChannel {
-//                        let params: NaviProtectedPoint = .init(Lat: 37.55218662936631, Lng: 127.07382541881452, dest: "세종대학교")
-//                        do {
-//                            let postData = try JSONEncoder().encode(params)
-//                            print(postData.count)
-//                            self.webRTCClient.sendData(data: postData)
-//                        } catch {
-//                            return
-//                        }
-//                    }
                     return
                 }
                 print("Request socket connect")
                 self.socket.connect()
             })
-            
             // 카메라 실행
             cameraSession!.startVideo()
             
         }
     }
-
-    func exitButtonTapped() {
-        if webRTCClient.isConnected {
-            webRTCClient.disconnect()
+    
+    func disconnect() {
+        self.tryToConnectWebSocket.invalidate()
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.cameraSession!.stopSession()
         }
+        self.webRTCClient.onDisConnected()
+        webRTCClient = nil
+        tryToConnectWebSocket = nil
+        cameraSession = nil
+        isSocketConnected = false
     }
+
 }
 
 //MARK: - private WebRTC Signaling, RTCIceCandidate
@@ -230,6 +230,10 @@ extension WebRTCManager: WebRTCClientDelegate {
 
 // MARK: Render local view
 extension WebRTCManager: CameraSessionDelegate {
+    func didRedOrGreen(_ type: String) {
+        delegate?.didRedOrGreenLight(type)
+    }
+    
     // video view에 표시하는 함수임.
     func didWebRTCOutput(_ sampleBuffer: CMSampleBuffer) {
         if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
@@ -237,7 +241,7 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
-//            self.webRTCClient?.didCaptureLocalFrame(videoFrame)
+            self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         
     }

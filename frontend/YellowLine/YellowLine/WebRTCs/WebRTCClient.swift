@@ -44,11 +44,6 @@ class WebRTCClient: NSObject{
         let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
         let videoDecoderFactory = RTCDefaultVideoDecoderFactory()
         
-//        // MARK: Codec (H.264 or VP8)
-        // If you do net set codec, it uses H.264 as a default in iOS 2.0+
-//        if let codecInformation = (RTCDefaultVideoEncoderFactory.supportedCodecs().first { $0.name.elementsEqual("VP8") }) {
-//            videoEncoderFactory.preferredCodec = codecInformation
-//        }
         return RTCPeerConnectionFactory(encoderFactory: videoEncoderFactory, decoderFactory: videoDecoderFactory)
     }()
     private let mediaConstraints = [kRTCMediaConstraintsOfferToReceiveVideo: kRTCMediaConstraintsValueTrue]
@@ -199,19 +194,25 @@ class WebRTCClient: NSObject{
             capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
         }
     }
+    private func stopCapture() {
+        if let capturer = self.videoCapturer as? RTCCameraVideoCapturer {
+            capturer.stopCapture()
+        }
+    }
 
     
-    func disconnect() {
-        print("disconnect webrtc client")
-        self.isConnected = false
-        hasReceivedSDP = false
-        peerConnection?.close()
-        peerConnection = nil
-        localVideoTrack = nil
-        localVideoSource = nil
-        remoteVideoTrack = nil
-        videoCapturer = nil
-    }
+//    func disconnect() {
+//        print("disconnect webrtc client")       
+//        TTSModelModule.ttsModule.stopTTS()
+//        self.isConnected = false
+//        hasReceivedSDP = false
+//        localVideoTrack = nil
+//        localVideoSource = nil
+//        remoteVideoTrack = nil
+//        videoCapturer = nil
+//        peerConnection?.close()
+//        peerConnection = nil
+//    }
 }
 
 extension WebRTCClient {
@@ -377,7 +378,7 @@ extension WebRTCClient {
     }
     
     // MARK: - CONNECTION EVENT
-    private func onConnected() {
+    func onConnected() {
         print("WebRTCClient onConnected")
         self.isConnected = true
         
@@ -390,15 +391,22 @@ extension WebRTCClient {
         }
     }
     
-    private func onDisConnected() {
+    func onDisConnected() {
         self.isConnected = false
         print("WebRTCClient onDisConnected")
         DispatchQueue.main.async {
             self.remoteRenderView?.isHidden = true
-            self.peerConnection!.close()
+            self.peerConnection?.close()
             self.peerConnection = nil
             self.localDataChannel = nil
             self.delegate?.didDisConnectedWebRTC()
+            TTSModelModule.ttsModule.stopTTS()
+            self.isConnected = false
+            self.hasReceivedSDP = false
+            self.localVideoTrack = nil
+            self.localVideoSource = nil
+            self.remoteVideoTrack = nil
+            self.videoCapturer = nil
         }
     }
 }
@@ -438,6 +446,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
         case .stable:
             state = "stable"
         case .closed:
+            self.isConnected = false
             state = "closed"
         case .haveLocalOffer:
             state="haveLocalOffer"

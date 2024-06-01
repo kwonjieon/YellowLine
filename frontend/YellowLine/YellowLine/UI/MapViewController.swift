@@ -12,8 +12,9 @@ import CoreMotion
 import Alamofire
 // 지도 뷰 로드
 class MapViewController: UIViewController, TMapViewDelegate {
-    
+    @IBOutlet weak var objectDetectionView: UIView!
     @IBOutlet weak var mapContainerView: UIView!
+    // MARK: 종료버튼
     @IBAction func backBtn(_ sender: Any) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpStopNavi") as! PopUpStopNavi
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
@@ -21,7 +22,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.btn2Text = "안내 중단"
         nextVC.titletext = "안내 중단"
         nextVC.descriptionText = "경로 안내를 중단할까요?"
-        
+        nextVC.webRTCManager = webRTCManager
+        //webrtc, camera 종료
+
+//        self.webRTCManager!.disconnect()
         self.present(nextVC, animated: true)
     }
 
@@ -29,12 +33,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
     @IBOutlet weak var standardText: UILabel!
     @IBOutlet weak var destinationText: UILabel!
     @IBOutlet weak var navigationBar: UIView!
-    @IBOutlet weak var offTrackText: UILabel!
-    @IBOutlet weak var latitudeText: UILabel!
-    @IBOutlet weak var longitudeText: UILabel!
     @IBOutlet weak var routineInform: UILabel!
-    @IBOutlet weak var twoPointsDistance: UILabel!
-    
+
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
     var locationManager = CLLocationManager()
@@ -77,8 +77,15 @@ class MapViewController: UIViewController, TMapViewDelegate {
     let tts = TTSModelModule()
     var isFirstTTSInform = true
     
+    // Object Detection variables
+    var webRTCManager: WebRTCManager?
+    var cameraSession: CameraSession?
+    var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
+    
+    //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.protectedId = UserDefaults.standard.string(forKey: "uid")
         // 맵 화면에 로드
         self.mapView = TMapView(frame: mapContainerView.frame)
         self.mapView?.delegate = self
@@ -94,18 +101,15 @@ class MapViewController: UIViewController, TMapViewDelegate {
 
         
         // 위치 정보 허용 확인
-        checkAuthorizationStatus()
+        //checkAuthorizationStatus()
+        locationManager.startUpdatingLocation()
         
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
         
-        // 방향 감지
-        //directionDetection()
-        
-        // GPS 위치 탐지 시작
-        //locationManager.startUpdatingLocation()
-        
-        getTMapAPINavigationInform()
+        //WebRTCManager
+        webRTCManager = WebRTCManager(uiView: objectDetectionView, protectedId!)
+        webRTCManager?.delegate = self
         
         setDestinationText()
         
@@ -121,13 +125,26 @@ class MapViewController: UIViewController, TMapViewDelegate {
         
         // 현재위치~목적지 경로 루트 표시
         showDestinationRoute()
-    
-        //
-        //updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
+        
+        // 경로 데이터
+        getTMapAPINavigationInform()
+ 
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
         
-        //locationManager.startMonitoringSignificantLocationChanges()
-        locationManager.startUpdatingLocation()
+//        locationManager.startMonitoringSignificantLocationChanges()
+//        locationManager.startUpdatingLocation()
+    }
+    
+    
+    func setObjectDetectionView() {
+        objectDetectionView.frame = CGRect(x: 0, y: 0, width: 393, height: 356)
+        objectDetectionView.layer.backgroundColor = UIColor(red: 0.851, green: 0.851, blue: 0.851, alpha: 1).cgColor
+        objectDetectionView.layer.cornerRadius = 20
+        objectDetectionView.translatesAutoresizingMaskIntoConstraints = false
+        objectDetectionView.widthAnchor.constraint(equalToConstant: 393).isActive = true
+        objectDetectionView.heightAnchor.constraint(equalToConstant: 356).isActive = true
+        objectDetectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
+        objectDetectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 496).isActive = true
     }
     
     func setNaviBar() {
@@ -156,14 +173,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
          
     }
     
-    
-    // 마커 초기화
-    func clearMarkers() {
-        for marker in self.markers {
-            marker.map = nil
-        }
-        self.markers.removeAll()
-    }
     
     // 경로 초기화
     func clearPolylines() {
@@ -254,10 +263,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
             // 집 37.53943759237482 127.21876285658607
             // 학정 입구 127.07412355017871,37.551447232646765
             // 가츠시 127.07570314407349 37.54633818154831
-            // 알바 37.54089617063285 127.22094921007677
+            // 알바
             // 어대공 6번출구 37.54885914948882, 127.07501188046824
-            "startX": 127.07412355017871,
-            "startY": 37.551447232646765,
+            "startX": longitude,
+            "startY": latitude,
             "angle": 20,
             "speed": 30,
             "endPoiId": "10001",
@@ -344,71 +353,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
             print(error)
         }
     }
-
-    // 네비게이션 경로 범위 내 위치인지 확인
-    func checkNavigationDistance() {
-        var isOffCourse: Bool = false
-        var differenceLati: Double
-        var differenceLong: Double
-        var leastDifferenceSum: Double
-        // 현재 위치와 가장 가까운 경로 포인트
-        var proximatePoint: Int = LocationPT
-        
-        guard let naviPointList = polyline?.path else {
-            return
-        }
-        // 경로 이탈 판단
-        // 경로 안내 시작한 직후를 제외하고 판단
-        if (LocationPT != 0 && LocationPT != naviPointList.count - 1) {
-            //가장 적은값의 오차 비교값 초기 세팅
-            leastDifferenceSum = (naviPointList[LocationPT].latitude - latitude) + (naviPointList[LocationPT].longitude - longitude)
-            
-            for i in LocationPT - 1...LocationPT + 1 {
-                differenceLati = naviPointList[i].latitude - latitude
-                differenceLong = naviPointList[i].longitude - longitude
-                
-                // 절대값으로 변환
-                if differenceLati < 0 {
-                    differenceLati = -differenceLati
-                }
-                if differenceLong < 0 {
-                    differenceLong = -differenceLong
-                }
-                print ("위도 차이 : \(differenceLati)")
-                print ("경도 차이 : \(differenceLong)")
-                
-                // 경로 이탈 여부 확인
-                if  differenceLati < 0.00018 && differenceLong < 0.00018 {
-                    // 현재 위치 포인터 수정 여부 확인
-                    // 경로포인터-1 보다 지금의 경로포인터가 더 현재와 근접하다면 포인터 현재 위치로 변경
-                    if leastDifferenceSum > differenceLati + differenceLong {
-                        proximatePoint = i
-                        leastDifferenceSum = differenceLati + differenceLong
-                    }
-                }
-                else {
-                    isOffCourse = true
-                    print("경로 이탈")
-                    DispatchQueue.main.async {
-                        self.offTrackText.text = "경로 이탈!"
-                    }
-                    break
-                }
-            }
-            
-            if isOffCourse == false {
-                print("경로 범위 이내")
-                DispatchQueue.main.async {
-                    self.offTrackText.text = "경로 범위 이내!"
-                }
-                print("LocationPT: \(LocationPT)")
-                LocationPT = proximatePoint
-            }
-        }
-        else {
-            LocationPT = 1
-        }
-    }
     
     //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
     func checkCurrentLoactionRotate() {
@@ -424,14 +368,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     tts.speakText(speechText, 1.0, 0.4, true)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
-                    sendNaviFinish()
+                    sendChangeToOffline()
                     
                     // 도착 안내 화면으로 이동
                     let nextVC = self.storyboard?.instantiateViewController(identifier: "ArrivalDestinationVC") as! ArrivalDestinationVC
                     nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
                     self.present(nextVC, animated: true)
                 }
-                twoPointsDistance.text = String(distance)
                 routineInform.text = location.direction
                 
                 // 음성안내
@@ -452,7 +395,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     }
     
     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
-    func sendNaviFinish() {
+    func sendChangeToOffline() {
         let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
         let loginURL = "http://43.202.136.75/user/arrival/"
         
@@ -471,15 +414,26 @@ class MapViewController: UIViewController, TMapViewDelegate {
             }
         }
     }
+    
+    // 보호자에게 피보호자의 위치 및 목적지 정보 실시간 전송
+    func sendCurrentPosition() {
+        if self.webRTCManager!.webRTCClient.isDataChannel {
+            let params: NaviProtectedPoint = .init(Lat: latitude, Lng: longitude, dest: destinationName!)
+            do {
+                let postData = try JSONEncoder().encode(params)
+                print(postData.count)
+                self.webRTCManager!.webRTCClient.sendData(data: postData)
+            } catch {
+                return
+            }
+        }
+    }
 }
 
 extension MapViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print("locationManager >> didUpdateLocations 🐥 ")
-        
-        latitude = CLLocationDegrees()
-        longitude = CLLocationDegrees()
 
         if let location = locations.first {
             latitude = location.coordinate.latitude
@@ -500,8 +454,8 @@ extension MapViewController: CLLocationManagerDelegate {
                 let speechText = "음성안내를 시작합니다."
                 tts.speakText(speechText, 1.0, 0.4, true)
             }
-            latitudeText.text = String(latitude)
-            longitudeText.text = String(longitude)
+            //latitudeText.text = String(latitude)
+            //longitudeText.text = String(longitude)
             
             // 현재위치 마커 표기
             updateCurrentPositionMarker(currentLatitude: latitude ,currentLongitude: longitude)
@@ -511,22 +465,40 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // 확대 레벨 기본 설정
             self.mapView?.setZoom(18)
-            
-            // 경로 안내
-            //checkNavigationDistance()
 
             // 현재 위치에 따른 길안내
-            checkCurrentLoactionRotate();
+            checkCurrentLoactionRotate()
+            
+            // 연결된 보호자에게 피보호자 위치 실시간 전송
+            sendCurrentPosition()
         }
     }
     
-    
+    /*
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         print("locationManager >> didChangeAuthorization 🐥 ")
         locationManager.startUpdatingLocation()  //위치 정보 받아오기 start
-    }
+    }*/
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("locationManager >> didFailWithError 🐥 ")
     }
+}
+
+extension MapViewController : WebRTCManagerDelegate {
+    func didRedOrGreenLight(_ text: String) {
+        /**
+         red_yl / green_yl인지만 판별하는 코드.
+         사용하려면
+         만약 red_yl이 들어온다면  n프레임 정도 들어오는지 확인한 후
+         flag = true로 변경하고 UI를 띄운다.
+         만약 green_yl일 경우
+         green_yl이 n프레임 들어온다면
+        빨간불 ui를 파란불 ui로 변경한다.
+         
+         ...와 비슷하게만 동작하면 될 것 같습니다.
+         */
+    }
+    
+    
 }
