@@ -36,15 +36,16 @@ class ShowObjectDetectionVC: UIViewController {
 
 
         self.dismiss(animated: true) {
-                self.tryToConnectWebSocket.invalidate()
-                self.tryToConnectWebSocket = nil
-                if self.isSocketConnected {
-                    self.socket.disconnect()
-                    self.isSocketConnected = false
-                self.socket = nil
-                self.webRTCClient.onDisConnected()
-                self.webRTCClient = nil
+            self.tryToConnectWebSocket.invalidate()
+            self.tryToConnectWebSocket = nil
+            if self.isSocketConnected {
+                self.socket.disconnect()
+                self.isSocketConnected = false
             }
+            self.socket = nil
+            self.webRTCClient.onDisConnected()
+            self.webRTCClient = nil
+            
         }
 
 

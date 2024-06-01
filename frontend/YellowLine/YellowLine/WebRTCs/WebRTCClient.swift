@@ -85,7 +85,7 @@ class WebRTCClient: NSObject{
     
     deinit {
         print("WebRTC Client Deinit")
-        self.peerConnection = nil
+//        self.peerConnection = nil
     }
     
     // MARK: Setting.
@@ -191,28 +191,21 @@ class WebRTCClient: NSObject{
                     }
                 }
             }
-            capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
+            DispatchQueue.global(qos: .userInitiated).async {
+                capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
+            }
         }
     }
     func stopCapture() {
         if let capturer = self.videoCapturer as? RTCCameraVideoCapturer {
-            capturer.stopCapture()
+            DispatchQueue.global(qos: .userInitiated).async {
+                capturer.stopCapture()
+            }
         }
     }
 
     
-//    func disconnect() {
-//        print("disconnect webrtc client")       
-//        TTSModelModule.ttsModule.stopTTS()
-//        self.isConnected = false
-//        hasReceivedSDP = false
-//        localVideoTrack = nil
-//        localVideoSource = nil
-//        remoteVideoTrack = nil
-//        videoCapturer = nil
-//        peerConnection?.close()
-//        peerConnection = nil
-//    }
+
 }
 
 extension WebRTCClient {
@@ -390,22 +383,24 @@ extension WebRTCClient {
 
         }
     }
+
     
     func onDisConnected() {
         self.isConnected = false
+        self.peerConnection?.close()
+        self.peerConnection = nil
         print("WebRTCClient onDisConnected")
         DispatchQueue.main.async {
             self.remoteRenderView?.isHidden = true
-            self.peerConnection?.close()
-            self.peerConnection = nil
             self.localDataChannel = nil
-            self.delegate?.didDisConnectedWebRTC()
             self.hasReceivedSDP = false
             self.localVideoTrack = nil
             self.localVideoSource = nil
             self.remoteVideoTrack = nil
+            self.cameraDevice = nil
             self.videoCapturer = nil
         }
+        self.stopCapture()
     }
 }
 

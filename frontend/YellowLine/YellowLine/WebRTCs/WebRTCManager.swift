@@ -52,25 +52,27 @@ class WebRTCManager {
             })
             // 카메라 실행
             cameraSession!.startVideo()
-            
         }
     }
     
     func disconnect() {
         self.tryToConnectWebSocket.invalidate()
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.webRTCClient.stopCapture()
-        }
-        self.webRTCClient.onDisConnected()
-        webRTCClient = nil
-        tryToConnectWebSocket = nil
-        cameraSession = nil
-        if self.isSocketConnected {
-            isSocketConnected = false
-            socket = nil
-        }
-
         
+//        self.webRTCClient.stopCapture()
+        self.webRTCClient.onDisConnected()
+            if self.isSocketConnected {
+                self.isSocketConnected = false
+            }
+        
+        self.cameraSession = nil
+        self.webRTCClient = nil
+
+//            self.tryToConnectWebSocket = nil
+////            self.cameraSession = nil
+//            self.socket = nil
+
+
+
     }
 
 }

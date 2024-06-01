@@ -67,7 +67,9 @@ class TTSModelModule {
             utterance.rate = 0.4
             utterance.volume = 10
             self.synthesizer.stopSpeaking(at: .word)
-            self.synthesizer.speak(utterance)
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.synthesizer.speak(utterance)
+            }
         }
     }
     
@@ -109,8 +111,10 @@ class TTSModelModule {
     
     // 만약 현재 TTS가 재생중이라면, 즉시종료
     func stopTTS() {
-        if self.synthesizer.isSpeaking == true {
-            self.synthesizer.stopSpeaking(at: .immediate)
+        DispatchQueue.global(qos: .userInitiated).async {
+            if self.synthesizer.isSpeaking == true {
+                self.synthesizer.stopSpeaking(at: .immediate)
+            }
         }
     }
 }
