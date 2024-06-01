@@ -69,12 +69,7 @@ class WebRTCManager {
             isSocketConnected = false
             socket = nil
         }
-        
-        if self.isSocketConnected {
-            self.socket.disconnect()
-            self.isSocketConnected = false
-            self.socket = nil
-        }
+
         
     }
 
