@@ -78,6 +78,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     let tts = TTSModelModule()
     var isFirstTTSInform = true
+    let queue = DispatchQueue(label: "naviQueue", qos: .userInteractive)
     
     // Object Detection variables
     var webRTCManager: WebRTCManager?
@@ -369,14 +370,16 @@ class MapViewController: UIViewController, TMapViewDelegate {
     func checkCurrentLoactionRotate() {
         for (index,location) in pointerDataList.enumerated() {
             let distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
-            if distance < 0.0000343 {
+            if distance < 0.000036 {
                 // 최종 목적지에 도착
                 
                 if (location.name == "finishLine2749") {
                     print("경로안내 종료")
                     // 음성안내
                     let speechText = destinationName! + "에 도착했습니다. 경로안내를 종료합니다."
-                    tts.speakText(speechText, 1.0, 0.4, true)
+                    self.queue.async {
+                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
+                    }
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
                     sendChangeToOffline()
@@ -396,11 +399,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     // 음성안내
                     // speakText(내용, 볼륨, 속도, 옵션)
                     let speechText = "여기서" + location.direction + "하세요"
-                    tts.speakText(speechText, 1.0, 0.4, true)
+                    self.queue.async {
+                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
+                    }
                     print("가야하는 방향: \(location.direction)")
                     
                     // 한번 도착한 경로는 포지션 리스트에서 삭제
-                    
                     pointerDataList.remove(at: index)
                 }
             }
