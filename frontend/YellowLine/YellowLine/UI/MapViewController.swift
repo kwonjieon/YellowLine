@@ -21,9 +21,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.btn2Text = "안내 중단"
         nextVC.titletext = "안내 중단"
         nextVC.descriptionText = "경로 안내를 중단할까요?"
+        nextVC.webRTCManager = webRTCManager
         //webrtc, camera 종료
 
-        self.webRTCManager!.disconnect()
+//        self.webRTCManager!.disconnect()
         self.present(nextVC, animated: true)
     }
 

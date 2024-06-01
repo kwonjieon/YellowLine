@@ -201,18 +201,18 @@ class WebRTCClient: NSObject{
     }
 
     
-    func disconnect() {
-        print("disconnect webrtc client")       
-        TTSModelModule.ttsModule.stopTTS()
-        self.isConnected = false
-        hasReceivedSDP = false
-        localVideoTrack = nil
-        localVideoSource = nil
-        remoteVideoTrack = nil
-        videoCapturer = nil
-        peerConnection?.close()
-        peerConnection = nil
-    }
+//    func disconnect() {
+//        print("disconnect webrtc client")       
+//        TTSModelModule.ttsModule.stopTTS()
+//        self.isConnected = false
+//        hasReceivedSDP = false
+//        localVideoTrack = nil
+//        localVideoSource = nil
+//        remoteVideoTrack = nil
+//        videoCapturer = nil
+//        peerConnection?.close()
+//        peerConnection = nil
+//    }
 }
 
 extension WebRTCClient {
@@ -378,7 +378,7 @@ extension WebRTCClient {
     }
     
     // MARK: - CONNECTION EVENT
-    private func onConnected() {
+    func onConnected() {
         print("WebRTCClient onConnected")
         self.isConnected = true
         
@@ -391,15 +391,22 @@ extension WebRTCClient {
         }
     }
     
-    private func onDisConnected() {
+    func onDisConnected() {
         self.isConnected = false
         print("WebRTCClient onDisConnected")
         DispatchQueue.main.async {
             self.remoteRenderView?.isHidden = true
-            self.peerConnection!.close()
+            self.peerConnection?.close()
             self.peerConnection = nil
             self.localDataChannel = nil
             self.delegate?.didDisConnectedWebRTC()
+            TTSModelModule.ttsModule.stopTTS()
+            self.isConnected = false
+            self.hasReceivedSDP = false
+            self.localVideoTrack = nil
+            self.localVideoSource = nil
+            self.remoteVideoTrack = nil
+            self.videoCapturer = nil
         }
     }
 }
@@ -439,6 +446,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
         case .stable:
             state = "stable"
         case .closed:
+            self.isConnected = false
             state = "closed"
         case .haveLocalOffer:
             state="haveLocalOffer"

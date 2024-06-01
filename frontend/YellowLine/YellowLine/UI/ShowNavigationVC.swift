@@ -300,13 +300,10 @@ extension ShowNavigationVC{
     
     //webrtc 연결이 상호 종료된다면?
     func didDisConnectedWebRTC() {
-        print("WebRTC연결이 종료되었습니다.")
+        print("피보호자와의 종료되었습니다.")
         if webRTCClient.isConnected {
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.tryToConnectWebSocket.invalidate()
-                self.webRTCClient.disconnect()
-//                self.dismiss(animated: true)
-            }
+            self.tryToConnectWebSocket.invalidate()
+            self.webRTCClient.onDisConnected()
         }
     }
     

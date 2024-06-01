@@ -31,9 +31,11 @@ class ShowObjectDetectionVC: UIViewController {
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
         if webRTCClient.isConnected {
-            webRTCClient.disconnect()
-            tryToConnectWebSocket.invalidate()
+            self.webRTCClient.onDisConnected()
+            self.tryToConnectWebSocket.invalidate()
+
         }
+        self.dismiss(animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -171,7 +173,9 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
         self.socket.disconnect()
     }
     
-    func didDisConnectedWebRTC() {}
+    func didDisConnectedWebRTC() {
+        print("피보호자와의 연결이 종료되었습니다.")
+    }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
         var state = ""
@@ -202,10 +206,8 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
     func didReceiveData(data: Data) {
         // data channel 을 연결했을 때 여기에 데이터가 옴. 추가기능임.
 //        print("Data received...! \(data)")
-
         do {
             let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
-//            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
         } catch {
             return
         }
@@ -213,10 +215,6 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
     
     func didReceiveMessage(message: String) {
         // 위와 마찬가지 data channel용.
-//        let converted = UIImage(base64: message, withPrefix: false)
-//        DispatchQueue.main.async {
-//            self.imageView!.image = converted
-//        }
         print(message)
         
     }
