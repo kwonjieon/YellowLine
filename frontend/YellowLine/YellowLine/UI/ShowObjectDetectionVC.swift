@@ -33,6 +33,9 @@ class ShowObjectDetectionVC: UIViewController {
     
     @IBAction func clickBackBtn(_ sender: Any) {
         self.dismiss(animated: true)
+        if webRTCClient.isConnected {
+            webRTCClient.disconnect()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -67,13 +70,6 @@ class ShowObjectDetectionVC: UIViewController {
 //                self.sendSDP(sessionDescription: offerSDP)
 //            })
 //        }
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if webRTCClient.isConnected {
-            webRTCClient.disconnect()
-        }
     }
     
     private func setupUI() {

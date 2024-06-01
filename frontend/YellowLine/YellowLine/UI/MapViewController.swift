@@ -22,8 +22,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.titletext = "안내 중단"
         nextVC.descriptionText = "경로 안내를 중단할까요?"
         //webrtc, camera 종료
-        self.webRTCManager!.webRTCClient.disconnect()
-        self.cameraSession?.stopSession()
+        self.webRTCManager!.disconnect()
+        
         self.present(nextVC, animated: true)
     }
 
@@ -264,7 +264,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
             // 집 37.53943759237482 127.21876285658607
             // 학정 입구 127.07412355017871,37.551447232646765
             // 가츠시 127.07570314407349 37.54633818154831
-            // 알바 37.54089617063285 127.22094921007677
+            // 알바
             // 어대공 6번출구 37.54885914948882, 127.07501188046824
             "startX": longitude,
             "startY": latitude,
