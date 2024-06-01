@@ -80,6 +80,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var cameraSession: CameraSession?
     var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
     
+    // webRTC
+    var webRTCClient: WebRTCClient!
+    
     //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -472,6 +475,19 @@ class MapViewController: UIViewController, TMapViewDelegate {
             }
         }
     }
+    
+    func sendCurrentPosition() {
+        if self.webRTCClient.isDataChannel {
+            let params: NaviProtectedPoint = .init(Lat: latitude, Lng: longitude, dest: destinationName!)
+            do {
+                let postData = try JSONEncoder().encode(params)
+                print(postData.count)
+                self.webRTCClient.sendData(data: postData)
+            } catch {
+                return
+            }
+        }
+    }
 }
 
 extension MapViewController: CLLocationManagerDelegate {
@@ -512,6 +528,9 @@ extension MapViewController: CLLocationManagerDelegate {
 
             // 현재 위치에 따른 길안내
             checkCurrentLoactionRotate()
+            
+            // 연결된 보호자에게 피보호자 위치 실시간 전송
+            sendCurrentPosition()
         }
     }
     
