@@ -47,6 +47,7 @@ class TTSModelModule {
     }
     
     func speakTTS(text: String) {
+        // 네비의 TTS이거나 TTS가 말하고 있지 않을 때 수행.
         if channels.navi || !synthesizer.isSpeaking {
             // handle audio session first, before trying to read the text
             do {
@@ -65,16 +66,17 @@ class TTSModelModule {
             self.synthesizer.stopSpeaking(at: .word)
             self.synthesizer.speak(utterance)
         }
-        
     }
     
     // type true = navi ,  = camera
+    // TTS 실행하기. 네비게이션에서 TTS를 실행한다면 type true 로
+    // TTS실행 시 Main 큐 외의 DispatchQueue에서 돌리기 ex) 359 line of CameraSession.
     func processTTS(type: Bool, text: String) {
-        if type {
+        if type { // 네비면 바로 실행.
             channels.navi = true
             speakTTS(text: text)
             channels.navi = false
-        } else {
+        } else { // 카메라면 5프레임 이상 찍혀야 실행.
             guard objectCounts >= 5 else { return }
             self.ttsQueue.append(text)
             speakTTS(text: text)

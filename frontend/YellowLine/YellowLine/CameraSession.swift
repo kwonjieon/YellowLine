@@ -352,7 +352,9 @@ class CameraSession: NSObject {
             } else {
                 self.show(predictions: [])
             }
+            // TTS 실행.
             if !self.closeObjects.isEmpty {
+                // 장애물이 탐지된 프레임이라면 +1
                 TTSModelModule.ttsModule.objectCounts += 1
                 self.queue.async {
                     TTSModelModule.ttsModule.processTTS(type: false, text: "전방에 장애물입니다.")
