@@ -80,7 +80,7 @@ class ProtectorMainVC: UIViewController {
     
     // 보호자-피보호자 관계 추가
     func makeRelations() {
-        let helper_id = LoginVC.protectorID
+        let helper_id = UserDefaults.standard.string(forKey: "uid")!
         print("보호자 아이디:\(helper_id)")
         let recipient_id = "testID"
         

@@ -83,6 +83,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.protectedId = UserDefaults.standard.string(forKey: "uid")
         // 맵 화면에 로드
         self.mapView = TMapView(frame: mapContainerView.frame)
         self.mapView?.delegate = self
@@ -104,7 +105,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
         
-        webRTCManager = WebRTCManager(uiView: objectDetectionView, "YLUSER01")
+        webRTCManager = WebRTCManager(uiView: objectDetectionView, protectedId!)
         
         setDestinationText()
         
