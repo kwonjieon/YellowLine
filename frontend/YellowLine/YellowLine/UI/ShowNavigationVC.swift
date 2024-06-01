@@ -10,6 +10,7 @@ import TMapSDK
 import CoreData
 import WebRTC
 import Starscream
+import Alamofire
 // 보호자가 보는 피보호자의 네비+물체감지 화면
 class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, WebRTCClientDelegate {
     
@@ -48,7 +49,10 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         }
     }
     
+    // 피보호자 아이디, 이름 정보
+    var id : String?
     var name: String?
+    var destination : String?
     
     
     override func viewDidLoad() {
@@ -75,6 +79,8 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
             self.socket.connect()
         })
         
+       getProtectedDestination()
+        
         //Navi
         self.mapView = TMapView(frame: mapContainerView.frame)
         self.mapView?.delegate = self
@@ -99,14 +105,15 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
-        
+        setLabel()
         setObjectDetectionView()
         setBackBtn()
         setNameLabel()
         setNavigationBar()
-        setLabel()
-
+        
     }
+    
+    
     
     override func viewDidAppear(_ animated: Bool) {
         isReadyLoadMap = true
@@ -114,6 +121,39 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         // 현재 위치로 지도 이동
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: currentLat, longitude: currentLongi))
         
+    }
+    
+    func getProtectedDestination() {
+        print ("id : \(id)")
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let URL = "http://43.202.136.75/user/protected-info/"
+        let tmpData : [String : String] = ["user_id" : id!]
+        AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
+            multipartFormData.append(val.data(using: .utf8)!, withName: key)
+        }
+        },to: URL, method: .post, headers: header)
+        .responseDecodable(of: DestinationResult.self){ response in
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    print("불러오기 성공")
+                    let result = response
+                    // error가 없으면 통과
+                    guard let destinationResult = result.recent_arrival else {
+                        return
+                    }
+                    self.destinationLabel.text = destinationResult
+                    print("id : \(destinationResult)")
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
     }
     
     
@@ -181,16 +221,18 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
     }
     
     func setLabel() {
+        //destinationLabel.text = destination
+        destinationLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        destinationLabel.font = UIFont(name: "AppleSDGothicNeo-Medium", size: 18)
+        destinationLabel.textAlignment = .center
+        destinationLabel.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        
         standardLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
         standardLabel.font = UIFont(name: "AppleSDGothicNeo-Medium", size: 18)
         standardLabel.textAlignment = .center
         standardLabel.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
         
-        destinationLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
-        destinationLabel.font = UIFont(name: "AppleSDGothicNeo-Medium", size: 18)
-        destinationLabel.textAlignment = .center
-        destinationLabel.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        destinationLabel.text = "임시도착지데이터"
+        
         
         // 목적지의 글자크기가 바뀌더라도 중앙정렬 유지
         stackView.translatesAutoresizingMaskIntoConstraints = false

@@ -25,7 +25,7 @@ class PopUpStopNavi: UIViewController {
         self.dismiss(animated: true)
     }
     @IBAction func clickStopBtn(_ sender: Any) {
-        mapViewController.sendNaviFinish()
+        mapViewController.sendChangeToOffline()
         if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController?.presentingViewController {
             // 메인화면으로 돌아감
             presentingVC.dismiss(animated: true, completion: nil)
