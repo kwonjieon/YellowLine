@@ -56,6 +56,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     // 최종적으로 사용할 좌/우 회전해야 하는 위치 정보 리스트
     var pointerDataList: [LocationData] = []
+    var pointMarkers:Array<TMapMarker> = []
     
     // 경로 중 좌, 우회전 해야하는 경/위도 리스트
     var naviPointList : [String] = []
@@ -79,6 +80,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     let tts = TTSModelModule()
     var isFirstTTSInform = true
+    let queue = DispatchQueue(label: "naviQueue", qos: .userInteractive)
     
     // Object Detection variables
     var webRTCManager: WebRTCManager?
@@ -99,12 +101,13 @@ class MapViewController: UIViewController, TMapViewDelegate {
         locationManager.delegate = self  // 델리게이트 설정
         locationManager.desiredAccuracy = kCLLocationAccuracyBest  // 거리 정확도 설정
         
-        locationManager.distanceFilter = 5.0 // 미터 단위
+        // 5미터 이동 시에만 업데이트
+        // 현재는 업데이트가 너무 늦어서 주석처리
+        //locationManager.distanceFilter = 5.0 // 미터 단위
 
         
         // 위치 정보 허용 확인
-        //checkAuthorizationStatus()
-        locationManager.startUpdatingLocation()
+        checkAuthorizationStatus()
         
         // 확대 레벨 기본 설정
         self.mapView?.setZoom(18)
@@ -125,16 +128,17 @@ class MapViewController: UIViewController, TMapViewDelegate {
         // 맵 로드 이후 마커 표기 시작하게 하는 flag
         startCheckLocation = true
         
+        sendCurrentPosition()
+        
         // 현재위치~목적지 경로 루트 표시
         showDestinationRoute()
         
         // 경로 데이터
         getTMapAPINavigationInform()
+        
+        
  
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
-        
-//        locationManager.startMonitoringSignificantLocationChanges()
-//        locationManager.startUpdatingLocation()
     }
     
     
@@ -334,6 +338,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
                                 }
                                 self.pointerDataList.append(inputData)
                                 
+                                DispatchQueue.main.async {
+                                    // 임시 좌/우 회전 포인터 마커들 표기
+                                    let pointMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: inputData.latitude, longitude: inputData.longitude))
+                                    pointMarker.map = self.mapView
+                                    self.pointMarkers.append(pointMarker)
+                                }
                             }
                         case .twoDimensional(let array): break
                         }
@@ -346,6 +356,9 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     self.pointerDataList.append(destinationData)
                     print("navigationList : \(self.navigationList)")
                     print("naviDestinationList : \(self.naviDestinationList)")
+                    for i in 0...self.pointerDataList.count-1 {
+                        print ("pointerDataList 이름 :\(self.pointerDataList[i].name)")
+                    }
                 }catch{
                     print(error)
                 }
@@ -358,32 +371,45 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     //각 pointerData 별로 내 위치와의 거리를 계산하고 하나의 객체라도 거리가 일정 수치 이하라면 경로 안내 출력
     func checkCurrentLoactionRotate() {
-        for location in pointerDataList {
+        for (index,location) in pointerDataList.enumerated() {
             let distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
-            if distance < 0.00003428 {
-                // 목적지에 도착
+            if distance < 0.000036 {
+                // 최종 목적지에 도착
+                
                 if (location.name == "finishLine2749") {
                     print("경로안내 종료")
-                    
                     // 음성안내
-                    let speechText = location.direction + "에 도착했습니다. 경로안내를 종료합니다."
-                    tts.speakText(speechText, 1.0, 0.4, true)
+                    let speechText = destinationName! + "에 도착했습니다. 경로안내를 종료합니다."
+                    self.queue.async {
+                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
+                    }
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
                     sendChangeToOffline()
+                    
+                    // 현재 위치 탐색 종료
+                    locationManager.stopUpdatingLocation()
                     
                     // 도착 안내 화면으로 이동
                     let nextVC = self.storyboard?.instantiateViewController(identifier: "ArrivalDestinationVC") as! ArrivalDestinationVC
                     nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
                     self.present(nextVC, animated: true)
                 }
-                routineInform.text = location.direction
-                
-                // 음성안내
-                // speakText(내용, 볼륨, 속도, 옵션)
-                let speechText = "여기서" + location.direction + "하세요"
-                tts.speakText(speechText, 1.0, 0.4, true)
-                print("가야하는 방향: \(location.direction)")
+                // 방향을 꺾어야 하는 위치에 도달
+                else {
+                    routineInform.text = location.name
+                    
+                    // 음성안내
+                    // speakText(내용, 볼륨, 속도, 옵션)
+                    let speechText = "여기서" + location.direction + "하세요"
+                    self.queue.async {
+                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
+                    }
+                    print("가야하는 방향: \(location.direction)")
+                    
+                    // 한번 도착한 경로는 포지션 리스트에서 삭제
+                    pointerDataList.remove(at: index)
+                }
             }
         }
     }
@@ -419,6 +445,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     // 보호자에게 피보호자의 위치 및 목적지 정보 실시간 전송
     func sendCurrentPosition() {
+        print(self.webRTCManager!.webRTCClient.isDataChannel)
+        print("위치 정보를 보냅니다")
         if self.webRTCManager!.webRTCClient.isDataChannel {
             let params: NaviProtectedPoint = .init(Lat: latitude, Lng: longitude, dest: destinationName!)
             do {
