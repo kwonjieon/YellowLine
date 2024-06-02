@@ -46,6 +46,8 @@
 		5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BB2BF347230013D6CF /* LocationData.swift */; };
 		5788A8BF2BF455550013D6CF /* MainScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BE2BF455550013D6CF /* MainScreenVC.swift */; };
 		5788A8C12BF5F19E0013D6CF /* SearchDestinationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8C02BF5F19E0013D6CF /* SearchDestinationVC.swift */; };
+		57D2E0822C0C127B00AE680E /* currentMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 57D2E0812C0C127B00AE680E /* currentMark.png */; };
+		57D2E08A2C0C16EA00AE680E /* customMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 57D2E0892C0C16EA00AE680E /* customMark.png */; };
 		57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */; };
 		57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */; };
 		57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */; };
@@ -125,6 +127,8 @@
 		5788A8BB2BF347230013D6CF /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		5788A8BE2BF455550013D6CF /* MainScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenVC.swift; sourceTree = "<group>"; };
 		5788A8C02BF5F19E0013D6CF /* SearchDestinationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationVC.swift; sourceTree = "<group>"; };
+		57D2E0812C0C127B00AE680E /* currentMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = currentMark.png; path = ../../../../../../../Downloads/currentMark.png; sourceTree = "<group>"; };
+		57D2E0892C0C16EA00AE680E /* customMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = customMark.png; sourceTree = "<group>"; };
 		57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationViewController.swift; sourceTree = "<group>"; };
 		57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDataModel.swift; sourceTree = "<group>"; };
 		57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationModel.swift; sourceTree = "<group>"; };
@@ -279,6 +283,8 @@
 		5788A8C22BF6151D0013D6CF /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				57D2E0892C0C16EA00AE680E /* customMark.png */,
+				57D2E0812C0C127B00AE680E /* currentMark.png */,
 				B9A53B012C09ED8F00C1F155 /* addRelationBtn.png */,
 				573D50752C087782007A42B8 /* directionWhite.png */,
 				573D50732C087735007A42B8 /* backBtnWhite.png */,
@@ -402,6 +408,8 @@
 				570FC2042BF6D4AC00F03378 /* search-icon.png in Resources */,
 				5709DFFA2BB13E9200553A23 /* Base in Resources */,
 				5714A1FC2BFDCFEC00EBCD35 /* AppleSDGothicNeoH.ttf in Resources */,
+				57D2E0822C0C127B00AE680E /* currentMark.png in Resources */,
+				57D2E08A2C0C16EA00AE680E /* customMark.png in Resources */,
 				5714A1FB2BFDCFEC00EBCD35 /* AppleSDGothicNeoL.ttf in Resources */,
 				573D50762C087782007A42B8 /* directionWhite.png in Resources */,
 				B9A53B022C09ED8F00C1F155 /* addRelationBtn.png in Resources */,
@@ -614,7 +622,7 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LLKYF9URAK;
+				DEVELOPMENT_TEAM = CX8QXFQAMZ;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -640,7 +648,7 @@
 					"$(PROJECT_DIR)/YellowLine/TMapSDK.framework",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -682,7 +690,7 @@
 					"$(PROJECT_DIR)/YellowLine/TMapSDK.framework",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sejong.YellowLineTest2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

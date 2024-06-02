@@ -32,6 +32,8 @@ class PopUpStopNavi: UIViewController {
         mapViewController.sendChangeToOffline()
 //        mapViewController.locationManager.stopUpdatingLocation()
         if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController?.presentingViewController {
+            // 현재 위치 탐색 종료
+            //mapViewController.locationManager.stopUpdatingLocation()
             webRTCManager!.disconnect()
             webRTCManager = nil
             // 메인화면으로 돌아감
