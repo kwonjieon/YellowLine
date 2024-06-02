@@ -380,15 +380,26 @@ extension WebRTCClient {
                 self.remoteRenderView!.isHidden = false
                 self.delegate?.didConnectWebRTC()
             }
-
         }
+    }
+    
+    func onDisConnected() {
+        print("WebRTCClient onDisconnected")
+        self.isConnected = false
+        DispatchQueue.main.async {
+            if self.isProtector {
+                self.remoteRenderView!.isHidden = true
+                self.delegate?.didDisConnectedWebRTC()
+            }
+        }
+        
     }
 
     func disconnect() {
         self.isConnected = false
         self.peerConnection?.close()
         self.peerConnection = nil
-        print("WebRTCClient onDisConnected")
+        print("WebRTCClient disconnect")
         DispatchQueue.main.async {
             self.remoteRenderView?.isHidden = true
             self.localDataChannel = nil
@@ -402,9 +413,7 @@ extension WebRTCClient {
         self.stopCapture()
     }
     
-    func onDisConnected() {
-        delegate?.didDisConnectedWebRTC()
-    }
+
 }
 
 //MARK: -DataChannel Event
@@ -489,11 +498,12 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
                 self.onConnected()
             }
         default:
+            if self.isConnected {
+                self.onDisConnected()
+            }
             break
-//            if self.isConnected{
-//                self.onDisConnected()
-//            }
         }
+        print("changed peerConnection state = \(self.isConnected)")
         
         DispatchQueue.main.async {
             self.delegate?.didIceConnectionStateChanged(iceConnectionState: newState)
@@ -506,7 +516,6 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
        //send message(video)
-        print("generate Candidate")
         self.delegate?.didGenerateCandidate(iceCandidate: candidate)
     }
     

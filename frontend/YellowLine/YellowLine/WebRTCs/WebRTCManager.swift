@@ -48,11 +48,12 @@ class WebRTCManager {
     }
     
     func disconnect() {
+        print("WebRTCManager: disconnect")
         self.tryToConnectWebSocket?.invalidate()
         self.tryToConnectWebSocket = nil
 //        self.webRTCClient.stopCapture()
         if (self.webRTCClient?.isConnected)! {
-            self.webRTCClient?.onDisConnected()
+//            self.webRTCClient?.onDisConnected()
         } else {
             self.webRTCClient?.disconnect()
         }
@@ -191,14 +192,21 @@ extension WebRTCManager: WebRTCClientDelegate {
         self.sendCandidate(iceCandidate: iceCandidate)
     }
     
+    
     func didConnectWebRTC() {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
+        print("WebRTCManager didConnectedWebRTC")
+        self.isSocketConnected = false
+        self.tryToConnectWebSocket?.invalidate()
         self.socket?.disconnect()
     }
     
     func didDisConnectedWebRTC() {
-//        webRTCClient?.disconnect()
-        self.disconnect()
+        print("WEBRTC MANAGER : didDisConnectedWebRTC")
+        if !self.isSocketConnected {
+            self.tryToConnectWebSocket?.fire()
+            startTimer()
+        }
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
@@ -252,7 +260,6 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
-            print("cam")
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         

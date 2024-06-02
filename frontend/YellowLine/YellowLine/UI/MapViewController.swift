@@ -395,21 +395,17 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
                     self.present(nextVC, animated: true)
                 }
-                // 방향을 꺾어야 하는 위치에 도달
-                else {
-                    routineInform.text = location.name
-                    
-                    // 음성안내
-                    // speakText(내용, 볼륨, 속도, 옵션)
-                    let speechText = "여기서" + location.direction + "하세요"
-                    self.queue.async {
-                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
-                    }
-                    print("가야하는 방향: \(location.direction)")
-                    
-                    // 한번 도착한 경로는 포지션 리스트에서 삭제
-                    pointerDataList.remove(at: index)
-                }
+                routineInform.text = location.direction
+                
+                // 음성안내
+                // speakText(내용, 볼륨, 속도, 옵션)
+                let speechText = "여기서" + location.direction + "하세요"
+                tts.speakText(speechText, 1.0, 0.4, false)
+                print("가야하는 방향: \(location.direction)")
+				// 한번 도착한 경로는 포지션 리스트에서 삭제
+                pointerDataList.remove(at: index)
+
+				
             }
         }
     }
