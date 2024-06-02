@@ -484,13 +484,7 @@ class CameraSession: NSObject {
                 
 //                    print("bestClass is : \(bestClass)")
                 
-                // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
-                //  필터링 사각형
-                if filtRect!.intersects(rect) {
-                    if !exceptObjects.contains(bestClass) {
-                        closeObjects.insert(bestClass)
-                    }
-                }
+
                 
                 if bestClass == "red_yl" || bestClass == "green_yl" {
 //                    delegate?.didRedOrGreen(bestClass)
@@ -505,12 +499,23 @@ class CameraSession: NSObject {
                     lights.red = false
                     lights.green = true
                 }
+                
+                // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
+                //  필터링 사각형
+                if filtRect!.intersects(rect) {
+                    if !exceptObjects.contains(bestClass) {
+                        closeObjects.insert(bestClass)
+                    }
+                    
+                    // Show the bounding box.
+                    boundingBoxViews[i].show(frame: rect,
+                                             label: String(format: "%@", bestClass),
+                                             color: colors[bestClass] ?? UIColor.white,
+                                             alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
+                }
+                
 
-                // Show the bounding box.
-                boundingBoxViews[i].show(frame: rect,
-                                         label: String(format: "%@", bestClass),
-                                         color: colors[bestClass] ?? UIColor.white,
-                                         alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
+                
             } else {
                 boundingBoxViews[i].hide()
             } // if prediction end...
