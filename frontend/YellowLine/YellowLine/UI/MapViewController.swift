@@ -382,7 +382,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 // 음성안내
                 // speakText(내용, 볼륨, 속도, 옵션)
                 let speechText = "여기서" + location.direction + "하세요"
-                tts.speakText(speechText, 1.0, 0.4, true)
+                tts.speakText(speechText, 1.0, 0.4, false)
                 print("가야하는 방향: \(location.direction)")
             }
         }

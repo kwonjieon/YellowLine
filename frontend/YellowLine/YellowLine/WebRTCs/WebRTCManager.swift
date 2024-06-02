@@ -198,7 +198,12 @@ extension WebRTCManager: WebRTCClientDelegate {
     
     func didDisConnectedWebRTC() {
 //        webRTCClient?.disconnect()
-        self.disconnect()
+        print("WEBRTC MANAGER : didDisConnectedWebRTC")
+//        self.disconnect()
+        if !self.isSocketConnected {
+            self.isSocketConnected = false
+            self.socket?.connect()
+        }
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
@@ -217,6 +222,7 @@ extension WebRTCManager: WebRTCClientDelegate {
             state = "count..."
         case .disconnected:
             state = "disconnected"
+            webRTCClient?.disconnect()
         case .failed:
             state = "failed"
         case .new:
@@ -252,7 +258,6 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
-            print("cam")
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         

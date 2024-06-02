@@ -551,7 +551,6 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
 //        print(CVPixelBufferGetPixelFormatType(cvImageBuffer!), CVPixelBufferGetWidth(cvImageBuffer!), CVPixelBufferGetHeight(cvImageBuffer!))
-        print("cam")
         delegate?.didWebRTCOutput(sampleBuffer)
         predict(cvImageBuffer)
     }

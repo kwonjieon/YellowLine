@@ -44,7 +44,9 @@ class TTSModelModule {
         utterance.rate = rate
         utterance.volume = volume
         self.synthesizer.stopSpeaking(at: .immediate)
-        self.synthesizer.speak(utterance)
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.synthesizer.speak(utterance)
+        }
     }
     
     func speakTTS(text: String) {
