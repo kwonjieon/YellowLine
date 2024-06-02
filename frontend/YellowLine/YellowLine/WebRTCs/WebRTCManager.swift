@@ -71,7 +71,6 @@ class WebRTCManager {
             self.socket?.connect()
         })
     }
-
 }
 
 //MARK: - private WebRTC Signaling, RTCIceCandidate
