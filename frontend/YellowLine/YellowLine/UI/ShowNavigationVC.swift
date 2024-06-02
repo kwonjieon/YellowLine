@@ -41,7 +41,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         socket = nil
         self.tryToConnectWebSocket?.invalidate()
         tryToConnectWebSocket = nil
-        webRTCClient?.onDisConnected()
+        webRTCClient?.disconnect()
         webRTCClient = nil
         self.dismiss(animated: true)
     }
@@ -307,7 +307,7 @@ extension ShowNavigationVC{
     
     func didConnectWebRTC() {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
-        self.isSocketConnected = true
+        self.isSocketConnected = false
         self.tryToConnectWebSocket?.invalidate()
         self.socket?.disconnect()
     }
@@ -315,14 +315,7 @@ extension ShowNavigationVC{
     //webrtc 연결이 상호 종료된다면?
     func didDisConnectedWebRTC() {
         print("피보호자와의 연결이 종료되었습니다.")
-        if !self.isSocketConnected {
-            self.tryToConnectWebSocket?.fire()
-            startTimer()
-        }
-//        self.tryToConnectWebSocket?.invalidate()
-//        tryToConnectWebSocket = nil
-//        webRTCClient?.disconnect()
-//        webRTCClient = nil
+
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
