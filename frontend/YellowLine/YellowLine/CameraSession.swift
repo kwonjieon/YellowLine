@@ -360,7 +360,7 @@ class CameraSession: NSObject {
             // 장애물이 탐지된 프레임이라면 +1
             TTSModelModule.ttsModule.objectCounts += 1
             self.queue.async {
-                TTSModelModule.ttsModule.processTTS(type: "Objects", text: "전방에 장애물입니다.")
+                TTSModelModule.ttsModule.processTTS(type: "objects", text: "전방에 장애물입니다.")
             }
         } else {
             TTSModelModule.ttsModule.objectCounts = 0

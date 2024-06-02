@@ -24,7 +24,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         nextVC.descriptionText = "경로 안내를 중단할까요?"
         nextVC.webRTCManager = webRTCManager
         //webrtc, camera 종료
-
+        // 현재 위치 탐색 종료
+        locationManager.stopUpdatingLocation()
         self.present(nextVC, animated: true)
     }
 
@@ -86,6 +87,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var webRTCManager: WebRTCManager?
     var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
     
+    
+    @IBOutlet weak var redView: UIView!
+    @IBOutlet weak var greenView: UIView!
+    
     //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -115,11 +120,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
         //WebRTCManager
         webRTCManager = WebRTCManager(uiView: objectDetectionView, protectedId!)
         webRTCManager?.delegate = self
-        
         setDestinationText()
-        
         setNaviBar()
-        
+        setObjectDetectionView()
+        setNaviMapView()
     }
     
     // 맵 로드 이후 ui 표시
@@ -136,11 +140,18 @@ class MapViewController: UIViewController, TMapViewDelegate {
         // 경로 데이터
         getTMapAPINavigationInform()
         
-        
  
         self.mapView?.setCenter(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
     }
     
+    func setNaviMapView() {
+        mapView?.frame = CGRect(x: 0, y: 0, width: 393, height: 376)
+        mapView?.translatesAutoresizingMaskIntoConstraints = false
+        mapView?.widthAnchor.constraint(equalToConstant: 393).isActive = true
+        mapView?.heightAnchor.constraint(equalToConstant: 376).isActive = true
+        mapView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
+        mapView?.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 120).isActive = true
+    }
     
     func setObjectDetectionView() {
         objectDetectionView.frame = CGRect(x: 0, y: 0, width: 393, height: 356)
@@ -223,6 +234,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
         }
         // 새로운 위치에 마커 생성 및 추가
         currentMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLatitude, longitude: currentLongitude))
+        // 아이콘 변경
+        currentMarker?.icon = UIImage(named: "customMark")
         currentMarker?.map = mapView
     }
     
@@ -249,6 +262,10 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 marker2.map = self.mapView
                 marker2.title = "목적지"
                 self.markers.append(marker2)
+                
+                // 라인 디자인 설정
+                self.polyline?.strokeColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1)
+                self.polyline?.strokeWidth = 9
                 
                 self.polyline?.map = self.mapView
                 self.polylines.append(self.polyline!)
@@ -381,7 +398,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     // 음성안내
                     let speechText = destinationName! + "에 도착했습니다. 경로안내를 종료합니다."
                     self.queue.async {
-                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
+                        TTSModelModule.ttsModule.processTTS(type: "navi", text: speechText)
                     }
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
@@ -403,7 +420,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     // speakText(내용, 볼륨, 속도, 옵션)
                     let speechText = "여기서" + location.direction + "하세요"
                     self.queue.async {
-                        TTSModelModule.ttsModule.processTTS(type: true, text: speechText)
+                        TTSModelModule.ttsModule.processTTS(type: "navi", text: speechText)
                     }
                     print("가야하는 방향: \(location.direction)")
                     
@@ -517,6 +534,12 @@ extension MapViewController: CLLocationManagerDelegate {
 
 extension MapViewController : WebRTCManagerDelegate {
     func didRedOrGreenLight(_ text: String) {
+        if (text == "red_yl") {
+            
+        }
+        else if (text == "green_yl") {
+            
+        }
         /**
          red_yl / green_yl인지만 판별하는 코드.
          사용하려면
