@@ -388,7 +388,7 @@ extension WebRTCClient {
         self.isConnected = false
         self.peerConnection?.close()
         self.peerConnection = nil
-        print("WebRTCClient onDisConnected")
+        print("WebRTCClient disconnect")
         DispatchQueue.main.async {
             self.remoteRenderView?.isHidden = true
             self.localDataChannel = nil
@@ -489,6 +489,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
                 self.onConnected()
             }
         default:
+            self.isConnected = false
             break
 //            if self.isConnected{
 //                self.onDisConnected()
