@@ -109,6 +109,7 @@
 		57253F772C06CA8600FE2CCA /* direction.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = direction.png; sourceTree = "<group>"; };
 		57253F792C06CAD100FE2CCA /* backBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backBtn.png; sourceTree = "<group>"; };
 		57253F7B2C06CB4500FE2CCA /* direction2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = direction2.png; sourceTree = "<group>"; };
+		5739DF7B2C0CA05A00AB4ED3 /* AppleSDGothicNeoH.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppleSDGothicNeoH.ttf; path = "../../../../../../../Downloads/Apple 산돌고딕 Neo (3)/AppleSDGothicNeoH.ttf"; sourceTree = "<group>"; };
 		573D50692C06CCC5007A42B8 /* ArrivalDestinationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrivalDestinationVC.swift; sourceTree = "<group>"; };
 		573D506B2C070A7F007A42B8 /* PopUpStopNavi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpStopNavi.swift; sourceTree = "<group>"; };
 		573D506D2C078D01007A42B8 /* ObjectDetectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionVC.swift; sourceTree = "<group>"; };
@@ -232,6 +233,7 @@
 		5714A1F62BFDCD7800EBCD35 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				5739DF7B2C0CA05A00AB4ED3 /* AppleSDGothicNeoH.ttf */,
 				5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */,
 				5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */,
 				5714A1F92BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf */,

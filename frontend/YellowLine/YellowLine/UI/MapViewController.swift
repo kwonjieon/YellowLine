@@ -88,9 +88,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
     
     
-    @IBOutlet weak var redView: UIView!
-    @IBOutlet weak var greenView: UIView!
-    
     //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -397,9 +394,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     print("경로안내 종료")
                     // 음성안내
                     let speechText = destinationName! + "에 도착했습니다. 경로안내를 종료합니다."
-                    self.queue.async {
-                        TTSModelModule.ttsModule.processTTS(type: "navi", text: speechText)
-                    }
+                    tts.speakText(speechText, 1.0, 0.4, false)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
                     sendChangeToOffline()
@@ -528,14 +523,7 @@ extension MapViewController: CLLocationManagerDelegate {
 }
 
 extension MapViewController : WebRTCManagerDelegate {
-    func didRedOrGreenLight(_ text: String) {
-        print("물체text : \(text)")
-        if (text == "red_yl") {
-            
-        }
-        else if (text == "green_yl") {
-            
-        }
+    func didRedOrGreenLight(_ light: String) {
         /**
          red_yl / green_yl인지만 판별하는 코드.
          사용하려면

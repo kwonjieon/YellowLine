@@ -64,6 +64,12 @@ class CameraSession: NSObject {
         
     }
     
+    // 신호등 플래그
+    var redFlag = false
+    var greenFlag = false
+    var redCount = 0
+    var greenCount = 0
+    
     // 이걸로 CameraSession + object detection 시작
     public func startVideo() {
         setup() { [self] success in
@@ -371,10 +377,34 @@ class CameraSession: NSObject {
             }
             self.closeObjects.removeAll()
             
+            
+            
+            if self.lights.red == false {
+                self.redCount += 1
+                if(self.redCount >= 1000) {
+                    self.redFlag = false
+                    self.redCount = 0
+                }
+            }
+             if !self.lights.green {
+                 self.greenCount += 1
+                 if(self.greenCount >= 1000) {
+                     self.greenFlag = false
+                     self.greenCount = 0
+                 }
+            }
+            
             if self.lights.red {
-                TTSModelModule.ttsModule.processTTS(type: "red", text: "빨간불입니다")
-            } else if self.lights.green {
-                TTSModelModule.ttsModule.processTTS(type: "green", text: "초록불입니다")
+                if(self.redFlag == false) {
+                    TTSModelModule.ttsModule.processTTS(type: "red", text: "빨간불입니다")
+                    self.redFlag = true
+                }
+            }
+            else if self.lights.green {
+                if(self.greenFlag == false) {
+                    TTSModelModule.ttsModule.processTTS(type: "green", text: "초록불입니다")
+                    self.greenFlag = true
+                }
             }
         }
         
