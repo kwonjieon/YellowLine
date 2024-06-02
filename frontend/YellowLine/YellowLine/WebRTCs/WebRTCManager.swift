@@ -192,17 +192,17 @@ extension WebRTCManager: WebRTCClientDelegate {
         self.sendCandidate(iceCandidate: iceCandidate)
     }
     
+    
     func didConnectWebRTC() {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
-        self.socket?.disconnect()
-        self.tryToConnectWebSocket?.invalidate()
+        print("WebRTCManager didConnectedWebRTC")
         self.isSocketConnected = false
+        self.tryToConnectWebSocket?.invalidate()
+        self.socket?.disconnect()
     }
     
     func didDisConnectedWebRTC() {
-//        webRTCClient?.disconnect()
         print("WEBRTC MANAGER : didDisConnectedWebRTC")
-//        self.disconnect()
         if !self.isSocketConnected {
             self.tryToConnectWebSocket?.fire()
             startTimer()
@@ -225,7 +225,6 @@ extension WebRTCManager: WebRTCClientDelegate {
             state = "count..."
         case .disconnected:
             state = "disconnected"
-            
         case .failed:
             state = "failed"
         case .new:
