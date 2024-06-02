@@ -534,6 +534,7 @@ extension MapViewController: CLLocationManagerDelegate {
 
 extension MapViewController : WebRTCManagerDelegate {
     func didRedOrGreenLight(_ text: String) {
+        print("물체text : \(text)")
         if (text == "red_yl") {
             
         }
