@@ -57,6 +57,13 @@ class CameraSession: NSObject {
         self.cameraDevice = setupInput(w: 1280, h:720)
     }
     
+    deinit {
+        print("*CameraSession deinit")
+        mlModel = nil
+        midasModel = nil
+        
+    }
+    
     // 이걸로 CameraSession + object detection 시작
     public func startVideo() {
         setup() { [self] success in
@@ -318,7 +325,7 @@ class CameraSession: NSObject {
         // Invoke a VNRequestHandler with that image
         if currentBuffer == nil {
             currentBuffer = cvImageBuffer
-            self.semaphore.wait()
+//            self.semaphore.wait()
             let ciContext = CIContext()
             let ciImage = CIImage(cvImageBuffer: cvImageBuffer!)
                 .oriented(forExifOrientation: 6)
@@ -342,7 +349,7 @@ class CameraSession: NSObject {
                     print(error)
                 }
             }
-            self.semaphore.signal()
+//            self.semaphore.signal()
             currentBuffer = nil
         } // if end
     } // predict end
@@ -354,23 +361,21 @@ class CameraSession: NSObject {
             } else {
                 self.show(predictions: [])
             }
-        }
-        // TTS 실행.
-        if !self.closeObjects.isEmpty {
-            // 장애물이 탐지된 프레임이라면 +1
-            TTSModelModule.ttsModule.objectCounts += 1
-            self.queue.async {
-                TTSModelModule.ttsModule.processTTS(type: "Objects", text: "전방에 장애물입니다.")
+            // TTS 실행.
+            if !self.closeObjects.isEmpty {
+                // 장애물이 탐지된 프레임이라면 +1
+                TTSModelModule.ttsModule.objectCounts += 1
+                TTSModelModule.ttsModule.processTTS(type: "objects", text: "전방에 장애물입니다.")
+            } else {
+                TTSModelModule.ttsModule.objectCounts = 0
             }
-        } else {
-            TTSModelModule.ttsModule.objectCounts = 0
-        }
-        self.closeObjects.removeAll()
-
-        if lights.red {
-            TTSModelModule.ttsModule.processTTS(type: "red", text: "빨간불입니다")
-        } else if lights.green {
-            TTSModelModule.ttsModule.processTTS(type: "green", text: "초록불입니다")
+            self.closeObjects.removeAll()
+            
+            if self.lights.red {
+                TTSModelModule.ttsModule.processTTS(type: "red", text: "빨간불입니다")
+            } else if self.lights.green {
+                TTSModelModule.ttsModule.processTTS(type: "green", text: "초록불입니다")
+            }
         }
         
     }
@@ -546,6 +551,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
 //        print(CVPixelBufferGetPixelFormatType(cvImageBuffer!), CVPixelBufferGetWidth(cvImageBuffer!), CVPixelBufferGetHeight(cvImageBuffer!))
+        print("cam")
         delegate?.didWebRTCOutput(sampleBuffer)
         predict(cvImageBuffer)
     }

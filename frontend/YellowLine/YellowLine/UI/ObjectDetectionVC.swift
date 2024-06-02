@@ -21,22 +21,15 @@ class ObjectDetectionVC: UIViewController {
     // 오프라인 상태
     var mapViewController = MapViewController()
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.webRTCManager!.disconnect()
+        self.webRTCManager?.disconnect()
+        self.webRTCManager = nil
         // 도보 -> 오프라인 상태로 변경
         mapViewController.sendChangeToOffline()
+        
         self.dismiss(animated: true) {
             print("종료합니다.")
         }
     }
-    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        print("will disappear")
-//    }
-//    
-//    override func viewDidDisappear(_ animated: Bool) {
-//        print("did disappear")
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

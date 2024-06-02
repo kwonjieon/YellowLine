@@ -445,14 +445,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
     // 보호자에게 피보호자의 위치 및 목적지 정보 실시간 전송
     func sendCurrentPosition() {
-        print(self.webRTCManager!.webRTCClient.isDataChannel)
-        print("위치 정보를 보냅니다")
-        if self.webRTCManager!.webRTCClient.isDataChannel {
+        if (self.webRTCManager!.webRTCClient?.isDataChannel)! {
             let params: NaviProtectedPoint = .init(Lat: latitude, Lng: longitude, dest: destinationName!)
             do {
                 let postData = try JSONEncoder().encode(params)
                 print(postData.count)
-                self.webRTCManager!.webRTCClient.sendData(data: postData)
+                self.webRTCManager!.webRTCClient?.sendData(data: postData)
             } catch {
                 return
             }

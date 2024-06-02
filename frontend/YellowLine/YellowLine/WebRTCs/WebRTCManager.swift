@@ -18,13 +18,12 @@ protocol WebRTCManagerDelegate: AnyObject {
 
 class WebRTCManager {
     var userName: String?
-    var webRTCClient: WebRTCClient!
-    var socket: WebSocket!
-    var tryToConnectWebSocket: Timer!
+    var webRTCClient: WebRTCClient?
+    var socket: WebSocket?
+    var tryToConnectWebSocket: Timer?
     var cameraSession: CameraSession?
     var isSocketConnected = false
     var delegate: WebRTCManagerDelegate?
-    
     // 내 화면 보여주는 uiview
     var localView: UIView?
     
@@ -34,43 +33,47 @@ class WebRTCManager {
         cameraSession = CameraSession(view: uiView)
         cameraSession?.delegate = self
         webRTCClient = WebRTCClient()
-        webRTCClient.delegate = self
-        webRTCClient.cameraDevice = cameraSession!.cameraDevice
-        webRTCClient.setupWithRole(isProtector: false, uiView)
+        webRTCClient?.delegate = self
+        webRTCClient?.cameraDevice = cameraSession!.cameraDevice
+        webRTCClient?.setupWithRole(isProtector: false, uiView)
         if cameraSession?.checkCameraAuthor() == true{
             //socket 연결요청
             let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.userName!)/")!)
             socket = WebSocket(request: request)
-            socket.delegate = self
-            self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
-                if self.webRTCClient.isConnected || self.isSocketConnected {
-                    print("socket connected!")
-                    return
-                }
-                print("Request socket connect")
-                self.socket.connect()
-            })
+            socket?.delegate = self
+            startTimer()
             // 카메라 실행
             cameraSession!.startVideo()
-            
         }
     }
     
     func disconnect() {
-        self.tryToConnectWebSocket.invalidate()
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.webRTCClient.stopCapture()
+        self.tryToConnectWebSocket?.invalidate()
+        self.tryToConnectWebSocket = nil
+//        self.webRTCClient.stopCapture()
+        if (self.webRTCClient?.isConnected)! {
+            self.webRTCClient?.onDisConnected()
+        } else {
+            self.webRTCClient?.disconnect()
         }
-        self.webRTCClient.onDisConnected()
-        webRTCClient = nil
-        tryToConnectWebSocket = nil
-        cameraSession = nil
+        self.webRTCClient = nil
         if self.isSocketConnected {
-            isSocketConnected = false
-            socket = nil
+            self.isSocketConnected = false
         }
-
-        
+        self.socket = nil
+        self.cameraSession = nil
+    }
+    
+    private func startTimer() {
+        guard self.tryToConnectWebSocket == nil else { return }
+        self.tryToConnectWebSocket = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true, block: { (timer) in
+            if (self.webRTCClient?.isConnected)! || self.isSocketConnected {
+                print("socket connected!")
+                return
+            }
+            print("Request socket connect")
+            self.socket?.connect()
+        })
     }
 
 }
@@ -93,7 +96,7 @@ extension WebRTCManager {
             let message = String(data: data, encoding: String.Encoding.utf8)!
             
             if self.isSocketConnected {
-                self.socket.write(string: message)
+                self.socket?.write(string: message)
             }
         }catch{
             print(error)
@@ -108,7 +111,7 @@ extension WebRTCManager {
             let message = String(data: data, encoding: String.Encoding.utf8)!
             
             if self.isSocketConnected {
-                self.socket.write(string: message)
+                self.socket?.write(string: message)
             }
         }catch{
             print(error)
@@ -136,15 +139,15 @@ extension WebRTCManager: WebSocketDelegate {
                 let signalingMessage = message.message!
 
                 if signalingMessage.type == "offer" {
-                    webRTCClient.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
+                    webRTCClient?.receiveOffer(srcOffer: RTCSessionDescription(type: .offer, sdp: (signalingMessage.sessionDescription?.sdp)!), onSuccess: {(answerSDP: RTCSessionDescription) in
                         self.sendSDP(sessionDescription: answerSDP)
                     })
                 }else if signalingMessage.type == "answer" {
-                    webRTCClient.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
+                    webRTCClient?.receiveAnswer(descSdp: RTCSessionDescription(type: .answer, sdp: (signalingMessage.sessionDescription?.sdp)!))
                     
                 }else if signalingMessage.type == "candidate" {
                     let candidate = signalingMessage.candidate!
-                    webRTCClient.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
+                    webRTCClient?.receiveCandidate(candidate: RTCIceCandidate(sdp: candidate.sdp, sdpMLineIndex: candidate.sdpMLineIndex, sdpMid: candidate.sdpMid))
                 }
             }catch{
                 print("didReceive Error 발생")
@@ -190,10 +193,13 @@ extension WebRTCManager: WebRTCClientDelegate {
     
     func didConnectWebRTC() {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
-        self.socket.disconnect()
+        self.socket?.disconnect()
     }
     
-    func didDisConnectedWebRTC() {}
+    func didDisConnectedWebRTC() {
+//        webRTCClient?.disconnect()
+        self.disconnect()
+    }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
         var state = ""
@@ -246,6 +252,7 @@ extension WebRTCManager: CameraSessionDelegate {
             let timeStampNs: Int64 = Int64(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000000000)
             // select rotation
             let videoFrame = RTCVideoFrame(buffer: rtcpixelBuffer, rotation: RTCVideoRotation._90, timeStampNs: timeStampNs)
+            print("cam")
             self.webRTCClient?.didCaptureLocalFrame(videoFrame)
         }
         
