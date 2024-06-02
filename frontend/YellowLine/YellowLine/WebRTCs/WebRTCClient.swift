@@ -74,6 +74,7 @@ class WebRTCClient: NSObject{
     var cameraDevice: AVCaptureDevice?
     private var hasReceivedSDP = false
     
+    
 //    weak var device: AVCaptureDevice?
     public private(set) var isConnected: Bool = false
     
@@ -85,7 +86,6 @@ class WebRTCClient: NSObject{
     
     deinit {
         print("WebRTC Client Deinit")
-//        self.peerConnection = nil
     }
     
     // MARK: Setting.
@@ -103,7 +103,7 @@ class WebRTCClient: NSObject{
             setupLocalTrack()
             startCapturerLocalVideo(cameraPosition: .back)
             //
-            localRenderView = RTCEAGLVideoView()
+            localRenderView = RTCEAGLVideoView(frame: localView.frame)
             localRenderView!.delegate = self
             localView.addSubview(localRenderView!)
             localVideoTrack.add(localRenderView!)
@@ -362,13 +362,7 @@ extension WebRTCClient {
         })
         print("= END makeAnswerSDP")
     }
-    
 
-
-    //render video track data of the remote peer.
-    func renderRemoteVideo(to renderer: RTCVideoRenderer) {
-        self.remoteVideoTrack!.add(renderer)
-    }
     
     // MARK: - CONNECTION EVENT
     func onConnected() {
@@ -587,15 +581,20 @@ extension WebRTCClient: RTCVideoViewDelegate {
             print("webrtc 491 line : something wrong.")
             return
         }
-        if(isLandScape){
-            let ratio = size.width / size.height
-            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.height * ratio, height: _parentView.frame.height)
-            _renderView.center.x = _parentView.frame.width/2
-        }else{
-            let ratio = size.height / size.width
-            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.width, height: _parentView.frame.width * ratio)
-            _renderView.center.y = _parentView.frame.height/2
-        }
+        
+        print("isLandScape : \(isLandScape)")
+
+        _renderView.frame = _parentView.bounds
+//        if(isLandScape){
+//            let ratio = size.width / size.height
+//            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.height * ratio, height: _parentView.frame.height)
+//            _renderView.center.x = _parentView.frame.width/2
+//        }else{
+//            let ratio = size.height / size.width
+//            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.width, height: _parentView.frame.width)
+//            _renderView.center.y = _parentView.frame.height/2
+//        }
+        print("_renderView: \(_renderView.bounds.width), \(_renderView.bounds.height)")
     }
 }
 

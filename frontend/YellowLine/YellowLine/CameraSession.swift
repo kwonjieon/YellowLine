@@ -38,6 +38,9 @@ class CameraSession: NSObject {
     
     let useMidas = false
     
+    var localWidth: CGFloat?
+    var localHeight: CGFloat?
+    
     public var previewLayer: AVCaptureVideoPreviewLayer?
     public var midasPreviewLayer: AVCaptureVideoPreviewLayer?
     
@@ -90,7 +93,7 @@ class CameraSession: NSObject {
     
     func setup(completion: @escaping (Bool) -> Void) {
 //        mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
-        mlModel = try! yolov8v2(configuration: MLModelConfiguration()).model
+        mlModel = try! yolov8sv3(configuration: MLModelConfiguration()).model
         
         if useMidas {
             midasModel = try! MiDaS(configuration: MLModelConfiguration())
@@ -226,6 +229,7 @@ class CameraSession: NSObject {
         if !self.captureSession.isRunning {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 self?.captureSession.startRunning()
+                self?.isCapturing = true
             }
         }
     }
@@ -234,6 +238,7 @@ class CameraSession: NSObject {
         if self.captureSession.isRunning {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 self?.captureSession.stopRunning()
+                self?.isCapturing = false
             }
         }
     }
@@ -276,7 +281,7 @@ class CameraSession: NSObject {
             self?.processObservations(for: request, error: error)
         })
         // NOTE: BoundingBoxView object scaling depends on request.imageCropAndScaleOption https://developer.apple.com/documentation/vision/vnimagecropandscaleoption
-        request.imageCropAndScaleOption = .scaleFill  // .scaleFit, .scaleFill, .centerCrop
+        request.imageCropAndScaleOption = .centerCrop// .scaleFit, .scaleFill, .centerCrop
         return request
     }()
     
@@ -330,7 +335,6 @@ class CameraSession: NSObject {
             let ciImage = CIImage(cvImageBuffer: cvImageBuffer!)
                 .oriented(forExifOrientation: 6)
             originalCIImage = ciImage
-//            resizedCGImage = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 640, height: 640))
 
             lazy var midasImg = ciContext.createCGImage(ciImage, from: ciImage.extent)?.resize(size: CGSize(width: 256, height: 256))
             lazy var midasHandler = VNImageRequestHandler(cgImage: midasImg!)
@@ -441,7 +445,7 @@ class CameraSession: NSObject {
                     rect.size.height /= ratio
                 }
                 rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
-//                    depthValue = 0.0
+                //                    depthValue = 0.0
 
 //
                 var midX = rect.midX
@@ -454,7 +458,8 @@ class CameraSession: NSObject {
                 var depthValue: Float?
                 let midasX = Int(midX / width * 256)
                 let midasY = Int(midY / height * 256)
-//
+                
+
 //                    // 마이다스 이미지버퍼 상대적 좌표 지정
                 if useMidas {
                     if self.depthCIImage != nil {
@@ -555,7 +560,6 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
-//        print(CVPixelBufferGetPixelFormatType(cvImageBuffer!), CVPixelBufferGetWidth(cvImageBuffer!), CVPixelBufferGetHeight(cvImageBuffer!))
         delegate?.didWebRTCOutput(sampleBuffer)
         predict(cvImageBuffer)
     }
