@@ -51,16 +51,11 @@ class WebRTCManager {
         print("WebRTCManager: disconnect")
         self.tryToConnectWebSocket?.invalidate()
         self.tryToConnectWebSocket = nil
-//        self.webRTCClient.stopCapture()
-        if (self.webRTCClient?.isConnected)! {
-//            self.webRTCClient?.onDisConnected()
-        } else {
-            self.webRTCClient?.disconnect()
-        }
-        self.webRTCClient = nil
+        self.webRTCClient?.disconnect()
         if self.isSocketConnected {
             self.isSocketConnected = false
         }
+        self.webRTCClient = nil
         self.socket = nil
         self.cameraSession = nil
     }
@@ -76,7 +71,6 @@ class WebRTCManager {
             self.socket?.connect()
         })
     }
-
 }
 
 //MARK: - private WebRTC Signaling, RTCIceCandidate
@@ -182,7 +176,6 @@ extension WebRTCManager: WebSocketDelegate {
 
 //MARK: - WebRTCClient Delegate
 extension WebRTCManager: WebRTCClientDelegate {
-
     
     func didOpenDataChanel() {
         print("did open data channel")
@@ -197,16 +190,11 @@ extension WebRTCManager: WebRTCClientDelegate {
         //peer to peer 연결이 완료되면 socket연결은 필요없음.
         print("WebRTCManager didConnectedWebRTC")
         self.isSocketConnected = false
-        self.tryToConnectWebSocket?.invalidate()
         self.socket?.disconnect()
     }
     
     func didDisConnectedWebRTC() {
         print("WEBRTC MANAGER : didDisConnectedWebRTC")
-        if !self.isSocketConnected {
-            self.tryToConnectWebSocket?.fire()
-            startTimer()
-        }
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
