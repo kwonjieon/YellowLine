@@ -370,8 +370,10 @@ class CameraSession: NSObject {
         DispatchQueue.main.async {
             if let results = request.results as? [VNRecognizedObjectObservation] {
                 self.show(predictions: results)
+                print("is.")
             } else {
                 self.show(predictions: [])
+                print("not.")
             }
             // TTS 실행.
             if !self.closeObjects.isEmpty {
@@ -490,7 +492,6 @@ class CameraSession: NSObject {
                 rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
                 //                    depthValue = 0.0
 
-//
                 var midX = rect.midX
                 var midY = rect.midY
                 if midX < 0 { midX = 0 }
@@ -550,6 +551,7 @@ class CameraSession: NSObject {
                 
                 // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
                 //  필터링 사각형
+
                 if filtRect!.intersects(rect) {
                     if !exceptObjects.contains(bestClass) {
                         closeObjects.insert(bestClass)
@@ -560,10 +562,8 @@ class CameraSession: NSObject {
                                              label: String(format: "%@", bestClass),
                                              color: colors[bestClass] ?? UIColor.white,
                                              alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
-                }
-                
 
-                
+                }
             } else {
                 boundingBoxViews[i].hide()
             } // if prediction end...
@@ -589,10 +589,17 @@ class CameraSession: NSObject {
          let x = width * (ofs / 2)
          let y = height * (0.97 - ofs)
          */
-        let widthLen = w * (1 - ofs)
-        let heightLen = h * ofs
-        let x = w * (ofs / 2)
+//        let widthLen = w * (1 - ofs)
+//        let heightLen = h * ofs
+//        let x = w * (ofs / 2)
+//        let y = h * (0.97 - ofs)
+        
+        let ofs = 0.2
+        let widthLen = w * (1 - ofs) - 80
+        let heightLen = h * (ofs)
+        let x = w * (ofs / 2) + 40
         let y = h * (0.97 - ofs)
+        
         return CGRect(origin: CGPoint(x: x, y: y), size: CGSize(width: widthLen, height: heightLen))
     }
 }
