@@ -27,12 +27,7 @@ class LoginVC: UIViewController {
         }
     }
 
-    // 임시 물체탐지 버튼 클릭
-    @IBAction func clickLoginBtnProtect(_ sender: Any) {
-        guard let nextVC = self.storyboard?.instantiateViewController(identifier: "ViewController") else {return}
-        nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        self.present(nextVC, animated: true)
-    }
+
     
     @IBAction func clickRegisterBtn(_ sender: Any) {
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "RegisterVC") else {return}
@@ -117,12 +112,14 @@ class LoginVC: UIViewController {
         PWField.clearButtonMode = .always
         // 키보드 입력시 엔터키 표출
         PWField.returnKeyType = .done
+        PWField.frame.size.height = 44
     }
     
     func setIDField() {
         IDField.placeholder = "아이디"
         IDField.clearButtonMode = .always
         IDField.returnKeyType = .done
+        IDField.frame.size.height = 44
     }
     
     

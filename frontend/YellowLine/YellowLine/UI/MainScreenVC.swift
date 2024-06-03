@@ -9,6 +9,29 @@ import UIKit
 import Alamofire
 class MainScreenVC: UIViewController {
     var userID: String?
+    
+    @IBOutlet weak var naviView: UIView!
+    @IBOutlet weak var objectView: UIView!
+    
+    @IBOutlet weak var naviTitleLabel: UILabel!
+    @IBOutlet weak var naviDescLabel: UILabel!
+    
+    @IBOutlet weak var objectTitleLabel: UILabel!
+    @IBOutlet weak var objectDescLabel: UILabel!
+    
+    @IBOutlet weak var title1: UILabel!
+    @IBOutlet weak var title2: UILabel!
+    @IBOutlet weak var designView: UIView!
+    
+
+    @IBOutlet weak var logoutBtn: UIButton!
+    @IBAction func clickLogoutBtn(_ sender: Any) {
+        self.dismiss(animated: true)
+    }
+    
+    @IBOutlet weak var naviIcon: UIImageView!
+    @IBOutlet weak var objectIcon: UIImageView!
+    
     // 네비게이션 버튼 클릭 시 실행되는 함수
     @objc func clickNaviBtn(_ gesture: UITapGestureRecognizer) {
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "SearchDestinationViewController") else {return}
@@ -44,207 +67,148 @@ class MainScreenVC: UIViewController {
         }
     }
     
-    lazy var naviBtn: UIView = {
-        let view = UIView()
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickNaviBtn(_:)))
-        view.addGestureRecognizer(tapGesture)
-        view.isUserInteractionEnabled = true
-        view.frame = CGRect(x: 0, y: 0, width: 356, height: 149)
-        
-        var shadows = UIView()
-        shadows.frame = view.frame
-        shadows.clipsToBounds = false
-        view.addSubview(shadows)
 
-        let shadowPath0 = UIBezierPath(roundedRect: shadows.bounds, cornerRadius: 20)
-        let layer0 = CALayer()
-        layer0.shadowPath = shadowPath0.cgPath
-        layer0.shadowColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.25).cgColor
-        layer0.shadowOpacity = 1
-        layer0.shadowRadius = 25
-        layer0.shadowOffset = CGSize(width: 0, height: 0)
-        layer0.bounds = shadows.bounds
-        layer0.position = shadows.center
-        shadows.layer.addSublayer(layer0)
-
-        var shapes = UIView()
-        shapes.frame = view.frame
-        shapes.clipsToBounds = true
-        view.addSubview(shapes)
-
-        let layer1 = CALayer()
-        layer1.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
-        layer1.bounds = shapes.bounds
-        layer1.position = shapes.center
-        shapes.layer.addSublayer(layer1)
-
-        shapes.layer.cornerRadius = 20
-        
-        let title = UILabel()
-        title.frame = CGRect(x: 0, y: 0, width: 63, height: 22)
-        title.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
-        title.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 24)
-        var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 0.66
-
-        title.textAlignment = .center
-        title.attributedText = NSMutableAttributedString(string: "길찾기", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-
-        view.addSubview(title)
-        title.translatesAutoresizingMaskIntoConstraints = false
-        title.widthAnchor.constraint(equalToConstant: 63).isActive = true
-        title.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        title.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 152).isActive = true
-        title.topAnchor.constraint(equalTo: view.topAnchor, constant: 28).isActive = true
-
-        
-        let description = UILabel()
-        description.frame = CGRect(x: 0, y: 0, width: 284, height: 46)
-        description.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
-        description.font = UIFont(name: "AppleSDGothicNeoL00-Regular", size: 18)
-        description.numberOfLines = 0
-        description.lineBreakMode = .byWordWrapping
-        paragraphStyle.lineHeightMultiple = 0.96
-
-        description.textAlignment = .center
-        description.attributedText = NSMutableAttributedString(string: "보행시 위험한 물체가 있는지 확인하면서\n음성 안내와 함께 길을 안내해드려요.", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-        
-        view.addSubview(description)
-        description.translatesAutoresizingMaskIntoConstraints = false
-        description.widthAnchor.constraint(equalToConstant: 284).isActive = true
-        description.heightAnchor.constraint(equalToConstant: 46).isActive = true
-        description.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 35).isActive = true
-        description.topAnchor.constraint(equalTo: view.topAnchor, constant: 68).isActive = true
-    
-        return view
-    }()
-    
-    lazy var objectDetectBtn: UIView = {
-        let view = UIView()
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickobjectDetectBtn(_:)))
-        view.addGestureRecognizer(tapGesture)
-        view.isUserInteractionEnabled = true
-        
-        view.frame = CGRect(x: 0, y: 0, width: 356, height: 149)
-        var shadows = UIView()
-        shadows.frame = view.frame
-        shadows.clipsToBounds = false
-        view.addSubview(shadows)
-
-        let shadowPath0 = UIBezierPath(roundedRect: shadows.bounds, cornerRadius: 20)
-        let layer0 = CALayer()
-        layer0.shadowPath = shadowPath0.cgPath
-        layer0.shadowColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.25).cgColor
-        layer0.shadowOpacity = 1
-        layer0.shadowRadius = 25
-        layer0.shadowOffset = CGSize(width: 0, height: 0)
-        layer0.bounds = shadows.bounds
-        layer0.position = shadows.center
-        shadows.layer.addSublayer(layer0)
-
-        var shapes = UIView()
-        shapes.frame = view.frame
-        shapes.clipsToBounds = true
-        view.addSubview(shapes)
-
-        let layer1 = CALayer()
-        layer1.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1).cgColor
-        layer1.bounds = shapes.bounds
-        layer1.position = shapes.center
-        shapes.layer.addSublayer(layer1)
-
-        shapes.layer.cornerRadius = 20
-
-        
-        var title = UILabel()
-        title.frame = CGRect(x: 0, y: 0, width: 158, height: 22)
-        title.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
-        title.font = UIFont(name: "AppleSDGothicNeoB00-Regular", size: 24)
-        
-        var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 0.66
-
-        title.textAlignment = .center
-        title.attributedText = NSMutableAttributedString(string: "위험한 물체 탐색", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-
-        view.addSubview(title)
-        title.translatesAutoresizingMaskIntoConstraints = false
-        title.widthAnchor.constraint(equalToConstant: 158).isActive = true
-        title.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        title.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 99).isActive = true
-        title.topAnchor.constraint(equalTo: view.topAnchor, constant: 28).isActive = true
-        
-        var description = UILabel()
-        description.frame = CGRect(x: 0, y: 0, width: 202, height: 46)
-        description.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
-        description.font = UIFont(name: "AppleSDGothicNeoL00-Regular", size: 18)
-        description.numberOfLines = 0
-        description.lineBreakMode = .byWordWrapping
-        
-        paragraphStyle.lineHeightMultiple = 0.96
-        // Line height: 22 pt
-        
-        description.textAlignment = .center
-        description.attributedText = NSMutableAttributedString(string: "보행시 위험한 물체가 있는지\n확인해 드려요.", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-
-        view.addSubview(description)
-        description.translatesAutoresizingMaskIntoConstraints = false
-        description.widthAnchor.constraint(equalToConstant: 202).isActive = true
-        description.heightAnchor.constraint(equalToConstant: 46).isActive = true
-        description.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 75).isActive = true
-        description.topAnchor.constraint(equalTo: view.topAnchor, constant: 68).isActive = true
-        
-        return view
-    }()
-    
-    lazy var titleLabel: UILabel = {
-        var view = UILabel()
-        view.frame = CGRect(x: 0, y: 0, width: 172, height: 22)
-        view.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        view.font = UIFont(name: "AppleSDGothicNeoH00", size: 32)
-        var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1
-        // Line height: 22 pt
-        // (identical to box height)
-        view.textAlignment = .center
-        view.attributedText = NSMutableAttributedString(string: "Yellow Line", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
-
-        
-        return view
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
+        self.view.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
         
-        // 길찾기 버튼 위치세팅
-        self.view.addSubview(naviBtn)
+        setNaviView()
+        setObjectView()
+        setTitle1()
+        setTitle2()
+        design()
+        setIcon()
+        setLogout()
+    }
+    
+    func setNaviView() {
+        naviView.frame = CGRect(x: 0, y: 0, width: 356, height: 134)
+        naviView.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
+        naviView.layer.cornerRadius = 20
 
-        naviBtn.translatesAutoresizingMaskIntoConstraints = false
-        naviBtn.widthAnchor.constraint(equalToConstant: 356).isActive = true
-        naviBtn.heightAnchor.constraint(equalToConstant: 149).isActive = true
+        naviView.translatesAutoresizingMaskIntoConstraints = false
+        naviView.widthAnchor.constraint(equalToConstant: 356).isActive = true
+        naviView.heightAnchor.constraint(equalToConstant: 134).isActive = true
+        naviView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 18).isActive = true
+        naviView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 504).isActive = true
         
-        naviBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 19).isActive = true
-        naviBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 483).isActive = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickNaviBtn(_:)))
+        naviView.addGestureRecognizer(tapGesture)
+        naviView.isUserInteractionEnabled = true
         
-        // 위험한 물체 탐색 버튼 위치세팅
-        self.view.addSubview(objectDetectBtn)
+        naviTitleLabel.text = "길찾기"
+        naviTitleLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        naviTitleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 21)
+        naviTitleLabel.textAlignment = .center
 
-        objectDetectBtn.translatesAutoresizingMaskIntoConstraints = false
-        objectDetectBtn.widthAnchor.constraint(equalToConstant: 356).isActive = true
-        objectDetectBtn.heightAnchor.constraint(equalToConstant: 149).isActive = true
+        naviTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        naviTitleLabel.leadingAnchor.constraint(equalTo: naviView.leadingAnchor, constant: 106).isActive = true
+        naviTitleLabel.topAnchor.constraint(equalTo: naviView.topAnchor, constant: 41).isActive = true
         
-        objectDetectBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 19).isActive = true
-        objectDetectBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 653).isActive = true
+        naviDescLabel.text = "길 안내 및 위험한 물체 확인 서비스"
+        naviDescLabel.textColor = UIColor(red: 0.21, green: 0.21, blue: 0.21, alpha: 1)
+        naviDescLabel.font = UIFont(name: "AppleSDGothicNeo-Light", size: 17)
+        naviDescLabel.textAlignment = .center
+
+        naviDescLabel.translatesAutoresizingMaskIntoConstraints = false
+        naviDescLabel.leadingAnchor.constraint(equalTo: naviView.leadingAnchor, constant: 106).isActive = true
+        naviDescLabel.topAnchor.constraint(equalTo: naviView.topAnchor, constant: 70).isActive = true
+    }
+    
+    func setObjectView() {
+        objectView.frame = CGRect(x: 0, y: 0, width: 356, height: 134)
+        objectView.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
+        objectView.layer.cornerRadius = 20
+
+        objectView.translatesAutoresizingMaskIntoConstraints = false
+        objectView.widthAnchor.constraint(equalToConstant: 356).isActive = true
+        objectView.heightAnchor.constraint(equalToConstant: 134).isActive = true
+        objectView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 18).isActive = true
+        objectView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 658).isActive = true
         
-        // 타이틀
-        self.view.addSubview(titleLabel)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.widthAnchor.constraint(equalToConstant: 172).isActive = true
-        titleLabel.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 110).isActive = true
-        titleLabel.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 213).isActive = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickobjectDetectBtn(_:)))
+        objectView.addGestureRecognizer(tapGesture)
+        objectView.isUserInteractionEnabled = true
+        
+        
+        objectTitleLabel.text = "안전보행"
+        objectTitleLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        objectTitleLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: 21)
+        objectTitleLabel.textAlignment = .center
+
+        objectTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        objectTitleLabel.leadingAnchor.constraint(equalTo: objectView.leadingAnchor, constant: 106).isActive = true
+        objectTitleLabel.topAnchor.constraint(equalTo: objectView.topAnchor, constant: 41).isActive = true
+        
+        objectDescLabel.text = "보행 중 위험한 물체 확인 서비스"
+        objectDescLabel.textColor = UIColor(red: 0.21, green: 0.21, blue: 0.21, alpha: 1)
+        objectDescLabel.font = UIFont(name: "AppleSDGothicNeo-Light", size: 17)
+        objectDescLabel.textAlignment = .center
+
+        objectDescLabel.translatesAutoresizingMaskIntoConstraints = false
+        objectDescLabel.leadingAnchor.constraint(equalTo: objectView.leadingAnchor, constant: 106).isActive = true
+        objectDescLabel.topAnchor.constraint(equalTo: objectView.topAnchor, constant: 66).isActive = true
+    }
+    
+    func setTitle1() {
+        title1.text = "Yellow"
+        title1.textColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1)
+        title1.font = UIFont(name: "AppleSDGothicNeoH00", size: 80)
+        title1.textAlignment = .center
+
+        title1.translatesAutoresizingMaskIntoConstraints = false
+        title1.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30).isActive = true
+        title1.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 159).isActive = true
+    }
+    
+    func setTitle2() {
+        title2.text = "Line"
+        title2.textColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1)
+        title2.font = UIFont(name: "AppleSDGothicNeoH00", size: 80)
+        title2.textAlignment = .center
+
+        title2.translatesAutoresizingMaskIntoConstraints = false
+        title2.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 34).isActive = true
+        title2.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 223).isActive = true
+    }
+    
+    func design() {
+        designView.frame = CGRect(x: 0, y: 0, width: 172, height: 39)
+        designView.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
+
+        designView.translatesAutoresizingMaskIntoConstraints = false
+        designView.widthAnchor.constraint(equalToConstant: 172).isActive = true
+        designView.heightAnchor.constraint(equalToConstant: 39).isActive = true
+        designView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 32).isActive = true
+        designView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 240).isActive = true
+    }
+    
+    func setIcon() {
+        naviIcon.frame = CGRect(x: 0, y: 0, width: 84, height: 84)
+        naviIcon.translatesAutoresizingMaskIntoConstraints = false
+        naviIcon.widthAnchor.constraint(equalToConstant: 84).isActive = true
+        naviIcon.heightAnchor.constraint(equalToConstant: 84).isActive = true
+        naviIcon.leadingAnchor.constraint(equalTo: naviView.leadingAnchor, constant: 12).isActive = true
+        naviIcon.topAnchor.constraint(equalTo: naviView.topAnchor, constant: 25).isActive = true
+        
+        objectIcon.frame = CGRect(x: 0, y: 0, width: 84, height: 84)
+        objectIcon.translatesAutoresizingMaskIntoConstraints = false
+        objectIcon.widthAnchor.constraint(equalToConstant: 84).isActive = true
+        objectIcon.heightAnchor.constraint(equalToConstant: 84).isActive = true
+        objectIcon.leadingAnchor.constraint(equalTo: objectView.leadingAnchor, constant: 12).isActive = true
+        objectIcon.topAnchor.constraint(equalTo: objectView.topAnchor, constant: 25).isActive = true
+    }
+    
+    func setLogout() {
+        logoutBtn.frame = CGRect(x: 0, y: 0, width: 82, height: 31)
+        logoutBtn.layer.backgroundColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1).cgColor
+        logoutBtn.layer.cornerRadius = 10
+
+        logoutBtn.translatesAutoresizingMaskIntoConstraints = false
+        logoutBtn.widthAnchor.constraint(equalToConstant: 82).isActive = true
+        logoutBtn.heightAnchor.constraint(equalToConstant: 31).isActive = true
+        logoutBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 292).isActive = true
+        logoutBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 59).isActive = true
+        logoutBtn.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
     }
 }

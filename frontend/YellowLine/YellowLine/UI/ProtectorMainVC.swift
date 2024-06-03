@@ -11,6 +11,13 @@ import Alamofire
 class ProtectorMainVC: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var relationBtn: UIButton!
+    
+    
+    @IBOutlet weak var logoutBtn: UIButton!
+    @IBAction func clickLogoutBtn(_ sender: Any) {
+        self.dismiss(animated: true)
+    }
+    
     @IBAction func clickRelationBtn(_ sender: Any) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpRelationTextField") as! PopUpRelationTextField
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
@@ -36,6 +43,8 @@ class ProtectorMainVC: UIViewController {
         
         protectedTableView.backgroundColor = UIColor(red: 0.902, green: 0.902, blue: 0.902, alpha: 1)
         self.view.backgroundColor = UIColor(red: 0.902, green: 0.902, blue: 0.902, alpha: 1)
+        
+        setLogout()
     }
     
     // 피보호자 리스트 불러오기
@@ -122,6 +131,21 @@ class ProtectorMainVC: UIViewController {
                 }
             }
         } //Alamofire request end...
+    }
+    
+    func setLogout() {
+        logoutBtn.frame = CGRect(x: 0, y: 0, width: 82, height: 29)
+        logoutBtn.layer.backgroundColor = UIColor(red: 0.592, green: 0.633, blue: 1, alpha: 1).cgColor
+        logoutBtn.layer.cornerRadius = 10
+
+        logoutBtn.translatesAutoresizingMaskIntoConstraints = false
+        logoutBtn.widthAnchor.constraint(equalToConstant: 82).isActive = true
+        logoutBtn.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        logoutBtn.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 294).isActive = true
+        logoutBtn.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 63).isActive = true
+        
+        logoutBtn.titleLabel!.text = "Logout"
+        logoutBtn.tintColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1)
     }
     
     func setRelationBtn() {

@@ -88,9 +88,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
     var protectedId: String?            // 피보호자 아이디 정보가 필요합니다.
     
     
-    @IBOutlet weak var redView: UIView!
-    @IBOutlet weak var greenView: UIView!
-    
     //MARK: - Definition Funcs
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -254,13 +251,16 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
             DispatchQueue.main.async {
                 let marker1 = TMapMarker(position: startPoint)
-                marker1.map = self.mapView
                 marker1.title = "출발지"
+                marker1.icon = UIImage(named: "startIcon")
+                marker1.offset = CGSize(width: 36, height: 51)
+                marker1.map = self.mapView
                 self.markers.append(marker1)
                 
                 let marker2 = TMapMarker(position: endPoint)
-                marker2.map = self.mapView
                 marker2.title = "목적지"
+                marker2.icon = UIImage(named: "arriveIcon")
+                marker2.map = self.mapView
                 self.markers.append(marker2)
                 
                 // 라인 디자인 설정
@@ -355,12 +355,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
                                 }
                                 self.pointerDataList.append(inputData)
                                 
+                                /*
                                 DispatchQueue.main.async {
                                     // 임시 좌/우 회전 포인터 마커들 표기
                                     let pointMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: inputData.latitude, longitude: inputData.longitude))
                                     pointMarker.map = self.mapView
                                     self.pointMarkers.append(pointMarker)
                                 }
+                                 */
                             }
                         case .twoDimensional(let array): break
                         }
@@ -397,9 +399,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
                     print("경로안내 종료")
                     // 음성안내
                     let speechText = destinationName! + "에 도착했습니다. 경로안내를 종료합니다."
-                    self.queue.async {
-                        TTSModelModule.ttsModule.processTTS(type: "navi", text: speechText)
-                    }
+                    tts.speakText(speechText, 1.0, 0.4, false)
                     
                     // 서버에 피보호자의 경로안내가 끝났다고 status를 업데이트
                     sendChangeToOffline()
@@ -528,14 +528,7 @@ extension MapViewController: CLLocationManagerDelegate {
 }
 
 extension MapViewController : WebRTCManagerDelegate {
-    func didRedOrGreenLight(_ text: String) {
-        print("물체text : \(text)")
-        if (text == "red_yl") {
-            
-        }
-        else if (text == "green_yl") {
-            
-        }
+    func didRedOrGreenLight(_ light: String) {
         /**
          red_yl / green_yl인지만 판별하는 코드.
          사용하려면

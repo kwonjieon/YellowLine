@@ -28,6 +28,8 @@
 		57253F782C06CA8600FE2CCA /* direction.png in Resources */ = {isa = PBXBuildFile; fileRef = 57253F772C06CA8600FE2CCA /* direction.png */; };
 		57253F7A2C06CAD100FE2CCA /* backBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 57253F792C06CAD100FE2CCA /* backBtn.png */; };
 		57253F7C2C06CB4500FE2CCA /* direction2.png in Resources */ = {isa = PBXBuildFile; fileRef = 57253F7B2C06CB4500FE2CCA /* direction2.png */; };
+		5739DF7E2C0D4B8200AB4ED3 /* ObjectIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5739DF7C2C0D4B8200AB4ED3 /* ObjectIcon.png */; };
+		5739DF7F2C0D4B8200AB4ED3 /* naviIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5739DF7D2C0D4B8200AB4ED3 /* naviIcon.png */; };
 		573D506A2C06CCC5007A42B8 /* ArrivalDestinationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D50692C06CCC5007A42B8 /* ArrivalDestinationVC.swift */; };
 		573D506C2C070A7F007A42B8 /* PopUpStopNavi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D506B2C070A7F007A42B8 /* PopUpStopNavi.swift */; };
 		573D506E2C078D01007A42B8 /* ObjectDetectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573D506D2C078D01007A42B8 /* ObjectDetectionVC.swift */; };
@@ -46,6 +48,8 @@
 		5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BB2BF347230013D6CF /* LocationData.swift */; };
 		5788A8BF2BF455550013D6CF /* MainScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8BE2BF455550013D6CF /* MainScreenVC.swift */; };
 		5788A8C12BF5F19E0013D6CF /* SearchDestinationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5788A8C02BF5F19E0013D6CF /* SearchDestinationVC.swift */; };
+		57C76D402C0D4FA0002C9E5D /* startIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 57C76D3E2C0D4FA0002C9E5D /* startIcon.png */; };
+		57C76D412C0D4FA0002C9E5D /* arriveIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 57C76D3F2C0D4FA0002C9E5D /* arriveIcon.png */; };
 		57D2E0822C0C127B00AE680E /* currentMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 57D2E0812C0C127B00AE680E /* currentMark.png */; };
 		57D2E08A2C0C16EA00AE680E /* customMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 57D2E0892C0C16EA00AE680E /* customMark.png */; };
 		57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */; };
@@ -108,6 +112,9 @@
 		57253F772C06CA8600FE2CCA /* direction.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = direction.png; sourceTree = "<group>"; };
 		57253F792C06CAD100FE2CCA /* backBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backBtn.png; sourceTree = "<group>"; };
 		57253F7B2C06CB4500FE2CCA /* direction2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = direction2.png; sourceTree = "<group>"; };
+		5739DF7B2C0CA05A00AB4ED3 /* AppleSDGothicNeoH.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppleSDGothicNeoH.ttf; path = "../../../../../../../Downloads/Apple 산돌고딕 Neo (3)/AppleSDGothicNeoH.ttf"; sourceTree = "<group>"; };
+		5739DF7C2C0D4B8200AB4ED3 /* ObjectIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ObjectIcon.png; sourceTree = "<group>"; };
+		5739DF7D2C0D4B8200AB4ED3 /* naviIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = naviIcon.png; sourceTree = "<group>"; };
 		573D50692C06CCC5007A42B8 /* ArrivalDestinationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrivalDestinationVC.swift; sourceTree = "<group>"; };
 		573D506B2C070A7F007A42B8 /* PopUpStopNavi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpStopNavi.swift; sourceTree = "<group>"; };
 		573D506D2C078D01007A42B8 /* ObjectDetectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionVC.swift; sourceTree = "<group>"; };
@@ -126,6 +133,8 @@
 		5788A8BB2BF347230013D6CF /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		5788A8BE2BF455550013D6CF /* MainScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenVC.swift; sourceTree = "<group>"; };
 		5788A8C02BF5F19E0013D6CF /* SearchDestinationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationVC.swift; sourceTree = "<group>"; };
+		57C76D3E2C0D4FA0002C9E5D /* startIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = startIcon.png; sourceTree = "<group>"; };
+		57C76D3F2C0D4FA0002C9E5D /* arriveIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arriveIcon.png; sourceTree = "<group>"; };
 		57D2E0812C0C127B00AE680E /* currentMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = currentMark.png; path = ../../../../../../../Downloads/currentMark.png; sourceTree = "<group>"; };
 		57D2E0892C0C16EA00AE680E /* customMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = customMark.png; sourceTree = "<group>"; };
 		57FC784B2BC3BE5700C81CA1 /* SearchDestinationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDestinationViewController.swift; sourceTree = "<group>"; };
@@ -228,6 +237,7 @@
 		5714A1F62BFDCD7800EBCD35 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				5739DF7B2C0CA05A00AB4ED3 /* AppleSDGothicNeoH.ttf */,
 				5714A1FF2BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf */,
 				5714A1FA2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf */,
 				5714A1F92BFDCFEC00EBCD35 /* AppleSDGothicNeoEB.ttf */,
@@ -279,6 +289,10 @@
 		5788A8C22BF6151D0013D6CF /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				57C76D3F2C0D4FA0002C9E5D /* arriveIcon.png */,
+				57C76D3E2C0D4FA0002C9E5D /* startIcon.png */,
+				5739DF7D2C0D4B8200AB4ED3 /* naviIcon.png */,
+				5739DF7C2C0D4B8200AB4ED3 /* ObjectIcon.png */,
 				57D2E0892C0C16EA00AE680E /* customMark.png */,
 				57D2E0812C0C127B00AE680E /* currentMark.png */,
 				B9A53B012C09ED8F00C1F155 /* addRelationBtn.png */,
@@ -400,6 +414,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5709DFFC2BB13E9300553A23 /* Assets.xcassets in Resources */,
+				57C76D402C0D4FA0002C9E5D /* startIcon.png in Resources */,
+				5739DF7F2C0D4B8200AB4ED3 /* naviIcon.png in Resources */,
 				5714A1F52BFDC82A00EBCD35 /* backButton.png in Resources */,
 				5709DFFF2BB13E9300553A23 /* Base in Resources */,
 				570FC2042BF6D4AC00F03378 /* search-icon.png in Resources */,
@@ -416,6 +432,8 @@
 				57253F7C2C06CB4500FE2CCA /* direction2.png in Resources */,
 				5714A1FE2BFDCFEC00EBCD35 /* AppleSDGothicNeoB.ttf in Resources */,
 				57253F7A2C06CAD100FE2CCA /* backBtn.png in Resources */,
+				57C76D412C0D4FA0002C9E5D /* arriveIcon.png in Resources */,
+				5739DF7E2C0D4B8200AB4ED3 /* ObjectIcon.png in Resources */,
 				573D50742C087735007A42B8 /* backBtnWhite.png in Resources */,
 				5714A2002BFDD10900EBCD35 /* AppleSDGothicNeoM.ttf in Resources */,
 			);
