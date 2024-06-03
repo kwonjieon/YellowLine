@@ -119,7 +119,7 @@ class MapViewController: UIViewController, TMapViewDelegate {
         webRTCManager?.delegate = self
         setDestinationText()
         setNaviBar()
-        setObjectDetectionView()
+        //setObjectDetectionView()
         setNaviMapView()
     }
     

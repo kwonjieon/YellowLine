@@ -16,7 +16,7 @@ fileprivate let _signaling = "ws://43.202.136.75:8001/yl/ws/sock/"
 fileprivate let defaultIceServers = ["stun:stun.l.google.com:19302",
                                      "stun:stun1.l.google.com:19302",
                                      "stun:stun2.l.google.com:19302",]
-fileprivate let _mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
+fileprivate let _mlModel = try! yolov8sv3(configuration: MLModelConfiguration()).model
 // ai 모델
 fileprivate let _midasModel = try! MiDaS()
 struct Config {
