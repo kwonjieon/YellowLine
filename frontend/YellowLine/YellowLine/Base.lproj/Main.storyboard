@@ -231,11 +231,21 @@
                                     <action selector="clickRelationBtn:" destination="gQy-ox-PYk" eventType="touchUpInside" id="Bbs-2t-YgU"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iSp-Ah-Kg4">
+                                <rect key="frame" x="299" y="50" width="78" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Logout"/>
+                                <connections>
+                                    <action selector="clickLogoutBtn:" destination="gQy-ox-PYk" eventType="touchUpInside" id="hiu-YA-AME"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="17b-PC-3nD"/>
                         <color key="backgroundColor" name="ContentColor"/>
                     </view>
                     <connections>
+                        <outlet property="logoutBtn" destination="iSp-Ah-Kg4" id="AQU-Is-lgv"/>
                         <outlet property="navigationBar" destination="Onk-bZ-Txh" id="3La-Cu-est"/>
                         <outlet property="protectedTableView" destination="8j6-fE-ENs" id="4Pu-N0-JF8"/>
                         <outlet property="relationBtn" destination="vBg-xX-5Os" id="5UH-SD-rXu"/>
@@ -590,6 +600,10 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="naviIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="rtE-ST-idN">
+                                        <rect key="frame" x="13" y="34" width="70" height="60"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemGray2Color"/>
                             </view>
@@ -611,6 +625,10 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="ObjectIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="bcb-PW-Mai">
+                                        <rect key="frame" x="8" y="26" width="70" height="60"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemGray2Color"/>
                             </view>
@@ -628,16 +646,28 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5YC-F4-qWA">
+                                <rect key="frame" x="301" y="36" width="78" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Logout"/>
+                                <connections>
+                                    <action selector="clickLogoutBtn:" destination="qZy-kp-fdV" eventType="touchUpInside" id="Kvj-Gc-cEF"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6RG-wn-rf1"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
                         <outlet property="designView" destination="PQz-0l-9y4" id="ztg-4T-yY5"/>
+                        <outlet property="logoutBtn" destination="5YC-F4-qWA" id="llu-eM-wi1"/>
                         <outlet property="naviDescLabel" destination="2mT-hv-LB4" id="eCE-1X-M7d"/>
+                        <outlet property="naviIcon" destination="rtE-ST-idN" id="FCQ-QR-eTA"/>
                         <outlet property="naviTitleLabel" destination="qiA-Su-AKw" id="Rbp-Rj-WDb"/>
                         <outlet property="naviView" destination="rC8-pk-HLB" id="zdH-vg-z0Z"/>
                         <outlet property="objectDescLabel" destination="y33-eN-ffm" id="xvh-cI-Djc"/>
+                        <outlet property="objectIcon" destination="bcb-PW-Mai" id="0E0-ij-J4U"/>
                         <outlet property="objectTitleLabel" destination="OxS-0m-VGa" id="Qns-gx-Eqw"/>
                         <outlet property="objectView" destination="UVE-11-Z9Z" id="vco-71-K0J"/>
                         <outlet property="title1" destination="krb-iK-4g5" id="gQZ-Vo-CSj"/>
@@ -1057,16 +1087,16 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" alignment="center" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="hW2-nN-Pw0">
-                                        <rect key="frame" x="49" y="65" width="150" height="43"/>
+                                        <rect key="frame" x="49" y="65" width="149.66666666666666" height="44.333333333333343"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="목적지에 도착했어요!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vwv-MT-8ey">
-                                                <rect key="frame" x="0.0" y="0.0" width="150" height="21"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="149.66666666666666" height="21.666666666666668"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeoL00" family="AppleSDGothicNeoL00" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="안내를 종료합니다." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mbb-JE-Ldi">
-                                                <rect key="frame" x="7.6666666666666714" y="22" width="134.66666666666663" height="21"/>
+                                                <rect key="frame" x="8.3333333333333286" y="22.666666666666686" width="133.33333333333337" height="21.666666666666671"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeoL00" family="AppleSDGothicNeoL00" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -1111,11 +1141,13 @@
         </scene>
     </scenes>
     <resources>
+        <image name="ObjectIcon.png" width="84" height="84"/>
         <image name="addRelationBtn.png" width="80" height="80"/>
         <image name="backBtnWhite.png" width="12" height="20"/>
         <image name="backButton.png" width="12" height="20"/>
         <image name="direction2.png" width="18" height="16"/>
         <image name="directionWhite.png" width="18" height="16"/>
+        <image name="naviIcon.png" width="84" height="84"/>
         <namedColor name="AccentColor">
             <color red="1" green="0.84313725490196079" blue="0.43529411764705883" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
@@ -1126,13 +1158,13 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemCyanColor">
-            <color red="0.1960784314" green="0.67843137249999996" blue="0.90196078430000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.19607843137254902" green="0.67843137254901964" blue="0.90196078431372551" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray2Color">
-            <color red="0.68235294120000001" green="0.68235294120000001" blue="0.69803921570000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemPinkColor">
-            <color red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

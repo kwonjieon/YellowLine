@@ -67,8 +67,10 @@ class CameraSession: NSObject {
     // 신호등 플래그
     var redFlag = false
     var greenFlag = false
-    var redCount = 0
-    var greenCount = 0
+    var redCool = 0
+    var greenCool = 0
+    var redCnt = 0
+    var greenCnt = 0
     
     // 이걸로 CameraSession + object detection 시작
     public func startVideo() {
@@ -377,37 +379,48 @@ class CameraSession: NSObject {
             }
             self.closeObjects.removeAll()
             
-            
-            
-            if self.lights.red == false {
-                self.redCount += 1
-                if(self.redCount >= 1000) {
-                    self.redFlag = false
-                    self.redCount = 0
-                }
-            }
-             if !self.lights.green {
-                 self.greenCount += 1
-                 if(self.greenCount >= 1000) {
-                     self.greenFlag = false
-                     self.greenCount = 0
-                 }
-            }
-            
+            // 빨간불을 기다리는 동안은 안내가 한번만 나오게 설정
+            // 빨간불이 10초동안 탐지되지 않아야, 빨간불을 봤을때 바로 tts 안내 가능
             if self.lights.red {
                 if(self.redFlag == false) {
-                    TTSModelModule.ttsModule.processTTS(type: "red", text: "빨간불입니다")
-                    self.redFlag = true
+                    self.redCnt += 1
+                    if (self.redCnt >= 10) {
+                        TTSModelModule.ttsModule.speakTTS(text: "빨간불입니다")
+                        self.redFlag = true
+                        self.redCool = 0
+                        self.redCnt = 0
+                        self.greenCnt = 0
+                    }
                 }
             }
-            else if self.lights.green {
+            else if !self.lights.red {
+                self.redCool += 1
+                if(self.redCool >= 500) {
+                    self.redFlag = false
+                    self.redCool = 0
+                }
+            }
+            
+            if self.lights.green {
                 if(self.greenFlag == false) {
-                    TTSModelModule.ttsModule.processTTS(type: "green", text: "초록불입니다")
-                    self.greenFlag = true
+                    self.greenCnt += 1
+                    if (self.greenCnt >= 8) {
+                        TTSModelModule.ttsModule.speakTTS(text: "초록불입니다")
+                        self.greenFlag = true
+                        self.greenCool = 0
+                        self.greenCnt = 0
+                        self.redCnt = 0
+                    }
+                }
+            }
+            else if !self.lights.green {
+                self.greenCool += 1
+                if(self.greenCool >= 500) {
+                    self.greenFlag = false
+                    self.greenCool = 0
                 }
             }
         }
-        
     }
 
     // 가까운 거리 판별 사각형

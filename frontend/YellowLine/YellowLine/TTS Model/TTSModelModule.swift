@@ -92,7 +92,6 @@ class TTSModelModule {
             guard redCounts >= 10 else { return }
             channels.red = true
             greenCounts = 0
-            redCounts = 0
             speakTTS(text: text)
             channels.green = false
             channels.red = false

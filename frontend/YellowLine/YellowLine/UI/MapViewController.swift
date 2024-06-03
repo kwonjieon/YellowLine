@@ -251,13 +251,16 @@ class MapViewController: UIViewController, TMapViewDelegate {
     
             DispatchQueue.main.async {
                 let marker1 = TMapMarker(position: startPoint)
-                marker1.map = self.mapView
                 marker1.title = "출발지"
+                marker1.icon = UIImage(named: "startIcon")
+                marker1.offset = CGSize(width: 36, height: 51)
+                marker1.map = self.mapView
                 self.markers.append(marker1)
                 
                 let marker2 = TMapMarker(position: endPoint)
-                marker2.map = self.mapView
                 marker2.title = "목적지"
+                marker2.icon = UIImage(named: "arriveIcon")
+                marker2.map = self.mapView
                 self.markers.append(marker2)
                 
                 // 라인 디자인 설정
@@ -352,12 +355,14 @@ class MapViewController: UIViewController, TMapViewDelegate {
                                 }
                                 self.pointerDataList.append(inputData)
                                 
+                                /*
                                 DispatchQueue.main.async {
                                     // 임시 좌/우 회전 포인터 마커들 표기
                                     let pointMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: inputData.latitude, longitude: inputData.longitude))
                                     pointMarker.map = self.mapView
                                     self.pointMarkers.append(pointMarker)
                                 }
+                                 */
                             }
                         case .twoDimensional(let array): break
                         }
