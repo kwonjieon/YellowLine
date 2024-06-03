@@ -34,7 +34,6 @@ class ObjectDetectionVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.protectedId = UserDefaults.standard.string(forKey: "uid")!
-        print(protectedId!)
         setNavigationBar()
         webRTCManager = WebRTCManager(uiView: localView, protectedId!)
         setLabel()

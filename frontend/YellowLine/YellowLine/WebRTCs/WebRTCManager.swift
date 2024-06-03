@@ -30,12 +30,11 @@ class WebRTCManager {
     init(uiView : UIView,_ userName: String) {
         self.userName = userName
         self.localView = uiView
-        print("uiView : \(uiView.bounds.width), \(uiView.bounds.height)")
+//        print("uiView : \(uiView.bounds.width), \(uiView.bounds.height)")
         cameraSession = CameraSession(view: uiView)
         cameraSession?.delegate = self
         webRTCClient = WebRTCClient()
         webRTCClient?.delegate = self
-//        webRTCClient?.cameraDevice = cameraSession!.cameraDevice
         webRTCClient?.setupWithRole(isProtector: false, uiView)
         if cameraSession?.checkCameraAuthor() == true{
             //socket 연결요청

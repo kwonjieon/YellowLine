@@ -50,7 +50,6 @@
 		57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */; };
 		57FC78502BC7C54C00C81CA1 /* DestinationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */; };
 		57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FC78512BC7CED500C81CA1 /* MapViewController.swift */; };
-		B92DDC292C075413005820BA /* ylyolov8s.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B92DDC282C075413005820BA /* ylyolov8s.mlmodel */; };
 		B92DDC362C076670005820BA /* TMapSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92DDC322C076633005820BA /* TMapSDK.framework */; };
 		B92DDC372C076670005820BA /* TMapSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B92DDC322C076633005820BA /* TMapSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B944E14E2C0B759C00ECBD4D /* yolov8v2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B944E14D2C0B759C00ECBD4D /* yolov8v2.mlmodel */; };
@@ -128,7 +127,6 @@
 		57FC784D2BC4F72C00C81CA1 /* NavigationDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDataModel.swift; sourceTree = "<group>"; };
 		57FC784F2BC7C54C00C81CA1 /* DestinationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationModel.swift; sourceTree = "<group>"; };
 		57FC78512BC7CED500C81CA1 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
-		B92DDC282C075413005820BA /* ylyolov8s.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = ylyolov8s.mlmodel; sourceTree = "<group>"; };
 		B92DDC322C076633005820BA /* TMapSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TMapSDK.framework; sourceTree = "<group>"; };
 		B944E14D2C0B759C00ECBD4D /* yolov8v2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = yolov8v2.mlmodel; sourceTree = "<group>"; };
 		B956CA062BCEA7C800188A09 /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
@@ -300,7 +298,6 @@
 			children = (
 				B97342032C0CA80900A7141B /* yolov8sv3.mlmodel */,
 				B944E14D2C0B759C00ECBD4D /* yolov8v2.mlmodel */,
-				B92DDC282C075413005820BA /* ylyolov8s.mlmodel */,
 				B9741B9A2C00CF8400E87A72 /* MiDaS.mlmodel */,
 			);
 			path = "Object Detection";
@@ -454,7 +451,6 @@
 				5754C41E2C041A17002FE306 /* SearchHistoryCell.swift in Sources */,
 				57FC784C2BC3BE5700C81CA1 /* SearchDestinationViewController.swift in Sources */,
 				5788A8BC2BF347230013D6CF /* LocationData.swift in Sources */,
-				B92DDC292C075413005820BA /* ylyolov8s.mlmodel in Sources */,
 				B944E14E2C0B759C00ECBD4D /* yolov8v2.mlmodel in Sources */,
 				57FC784E2BC4F72C00C81CA1 /* NavigationDataModel.swift in Sources */,
 				57FC78522BC7CED500C81CA1 /* MapViewController.swift in Sources */,
