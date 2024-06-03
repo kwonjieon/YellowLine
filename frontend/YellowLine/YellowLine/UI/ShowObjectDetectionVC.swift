@@ -45,7 +45,6 @@ class ShowObjectDetectionVC: UIViewController {
             self.socket = nil
             self.webRTCClient.onDisConnected()
             self.webRTCClient = nil
-            
         }
 
 
@@ -188,6 +187,17 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
     
     func didDisConnectedWebRTC() {
         print("피보호자와의 연결이 종료되었습니다.")
+        self.dismiss(animated: true) {
+            self.tryToConnectWebSocket.invalidate()
+            self.tryToConnectWebSocket = nil
+            if self.isSocketConnected {
+                self.socket.disconnect()
+                self.isSocketConnected = false
+            }
+            self.socket = nil
+            self.webRTCClient.onDisConnected()
+            self.webRTCClient = nil
+        }
     }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
