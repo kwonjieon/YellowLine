@@ -13,6 +13,13 @@ class LoginVC: UIViewController {
     @IBOutlet weak var PWField: UITextField!
     @IBOutlet weak var IDField: UITextField!
     
+    @IBOutlet weak var title1: UILabel!
+    @IBOutlet weak var title2: UILabel!
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    
+    
+    
     // 로그인 버튼 클릭
     @IBAction func clickLoginBtn(_ sender: Any) {
         // 버튼 누르면 키보드가 자동으로 내려감
