@@ -997,13 +997,6 @@
                                     <action selector="backBtn:" destination="k2S-Ze-1qb" eventType="touchUpInside" id="9yw-hM-zb9"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="경로 안내" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XDX-dc-aNb">
-                                <rect key="frame" x="298" y="46" width="81" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="XPB-0L-eTH">
                                 <rect key="frame" x="130" y="74" width="178.66666666666663" height="20.333333333333329"/>
                                 <subviews>
@@ -1038,7 +1031,6 @@
                         <outlet property="mapContainerView" destination="wWg-Zb-XIP" id="BaF-bV-zdI"/>
                         <outlet property="navigationBar" destination="6j0-r3-DLE" id="dy2-7j-8sT"/>
                         <outlet property="objectDetectionView" destination="yWV-H4-77O" id="RSO-pP-1uc"/>
-                        <outlet property="routineInform" destination="XDX-dc-aNb" id="o8g-dK-Ow8"/>
                         <outlet property="stackView" destination="XPB-0L-eTH" id="uMZ-ap-pqW"/>
                         <outlet property="standardText" destination="l8D-Pe-53m" id="7IL-tO-8Fp"/>
                     </connections>

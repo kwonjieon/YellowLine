@@ -33,7 +33,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
     @IBOutlet weak var standardText: UILabel!
     @IBOutlet weak var destinationText: UILabel!
     @IBOutlet weak var navigationBar: UIView!
-    @IBOutlet weak var routineInform: UILabel!
 
     var mapView:TMapView?
     let apiKey:String = "YcaUVUHoQr16RxftAbmvGmlYiFY5tkH2iTkvG1V2"
@@ -97,8 +96,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
         self.mapView?.delegate = self
         self.mapView?.setApiKey(apiKey)
         mapContainerView.addSubview(self.mapView!)
-        
-        routineInform.textColor = .white
         
         locationManager.delegate = self  // 델리게이트 설정
         locationManager.desiredAccuracy = kCLLocationAccuracyBest  // 거리 정확도 설정
@@ -414,8 +411,6 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 }
                 // 방향을 꺾어야 하는 위치에 도달
                 else {
-                    routineInform.text = location.direction
-                
                 // 음성안내
                 // speakText(내용, 볼륨, 속도, 옵션)
                 let speechText = "여기서" + location.direction + "하세요"
