@@ -153,16 +153,16 @@ class MapViewController: UIViewController, TMapViewDelegate {
         mapView?.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 120).isActive = true
     }
     
-    func setObjectDetectionView() {
-        objectDetectionView.frame = CGRect(x: 0, y: 0, width: 393, height: 356)
-        objectDetectionView.layer.backgroundColor = UIColor(red: 0.851, green: 0.851, blue: 0.851, alpha: 1).cgColor
-        objectDetectionView.layer.cornerRadius = 20
-        objectDetectionView.translatesAutoresizingMaskIntoConstraints = false
-        objectDetectionView.widthAnchor.constraint(equalToConstant: 393).isActive = true
-        objectDetectionView.heightAnchor.constraint(equalToConstant: 356).isActive = true
-        objectDetectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
-        objectDetectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 496).isActive = true
-    }
+//    func setObjectDetectionView() {
+//        objectDetectionView.frame = CGRect(x: 0, y: 0, width: 393, height: 356)
+//        objectDetectionView.layer.backgroundColor = UIColor(red: 0.851, green: 0.851, blue: 0.851, alpha: 1).cgColor
+//        objectDetectionView.layer.cornerRadius = 20
+//        objectDetectionView.translatesAutoresizingMaskIntoConstraints = false
+//        objectDetectionView.widthAnchor.constraint(equalToConstant: 393).isActive = true
+//        objectDetectionView.heightAnchor.constraint(equalToConstant: 356).isActive = true
+//        objectDetectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
+//        objectDetectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 496).isActive = true
+//    }
     
     func setNaviBar() {
         navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 120)
@@ -268,8 +268,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 self.polyline?.strokeWidth = 9
                 
                 self.polyline?.map = self.mapView
-                self.polylines.append(self.polyline!)
-                self.mapView?.fitMapBoundsWithPolylines(self.polylines)
+//                self.polylines.append(self.polyline!)
+//                self.mapView?.fitMapBoundsWithPolylines(self.polylines)
             }
         }
     }
