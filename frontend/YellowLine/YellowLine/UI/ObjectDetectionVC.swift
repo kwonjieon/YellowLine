@@ -48,12 +48,12 @@ class ObjectDetectionVC: UIViewController {
     
     
     func setNavigationBar() {
-        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 120)
+        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 140)
         navigationBar.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
 
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
-        navigationBar.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        navigationBar.heightAnchor.constraint(equalToConstant: 140).isActive = true
     }
 
     

@@ -431,9 +431,11 @@ extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataS
             cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
             
             // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
+            /*
             let background = UIView()
             background.backgroundColor = .clear
             cell.selectedBackgroundView = background
+             */
             return cell
         }
         
@@ -445,10 +447,13 @@ extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataS
             cell.backgroundColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1.00)
             
             // cell 누르고 있거나 눌렀을 때 배경색 안바뀌게 유지
+            /*
             let background = UIView()
             background.backgroundColor = .clear
             cell.selectedBackgroundView = background
+             */
             return cell
+             
         }
     }
     
@@ -486,7 +491,8 @@ extension SearchDestinationViewController: UITableViewDelegate, UITableViewDataS
         
         self.present(nextVC, animated: true)
         
+        
         // 한번 클릭 한 row 클릭상태 ui 바로 해제
-        tableView.deselectRow(at: indexPath, animated: true)
+        //tableView.deselectRow(at: indexPath, animated: true)
     }
 }

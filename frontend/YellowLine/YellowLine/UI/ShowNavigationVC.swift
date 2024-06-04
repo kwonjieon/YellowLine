@@ -175,6 +175,7 @@ class ShowNavigationVC: UIViewController, TMapViewDelegate, WebSocketDelegate, W
         
         // 새로운 위치에 마커 생성 및 추가
         currentMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: currentLatitude, longitude: currentLongitude))
+        currentMarker?.icon = UIImage(named: "customMark")
         currentMarker?.map = mapView
         
         print("마커 업데이트")

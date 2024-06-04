@@ -320,6 +320,38 @@ class MapViewController: UIViewController, TMapViewDelegate {
                 // 목적지 선택 후, 지정된 목적지로 포인트들 탐색 후 mapvie 에서 데이터 사용
                 do{
                     self.navigationDataModel = try JSONDecoder().decode(NavigationDataModel.self, from: data!)
+                    var inputData: LocationData = LocationData()
+                    //inputData.latitude = 37.54918981694703
+                    //inputData.longitude = 127.07552689991017
+                    inputData.latitude = 37.54917522401608
+                    inputData.longitude = 127.07548259655896
+                    inputData.direction = "좌회전"
+                    inputData.name = "임시"
+                    /*
+                    DispatchQueue.main.async {
+                        // 임시 좌/우 회전 포인터 마커들 표기
+                        let pointMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: inputData.latitude, longitude: inputData.longitude))
+                        pointMarker.map = self.mapView
+                        self.pointMarkers.append(pointMarker)
+                    }
+                    */
+                    self.pointerDataList.append(inputData)
+
+                    var inputData2: LocationData = LocationData()
+                    inputData2.latitude = 37.54928899367446
+                    inputData2.longitude = 127.07519694129887
+                    inputData2.direction = "우회전"
+                    inputData2.name = "임시2"
+                    /*
+                    DispatchQueue.main.async {
+                        // 임시 좌/우 회전 포인터 마커들 표기
+                        let pointMarker = TMapMarker(position: CLLocationCoordinate2D(latitude: inputData.latitude, longitude: inputData.longitude))
+                        pointMarker.map = self.mapView
+                        self.pointMarkers.append(pointMarker)
+                    }
+                    */
+                    self.pointerDataList.append(inputData2)
+                    
                     for i in 0...self.navigationDataModel!.features.count-1 {
                         
                         if let destinationInput = self.navigationDataModel!.features[i].properties.nearPoiName {
@@ -359,11 +391,12 @@ class MapViewController: UIViewController, TMapViewDelegate {
                                     pointMarker.map = self.mapView
                                     self.pointMarkers.append(pointMarker)
                                 }
-                                 */
+                             */
                             }
                         case .twoDimensional(let array): break
                         }
                     }
+                    
                     var destinationData: LocationData = LocationData()
                     destinationData.latitude = Double(self.destinationLati!)!
                     destinationData.longitude = Double(self.destinationLongi!)!
@@ -389,7 +422,8 @@ class MapViewController: UIViewController, TMapViewDelegate {
     func checkCurrentLoactionRotate() {
         for (index,location) in pointerDataList.enumerated() {
             let distance = distanceBetweenPoints(x1: location.latitude, y1: location.longitude, x2: latitude, y2: longitude)
-            if distance < 0.000036 {
+            // 값이 커질수록 범위가 넓어짐
+            if distance < 0.00005 {
                 // 최종 목적지에 도착
                 
                 if (location.name == "finishLine2749") {

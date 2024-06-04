@@ -383,6 +383,8 @@ class CameraSession: NSObject {
             } else {
                 TTSModelModule.ttsModule.objectCounts = 0
             }
+            print(self.closeObjects)
+            print("---------------------------------------------")
             self.closeObjects.removeAll()
             
             // 빨간불을 기다리는 동안은 안내가 한번만 나오게 설정
@@ -398,16 +400,19 @@ class CameraSession: NSObject {
                         self.greenCnt = 0
                     }
                 }
+                self.greenCool += 1
             }
             else if !self.lights.red {
                 self.redCool += 1
-                if(self.redCool >= 500) {
+                if(self.redCool >= 50) {
                     self.redFlag = false
                     self.redCool = 0
+
                 }
             }
-            
+            // 초록불 보이는 상태
             if self.lights.green {
+                // 초록불 안내를 해도 될떄 (이미 한번 함)
                 if(self.greenFlag == false) {
                     self.greenCnt += 1
                     if (self.greenCnt >= 8) {
@@ -418,12 +423,14 @@ class CameraSession: NSObject {
                         self.redCnt = 0
                     }
                 }
+                self.redCool += 1
             }
             else if !self.lights.green {
                 self.greenCool += 1
-                if(self.greenCool >= 500) {
+                if(self.greenCool >= 50) {
                     self.greenFlag = false
                     self.greenCool = 0
+                    
                 }
             }
         }
@@ -526,11 +533,12 @@ class CameraSession: NSObject {
                 let confidence = prediction.labels[0].confidence
                 
                 // filter boundary visualizing...
-//                    let redSquare = UIView()
-//                    redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
-//                    redSquare.frame = filtRect!
-//                    localView?.addSubview(redSquare)
-                
+                /*
+                    let redSquare = UIView()
+                    redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
+                    redSquare.frame = filtRect!
+                    localView?.addSubview(redSquare)
+                */
 //                    print("bestClass is : \(bestClass)")
                 
 
@@ -552,7 +560,7 @@ class CameraSession: NSObject {
                 // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
                 //  필터링 사각형
 
-                if filtRect!.intersects(rect) {
+                if  lights.red || lights.green || filtRect!.intersects(rect) {
                     if !exceptObjects.contains(bestClass) {
                         closeObjects.insert(bestClass)
                     }
@@ -595,10 +603,10 @@ class CameraSession: NSObject {
 //        let y = h * (0.97 - ofs)
         
         let ofs = 0.2
-        let widthLen = w * (1 - ofs) - 80
-        let heightLen = h * (ofs)
-        let x = w * (ofs / 2) + 40
-        let y = h * (0.97 - ofs)
+        let widthLen = w * (1 - ofs) - 170
+        let heightLen = h * (ofs) + 300
+        let x = w * (ofs / 2) + 85
+        let y = h * (0.97 - ofs) - 50
         
         return CGRect(origin: CGPoint(x: x, y: y), size: CGSize(width: widthLen, height: heightLen))
     }
