@@ -80,7 +80,7 @@ class TTSModelModule {
     // TTS실행 시 Main 큐 외의 DispatchQueue에서 돌리기 ex) 359 line of CameraSession.
     func processTTS(type: String, text: String) {
         switch type {
-        case "navi" :
+        case "navi", "closest" :
             channels.navi = true
             speakTTS(text: text)
             channels.navi = false

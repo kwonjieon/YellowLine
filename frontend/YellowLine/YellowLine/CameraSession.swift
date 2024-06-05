@@ -36,7 +36,7 @@ class CameraSession: NSObject {
     //for test
     var midasView: UIImageView?
     
-    let useMidas = false
+    var useMidas = true
     
     var localWidth: CGFloat?
     var localHeight: CGFloat?
@@ -81,12 +81,7 @@ class CameraSession: NSObject {
             if success {
                 setUpBoundingBoxViews()
                 self.filtRect = makeRectFilter(localView!.bounds.width, localView!.bounds.height, 0.07)
-                // Add the video preview into the UI.
-//                if let previewLayer = self.previewLayer {
-//                    localView!.layer.addSublayer(previewLayer)
-//                    self.previewLayer!.frame = self.localView!.bounds  // resize preview layer
-//                }
-                
+
                 // Add the bounding box layers to the UI, on top of the video preview.
                 for box in self.boundingBoxViews {
                     box.addToLayer(self.localView!.layer)
@@ -315,7 +310,7 @@ class CameraSession: NSObject {
             , let bf = currentBuffer {
             depthPixelBuffer = pixelBuffer
             depthCIImage = CIImage(cvPixelBuffer: pixelBuffer)
-            let uiImage = UIImage(ciImage: depthCIImage!)
+            
             let handler = VNImageRequestHandler(ciImage: originalCIImage!)
 //            let handler = VNImageRequestHandler(cgImage: resizedCGImage!)
             do {
@@ -337,6 +332,8 @@ class CameraSession: NSObject {
     func predict(_ cvImageBuffer : CVImageBuffer?){
         // Invoke a VNRequestHandler with that image
         if currentBuffer == nil {
+            print("midasFrame : \(midasFrame)")
+            midasFrame += 1
             currentBuffer = cvImageBuffer
 //            self.semaphore.wait()
             let ciContext = CIContext()
@@ -370,10 +367,8 @@ class CameraSession: NSObject {
         DispatchQueue.main.async {
             if let results = request.results as? [VNRecognizedObjectObservation] {
                 self.show(predictions: results)
-                print("is.")
             } else {
                 self.show(predictions: [])
-                print("not.")
             }
             // TTS 실행.
             if !self.closeObjects.isEmpty {
@@ -383,8 +378,6 @@ class CameraSession: NSObject {
             } else {
                 TTSModelModule.ttsModule.objectCounts = 0
             }
-            print(self.closeObjects)
-            print("---------------------------------------------")
             self.closeObjects.removeAll()
             
             // 빨간불을 기다리는 동안은 안내가 한번만 나오게 설정
@@ -400,19 +393,16 @@ class CameraSession: NSObject {
                         self.greenCnt = 0
                     }
                 }
-                self.greenCool += 1
             }
             else if !self.lights.red {
                 self.redCool += 1
-                if(self.redCool >= 50) {
+                if(self.redCool >= 500) {
                     self.redFlag = false
                     self.redCool = 0
-
                 }
             }
-            // 초록불 보이는 상태
+            
             if self.lights.green {
-                // 초록불 안내를 해도 될떄 (이미 한번 함)
                 if(self.greenFlag == false) {
                     self.greenCnt += 1
                     if (self.greenCnt >= 8) {
@@ -423,14 +413,12 @@ class CameraSession: NSObject {
                         self.redCnt = 0
                     }
                 }
-                self.redCool += 1
             }
             else if !self.lights.green {
                 self.greenCool += 1
-                if(self.greenCool >= 50) {
+                if(self.greenCool >= 500) {
                     self.greenFlag = false
                     self.greenCool = 0
-                    
                 }
             }
         }
@@ -513,7 +501,8 @@ class CameraSession: NSObject {
 
 //                    // 마이다스 이미지버퍼 상대적 좌표 지정
                 if useMidas {
-                    if self.depthCIImage != nil {
+                    if self.depthCIImage != nil ,
+                       self.depthPixelBuffer != nil{
                         let bf = (self.depthPixelBuffer)!
                         let imgWidth = CGFloat(CVPixelBufferGetWidth(bf))
                         let imgHeight = CGFloat(CVPixelBufferGetHeight(bf))
@@ -523,22 +512,40 @@ class CameraSession: NSObject {
                         let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
                         let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
                         // read the data (returns value of type UInt8)
-                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
-                        depthValue = 1.0 - Float(dalue) / 255.0
+                        let val = Float(0.5)
+                        let ofs = 0.3
+                        let sz = 256 * 256 * ofs
+                        var countWhitePixel = 0
+                        for i in 0..<256{
+                            for j in 0..<256 {
+                                var fval = 1.0 - Float(byteBuffer[i * bytePerRow + j]) / 255.0
+                                if fval < val {
+                                    countWhitePixel += 1
+                                }
+                            }
+                        }
+                        if countWhitePixel > Int(sz) {
+                            print("충분히 가깝게 있습니다.")
+                            TTSModelModule.ttsModule.processTTS(type: "closest", text: "충분히 가깝게 있습니다")
+                        }
+                        //                        let dalue = byteBuffer[midasX + midasY * bytePerRow]
+//                        depthValue = 1.0 - Float(dalue) / 255.0
                         CVPixelBufferUnlockBaseAddress(bf, .readOnly)
                     }
+                    print("DepthValue : \(depthValue)")
                 }
 
                 let bestClass = prediction.labels[0].identifier
                 let confidence = prediction.labels[0].confidence
                 
                 // filter boundary visualizing...
-                /*
-                    let redSquare = UIView()
+                    let redSquare = UIImageView()
                     redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
                     redSquare.frame = filtRect!
                     localView?.addSubview(redSquare)
-                */
+                DispatchQueue.main.async {
+                    redSquare.image = UIImage(ciImage: self.depthCIImage!)
+                }
 //                    print("bestClass is : \(bestClass)")
                 
 
@@ -560,7 +567,7 @@ class CameraSession: NSObject {
                 // 전방 필터 사각형 범위 내에 물체가 있으면 ( 가까이 물체가 있다면 )
                 //  필터링 사각형
 
-                if  lights.red || lights.green || filtRect!.intersects(rect) {
+                if filtRect!.intersects(rect) {
                     if !exceptObjects.contains(bestClass) {
                         closeObjects.insert(bestClass)
                     }
@@ -603,13 +610,15 @@ class CameraSession: NSObject {
 //        let y = h * (0.97 - ofs)
         
         let ofs = 0.2
-        let widthLen = w * (1 - ofs) - 170
-        let heightLen = h * (ofs) + 300
-        let x = w * (ofs / 2) + 85
-        let y = h * (0.97 - ofs) - 50
+        let widthLen = w * (1 - ofs) - 80
+        let heightLen = h * (ofs)
+        let x = w * (ofs / 2) + 40
+        let y = h * (0.97 - ofs)
         
         return CGRect(origin: CGPoint(x: x, y: y), size: CGSize(width: widthLen, height: heightLen))
     }
+    
+    var midasFrame = 0
 }
 
 //MARK: - captureOutput 설정
@@ -618,11 +627,17 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
+        if midasFrame % 10 == 0 {
+            midasFrame = 0
+            useMidas = true
+        } else {
+            useMidas = false
+        }
+        
         delegate?.didWebRTCOutput(sampleBuffer)
         predict(cvImageBuffer)
     }
 }
-
 
 extension CGImage {
     func resize(size:CGSize) -> CGImage? {

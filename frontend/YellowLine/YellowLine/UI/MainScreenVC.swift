@@ -180,7 +180,7 @@ class MainScreenVC: UIViewController {
         designView.widthAnchor.constraint(equalToConstant: 172).isActive = true
         designView.heightAnchor.constraint(equalToConstant: 39).isActive = true
         designView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 32).isActive = true
-        designView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 280).isActive = true
+        designView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 240).isActive = true
     }
     
     func setIcon() {

@@ -13,16 +13,6 @@ class LoginVC: UIViewController {
     @IBOutlet weak var PWField: UITextField!
     @IBOutlet weak var IDField: UITextField!
     
-    @IBOutlet weak var title1: UILabel!
-    @IBOutlet weak var title2: UILabel!
-    
-    @IBOutlet weak var registerBtn: UIButton!
-    @IBOutlet weak var loginBtn: UIButton!
-    
-    @IBOutlet weak var designView: UIView!
-    
-    
-    
     // 로그인 버튼 클릭
     @IBAction func clickLoginBtn(_ sender: Any) {
         // 버튼 누르면 키보드가 자동으로 내려감
@@ -37,6 +27,8 @@ class LoginVC: UIViewController {
         }
     }
 
+
+    
     @IBAction func clickRegisterBtn(_ sender: Any) {
         guard let nextVC = self.storyboard?.instantiateViewController(identifier: "RegisterVC") else {return}
         nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
@@ -51,9 +43,6 @@ class LoginVC: UIViewController {
         
         setPWField()
         setIDField()
-        setBtn()
-        setLabel()
-        setDesignView()
     }
     
     // 로그인 시도
@@ -123,82 +112,16 @@ class LoginVC: UIViewController {
         PWField.clearButtonMode = .always
         // 키보드 입력시 엔터키 표출
         PWField.returnKeyType = .done
-        PWField.isSecureTextEntry = true
-        
-        PWField.frame = CGRect(x: 0, y: 0, width: 299, height: 50)
-        PWField.backgroundColor = UIColor(red: 0.937, green: 0.937, blue: 0.937, alpha: 1)
-        
-        PWField.translatesAutoresizingMaskIntoConstraints = false
-        PWField.widthAnchor.constraint(equalToConstant: 299).isActive = true
-        PWField.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        PWField.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 47).isActive = true
-        PWField.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 396).isActive = true
-        
+        PWField.frame.size.height = 44
     }
     
     func setIDField() {
         IDField.placeholder = "아이디"
         IDField.clearButtonMode = .always
         IDField.returnKeyType = .done
-
-        IDField.frame = CGRect(x: 0, y: 0, width: 299, height: 50)
-        IDField.backgroundColor = UIColor(red: 0.937, green: 0.937, blue: 0.937, alpha: 1)
-        IDField.layer.cornerRadius = 10
-        
-        IDField.translatesAutoresizingMaskIntoConstraints = false
-        IDField.widthAnchor.constraint(equalToConstant: 299).isActive = true
-        IDField.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        IDField.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 47).isActive = true
-        IDField.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 335).isActive = true
+        IDField.frame.size.height = 44
     }
     
-    func setBtn() {
-        loginBtn.frame = CGRect(x: 0, y: 0, width: 299, height: 50)
-        loginBtn.layer.backgroundColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1).cgColor
-        loginBtn.layer.cornerRadius = 10
-        loginBtn.tintColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        
-        loginBtn.translatesAutoresizingMaskIntoConstraints = false
-        loginBtn.widthAnchor.constraint(equalToConstant: 299).isActive = true
-        loginBtn.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        loginBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 47).isActive = true
-        loginBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 484).isActive = true
-        
-
-        registerBtn.tintColor = UIColor(red: 0.539, green: 0.539, blue: 0.539, alpha: 1)
-        registerBtn.translatesAutoresizingMaskIntoConstraints = false
-        //registerBtn.widthAnchor.constraint(equalToConstant: 74).isActive = true
-        //registerBtn.heightAnchor.constraint(equalToConstant: 25).isActive = true
-        registerBtn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 159).isActive = true
-        registerBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 545).isActive = true
-    }
-    
-    func setLabel() {
-        title1.textColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1)
-        title1.font = UIFont(name: "AppleSDGothicNeoH00", size: 60)
-        title1.textAlignment = .center
-        title1.translatesAutoresizingMaskIntoConstraints = false
-        title1.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 47).isActive = true
-        title1.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 182).isActive = true
-        
-        title2.textColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1)
-        title2.font = UIFont(name: "AppleSDGothicNeoH00", size: 60)
-        title2.textAlignment = .center
-        title2.translatesAutoresizingMaskIntoConstraints = false
-        title2.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 49).isActive = true
-        title2.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 233).isActive = true
-    }
-    
-    func setDesignView() {
-        designView.frame = CGRect(x: 0, y: 0, width: 152, height: 28)
-        designView.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
-
-        designView.translatesAutoresizingMaskIntoConstraints = false
-        designView.widthAnchor.constraint(equalToConstant: 152).isActive = true
-        designView.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        designView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 47).isActive = true
-        designView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 275).isActive = true
-    }
     
     // MARK: 로그인 검증
     
