@@ -514,9 +514,9 @@ class CameraSession: NSObject {
                         // read the data (returns value of type UInt8)
                         /*
                          val : 기준점
-                         sz : 가까이 있다는 픽셀선택 비교 기준점
+                         sz : 선택한 범위의 카운트 해야 할 개수
+                            ofs으로 비율을 조절하면 됩니다.
                          countWhitePixel : 기준점 이상의 픽셀개수
-                         
                          */
                         let val = Float(0.5)
                         let ofs = 0.3
@@ -530,6 +530,7 @@ class CameraSession: NSObject {
                                 }
                             }
                         }
+                        print("마이다스")
                         // 기준점 이상의 픽셀개수가 비교 기준점보다 많으면
                         if countWhitePixel > Int(sz) {
                             print("충분히 가깝게 있습니다.")
@@ -634,7 +635,14 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
-        if midasFrame % 10 == 0 {
+        if midasFrame % 10/* 이 부분 조정하기*/ == 0 {
+            /*
+             515 line 주석 미리 첨부.
+             val : 기준점
+             sz : 선택한 범위의 카운트 해야 할 개수
+                ofs으로 비율을 조절하면 됩니다.
+             countWhitePixel : 기준점 이상의 픽셀개수
+             */
             midasFrame = 0
             useMidas = true
         } else {
