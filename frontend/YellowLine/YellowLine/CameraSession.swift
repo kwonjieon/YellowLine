@@ -512,6 +512,12 @@ class CameraSession: NSObject {
                         let byteBuffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
                         let bytePerRow = CVPixelBufferGetBytesPerRow(bf)
                         // read the data (returns value of type UInt8)
+                        /*
+                         val : 기준점
+                         sz : 가까이 있다는 픽셀선택 비교 기준점
+                         countWhitePixel : 기준점 이상의 픽셀개수
+                         
+                         */
                         let val = Float(0.5)
                         let ofs = 0.3
                         let sz = 256 * 256 * ofs
@@ -519,11 +525,12 @@ class CameraSession: NSObject {
                         for i in 0..<256{
                             for j in 0..<256 {
                                 var fval = 1.0 - Float(byteBuffer[i * bytePerRow + j]) / 255.0
-                                if fval < val {
+                                if fval <= val {
                                     countWhitePixel += 1
                                 }
                             }
                         }
+                        // 기준점 이상의 픽셀개수가 비교 기준점보다 많으면
                         if countWhitePixel > Int(sz) {
                             print("충분히 가깝게 있습니다.")
                             TTSModelModule.ttsModule.processTTS(type: "closest", text: "충분히 가깝게 있습니다")
