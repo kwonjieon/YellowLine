@@ -538,14 +538,14 @@ class CameraSession: NSObject {
                 let bestClass = prediction.labels[0].identifier
                 let confidence = prediction.labels[0].confidence
                 
-                // filter boundary visualizing...
-                    let redSquare = UIImageView()
-                    redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
-                    redSquare.frame = filtRect!
-                    localView?.addSubview(redSquare)
-                DispatchQueue.main.async {
-                    redSquare.image = UIImage(ciImage: self.depthCIImage!)
-                }
+//                // filter boundary visualizing...
+//                    let redSquare = UIImageView()
+//                    redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
+//                    redSquare.frame = filtRect!
+//                    localView?.addSubview(redSquare)
+//                DispatchQueue.main.async {
+//                    redSquare.image = UIImage(ciImage: self.depthCIImage!)
+//                }
 //                    print("bestClass is : \(bestClass)")
                 
 
