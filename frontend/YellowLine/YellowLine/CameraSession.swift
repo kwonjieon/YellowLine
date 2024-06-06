@@ -518,11 +518,11 @@ class CameraSession: NSObject {
                             ofs으로 비율을 조절하면 됩니다.
                          countWhitePixel : 기준점 이상의 픽셀개수
                          */
-                        let val = Float(0.5)
-                        let ofs = 0.3
-                        let sz = 256 * 256 * ofs
+                        let val = Float(0.8)
+                        let ofs = 0.1
+                        let sz = 128 * 256 * ofs
                         var countWhitePixel = 0
-                        for i in 0..<256{
+                        for i in 128..<256{
                             for j in 0..<256 {
                                 var fval = 1.0 - Float(byteBuffer[i * bytePerRow + j]) / 255.0
                                 if fval <= val {
@@ -635,7 +635,7 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         let cvImageBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
         //cvImageBuffer info : osType:875704438 w: 1280 h: 720
         guard cvImageBuffer != nil else { return }
-        if midasFrame % 10/* 이 부분 조정하기*/ == 0 {
+        if midasFrame % 80/* 이 부분 조정하기*/ == 0 {
             /*
              515 line 주석 미리 첨부.
              val : 기준점
