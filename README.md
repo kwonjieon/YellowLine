@@ -1,12 +1,9 @@
-서버는 임시로 ngrok 사용합니다. 매번 url주소가 바뀝니다.
-
-서버주소 <br>
-http://ec2-15-165-108-236.ap-northeast-2.compute.amazonaws.com:8001/"urls..."
-
 ---
 ## 프론트
 
 ## 백엔드
+> 시크릿키는 새로 만들어서 따로 뺴놨습니다. 개발 시 공유 요청해주세요.
+> 
 pycharm<br>
 python: 3.12.2<br>
 인터프리터 설정:
