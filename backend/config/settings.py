@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+from .my_settings import MY_SECRET_KEY
 
 from sympy import python
 
@@ -21,13 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*5vzdgg9_eztyyd0wfjyso*=dm0!pu(f-jp!dov*oc16)y91@v'
+SECRET_KEY = MY_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # allowed port = 8001
-ALLOWED_HOSTS = ['*','.ap-northeast-2.compute.amazonaws.com']
+# 만약 여기서 뭔가 접속이 안된다면 '*' 추가하기.
+ALLOWED_HOSTS = ['.ap-northeast-2.compute.amazonaws.com']
 
 # Application definition
 
