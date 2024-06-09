@@ -11,6 +11,13 @@ import Alamofire
 class ProtectorMainVC: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var relationBtn: UIButton!
+    
+    
+    @IBOutlet weak var logoutBtn: UIButton!
+    @IBAction func clickLogoutBtn(_ sender: Any) {
+        self.dismiss(animated: true)
+    }
+    
     @IBAction func clickRelationBtn(_ sender: Any) {
         let nextVC = self.storyboard?.instantiateViewController(identifier: "PopUpRelationTextField") as! PopUpRelationTextField
         nextVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
@@ -36,11 +43,12 @@ class ProtectorMainVC: UIViewController {
         
         protectedTableView.backgroundColor = UIColor(red: 0.902, green: 0.902, blue: 0.902, alpha: 1)
         self.view.backgroundColor = UIColor(red: 0.902, green: 0.902, blue: 0.902, alpha: 1)
+        
+        setLogout()
     }
     
     // 피보호자 리스트 불러오기
     func loadRecipients() {
-        
         let headers = ["Accept": "application/json"]
         let requestStr: String = "http://43.202.136.75/user/relations/"
         
@@ -80,7 +88,7 @@ class ProtectorMainVC: UIViewController {
     
     // 보호자-피보호자 관계 추가
     func makeRelations() {
-        let helper_id = LoginVC.protectorID
+        let helper_id = UserDefaults.standard.string(forKey: "uid")!
         print("보호자 아이디:\(helper_id)")
         let recipient_id = "testID"
         
@@ -123,6 +131,21 @@ class ProtectorMainVC: UIViewController {
                 }
             }
         } //Alamofire request end...
+    }
+    
+    func setLogout() {
+        logoutBtn.frame = CGRect(x: 0, y: 0, width: 82, height: 29)
+        logoutBtn.layer.backgroundColor = UIColor(red: 0.592, green: 0.633, blue: 1, alpha: 1).cgColor
+        logoutBtn.layer.cornerRadius = 10
+
+        logoutBtn.translatesAutoresizingMaskIntoConstraints = false
+        logoutBtn.widthAnchor.constraint(equalToConstant: 82).isActive = true
+        logoutBtn.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        logoutBtn.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 294).isActive = true
+        logoutBtn.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 63).isActive = true
+        
+        logoutBtn.titleLabel!.text = "Logout"
+        logoutBtn.tintColor = UIColor(red: 0.324, green: 0.39, blue: 0.989, alpha: 1)
     }
     
     func setRelationBtn() {
@@ -201,17 +224,65 @@ class ProtectorMainVC: UIViewController {
         if sender.titleLabel?.text == "도보 카메라 확인" {
             let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowObjectDetectionVC") as! ShowObjectDetectionVC
             nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-            // 피보호자 이름 전달
+            
+            // 피보호자 이름, 아이디 전달
             nextVC.name = protectedList[sender.tag].name
+            nextVC.id = protectedList[sender.tag].id
+        
             self.present(nextVC, animated: true)
         }
         else if sender.titleLabel?.text == "네비게이션 및 도보 카메라 확인" {
             let nextVC = self.storyboard?.instantiateViewController(identifier: "ShowNavigationVC") as! ShowNavigationVC
             nextVC.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+            getProtectedDestination(id: protectedList[sender.tag].id)
+            
+            // 피보호자 이름, 아이디 전달
             nextVC.name = protectedList[sender.tag].name
+            nextVC.id = protectedList[sender.tag].id
+            
             self.present(nextVC, animated: true)
         }
     }
+    
+    func getProtectedDestination(id : String) {
+        print ("id : \(id)")
+        let header: HTTPHeaders = ["Content-Type" : "multipart/form-data"]
+        let URL = "http://43.202.136.75/user/protected-info/"
+        let tmpData : [String : String] = ["user_id" : id]
+        AF.upload(multipartFormData: { multipartFormData in for (key, val) in tmpData {
+            multipartFormData.append(val.data(using: .utf8)!, withName: key)
+        }
+        },to: URL, method: .post, headers: header)
+        .responseDecodable(of: DestinationResult.self){ response in
+            DispatchQueue.main.async {
+                switch response.result {
+                case let .success(response):
+                    print("불러오기 성공")
+                    let result = response
+                    // error가 없으면 통과
+                    guard let resOption = result.recent_arrival else {
+                        return
+                    }
+                    print(resOption)
+                    let cType = resOption
+                    
+                case let .failure(error):
+                    print(error)
+                    print("실패입니다.")
+                    
+                default:
+                    print("something wrong...")
+                    break
+                }
+            }
+        } //Alamofire request end...
+    }
+}
+
+struct DestinationResult : Codable {
+    let user_id : String?
+    let user_name : String?
+    let recent_arrival : String?
 }
 
 struct MakeRelationResult : Codable {

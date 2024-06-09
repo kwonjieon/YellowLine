@@ -21,12 +21,21 @@ class PopUpStopNavi: UIViewController {
     var btn2Text : String?
     var function : String?
     
+    var webRTCManager : WebRTCManager?
+    
     @IBAction func clickCancelBtn(_ sender: Any) {
         self.dismiss(animated: true)
     }
+    
+    
     @IBAction func clickStopBtn(_ sender: Any) {
-        mapViewController.sendNaviFinish()
+        mapViewController.sendChangeToOffline()
+//        mapViewController.locationManager.stopUpdatingLocation()
         if let presentingVC = self.presentingViewController?.presentingViewController?.presentingViewController?.presentingViewController {
+            // 현재 위치 탐색 종료
+            //mapViewController.locationManager.stopUpdatingLocation()
+            webRTCManager!.disconnect()
+            webRTCManager = nil
             // 메인화면으로 돌아감
             presentingVC.dismiss(animated: true, completion: nil)
         }
@@ -34,10 +43,13 @@ class PopUpStopNavi: UIViewController {
     
     var mapViewController = MapViewController()
     
+    deinit {
+        print("****PopUpStopNavi deinit...")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setBasicInfo()
-        
         setLabel()
         setPopUpView()
         setCancelBtn()

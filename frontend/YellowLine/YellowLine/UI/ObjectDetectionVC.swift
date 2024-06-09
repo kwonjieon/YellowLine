@@ -14,21 +14,28 @@ class ObjectDetectionVC: UIViewController {
     // 물체탐지 레이어
     @IBOutlet var localView: UIView!
     var webRTCManager: WebRTCManager?
-    var cameraSession: CameraSession?
     
     // 피보호자 아이디
-    var protectedId = "YLUSER01"
+    var protectedId : String?
+    
+    // 오프라인 상태
+    var mapViewController = MapViewController()
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.dismiss(animated: true)
-        self.webRTCManager!.webRTCClient.disconnect()
-        self.cameraSession?.stopSession()
+        self.webRTCManager?.disconnect()
+        self.webRTCManager = nil
+        // 도보 -> 오프라인 상태로 변경
+        mapViewController.sendChangeToOffline()
+        
+        self.dismiss(animated: true) {
+            print("종료합니다.")
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.protectedId = UserDefaults.standard.string(forKey: "uid")!
         setNavigationBar()
-        webRTCManager = WebRTCManager(uiView: localView, protectedId)
-        
+        webRTCManager = WebRTCManager(uiView: localView, protectedId!)
         setLabel()
         setBtn()
     }
@@ -39,19 +46,16 @@ class ObjectDetectionVC: UIViewController {
         backBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 70).isActive = true
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.cameraSession?.stopSession()
-    }
     
     func setNavigationBar() {
-        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 120)
+        navigationBar.frame = CGRect(x: 0, y: 0, width: 393, height: 140)
         navigationBar.layer.backgroundColor = UIColor(red: 1, green: 0.841, blue: 0.468, alpha: 1).cgColor
 
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.widthAnchor.constraint(equalToConstant: 393).isActive = true
-        navigationBar.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        navigationBar.heightAnchor.constraint(equalToConstant: 140).isActive = true
     }
+
     
     func setLabel() {
         titleLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)

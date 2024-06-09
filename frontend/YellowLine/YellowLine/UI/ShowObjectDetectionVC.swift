@@ -18,25 +18,42 @@ class ShowObjectDetectionVC: UIViewController {
     @IBOutlet weak var backBtn: UIButton!
     @IBOutlet weak var objectDetectionView: UIView! // remote view
     
-//    private var protectedId = "YLUSER01" //보호자 아이디
-    var protectedId : String?
-    private var ipAddress: String = Config.urls.signaling
     
     var socket: WebSocket!
     var webRTCClient: WebRTCClient!
     var tryToConnectWebSocket: Timer!
     var isSocketConnected = false
     
+    // 피보호자 정보
     var name: String?
+    var id : String?
+    
+    deinit {
+        print("**Show ObjectDetectionVC deinit...")
+    }
     
     @IBAction func clickBackBtn(_ sender: Any) {
-        self.dismiss(animated: true)
+
+
+        self.dismiss(animated: true) {
+            self.tryToConnectWebSocket.invalidate()
+            self.tryToConnectWebSocket = nil
+            if self.isSocketConnected {
+                self.socket.disconnect()
+                self.isSocketConnected = false
+            }
+            self.socket = nil
+            self.webRTCClient.onDisConnected()
+            self.webRTCClient = nil
+        }
+
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupUI()   // ui setting
-        let request = URLRequest(url: URL(string: ipAddress + "\(self.protectedId)/")!)
+        let request = URLRequest(url: URL(string: Config.urls.signaling + "\(self.id!)/")!)
         socket = WebSocket(request: request)
         socket.delegate = self
         // socket 반복요청
@@ -60,18 +77,6 @@ class ShowObjectDetectionVC: UIViewController {
         webRTCClient = WebRTCClient()
         webRTCClient.delegate = self
         webRTCClient.setupWithRole(isProtector: true, objectDetectionView)
-//        if isSocketConnected && !webRTCClient.isConnected {
-//            webRTCClient.connect(onSuccess: { (offerSDP: RTCSessionDescription) in
-//                self.sendSDP(sessionDescription: offerSDP)
-//            })
-//        }
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if webRTCClient.isConnected {
-            webRTCClient.disconnect()
-        }
     }
     
     private func setupUI() {
@@ -180,7 +185,20 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
         self.socket.disconnect()
     }
     
-    func didDisConnectedWebRTC() {}
+    func didDisConnectedWebRTC() {
+        print("피보호자와의 연결이 종료되었습니다.")
+        self.dismiss(animated: true) {
+            self.tryToConnectWebSocket.invalidate()
+            self.tryToConnectWebSocket = nil
+            if self.isSocketConnected {
+                self.socket.disconnect()
+                self.isSocketConnected = false
+            }
+            self.socket = nil
+            self.webRTCClient.onDisConnected()
+            self.webRTCClient = nil
+        }
+    }
     
     func didIceConnectionStateChanged(iceConnectionState: RTCIceConnectionState) {
         var state = ""
@@ -211,10 +229,8 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
     func didReceiveData(data: Data) {
         // data channel 을 연결했을 때 여기에 데이터가 옴. 추가기능임.
 //        print("Data received...! \(data)")
-
         do {
             let received = try JSONDecoder().decode(NaviProtectedPoint.self, from: data)
-            print("received data\n : Lat(\(received.Lat)), Lng(\(received.Lng)), Destination(\(received.dest))")
         } catch {
             return
         }
@@ -222,10 +238,6 @@ extension ShowObjectDetectionVC : WebRTCClientDelegate{
     
     func didReceiveMessage(message: String) {
         // 위와 마찬가지 data channel용.
-//        let converted = UIImage(base64: message, withPrefix: false)
-//        DispatchQueue.main.async {
-//            self.imageView!.image = converted
-//        }
         print(message)
         
     }

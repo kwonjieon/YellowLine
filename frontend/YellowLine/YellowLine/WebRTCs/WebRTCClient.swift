@@ -44,11 +44,6 @@ class WebRTCClient: NSObject{
         let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
         let videoDecoderFactory = RTCDefaultVideoDecoderFactory()
         
-//        // MARK: Codec (H.264 or VP8)
-        // If you do net set codec, it uses H.264 as a default in iOS 2.0+
-//        if let codecInformation = (RTCDefaultVideoEncoderFactory.supportedCodecs().first { $0.name.elementsEqual("VP8") }) {
-//            videoEncoderFactory.preferredCodec = codecInformation
-//        }
         return RTCPeerConnectionFactory(encoderFactory: videoEncoderFactory, decoderFactory: videoDecoderFactory)
     }()
     private let mediaConstraints = [kRTCMediaConstraintsOfferToReceiveVideo: kRTCMediaConstraintsValueTrue]
@@ -79,6 +74,7 @@ class WebRTCClient: NSObject{
     var cameraDevice: AVCaptureDevice?
     private var hasReceivedSDP = false
     
+    
 //    weak var device: AVCaptureDevice?
     public private(set) var isConnected: Bool = false
     
@@ -90,7 +86,6 @@ class WebRTCClient: NSObject{
     
     deinit {
         print("WebRTC Client Deinit")
-        self.peerConnection = nil
     }
     
     // MARK: Setting.
@@ -108,7 +103,7 @@ class WebRTCClient: NSObject{
             setupLocalTrack()
             startCapturerLocalVideo(cameraPosition: .back)
             //
-            localRenderView = RTCEAGLVideoView()
+            localRenderView = RTCEAGLVideoView(frame: localView.frame)
             localRenderView!.delegate = self
             localView.addSubview(localRenderView!)
             localVideoTrack.add(localRenderView!)
@@ -196,22 +191,21 @@ class WebRTCClient: NSObject{
                     }
                 }
             }
-            capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
+            DispatchQueue.global(qos: .userInitiated).async {
+                capturer.startCapture(with: targetDevice!, format: targetFormat!, fps: 30)
+            }
+        }
+    }
+    func stopCapture() {
+        if let capturer = self.videoCapturer as? RTCCameraVideoCapturer {
+            DispatchQueue.global(qos: .userInitiated).async {
+                capturer.stopCapture()
+            }
         }
     }
 
     
-    func disconnect() {
-        print("disconnect webrtc client")
-        self.isConnected = false
-        hasReceivedSDP = false
-        peerConnection?.close()
-        peerConnection = nil
-        localVideoTrack = nil
-        localVideoSource = nil
-        remoteVideoTrack = nil
-        videoCapturer = nil
-    }
+
 }
 
 extension WebRTCClient {
@@ -368,16 +362,10 @@ extension WebRTCClient {
         })
         print("= END makeAnswerSDP")
     }
-    
 
-
-    //render video track data of the remote peer.
-    func renderRemoteVideo(to renderer: RTCVideoRenderer) {
-        self.remoteVideoTrack!.add(renderer)
-    }
     
     // MARK: - CONNECTION EVENT
-    private func onConnected() {
+    func onConnected() {
         print("WebRTCClient onConnected")
         self.isConnected = true
         
@@ -386,21 +374,40 @@ extension WebRTCClient {
                 self.remoteRenderView!.isHidden = false
                 self.delegate?.didConnectWebRTC()
             }
-
         }
     }
     
-    private func onDisConnected() {
+    func onDisConnected() {
+        print("WebRTCClient onDisconnected")
         self.isConnected = false
-        print("WebRTCClient onDisConnected")
+        DispatchQueue.main.async {
+            if self.isProtector {
+                self.remoteRenderView!.isHidden = true
+                self.delegate?.didDisConnectedWebRTC()
+            }
+        }
+        
+    }
+
+    func disconnect() {
+        self.isConnected = false
+        self.peerConnection?.close()
+        self.peerConnection = nil
+        print("WebRTCClient disconnect")
         DispatchQueue.main.async {
             self.remoteRenderView?.isHidden = true
-            self.peerConnection!.close()
-            self.peerConnection = nil
             self.localDataChannel = nil
-            self.delegate?.didDisConnectedWebRTC()
+            self.hasReceivedSDP = false
+            self.localVideoTrack = nil
+            self.localVideoSource = nil
+            self.remoteVideoTrack = nil
+            self.cameraDevice = nil
+            self.videoCapturer = nil
         }
+        self.stopCapture()
     }
+    
+
 }
 
 //MARK: -DataChannel Event
@@ -438,6 +445,7 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
         case .stable:
             state = "stable"
         case .closed:
+            self.isConnected = false
             state = "closed"
         case .haveLocalOffer:
             state="haveLocalOffer"
@@ -484,10 +492,12 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
                 self.onConnected()
             }
         default:
-            if self.isConnected{
+            if self.isConnected {
                 self.onDisConnected()
             }
+            break
         }
+        print("changed peerConnection state = \(self.isConnected)")
         
         DispatchQueue.main.async {
             self.delegate?.didIceConnectionStateChanged(iceConnectionState: newState)
@@ -500,7 +510,6 @@ extension WebRTCClient : RTCPeerConnectionDelegate {
     
     func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {
        //send message(video)
-        print("generate Candidate")
         self.delegate?.didGenerateCandidate(iceCandidate: candidate)
     }
     
@@ -572,15 +581,20 @@ extension WebRTCClient: RTCVideoViewDelegate {
             print("webrtc 491 line : something wrong.")
             return
         }
-        if(isLandScape){
-            let ratio = size.width / size.height
-            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.height * ratio, height: _parentView.frame.height)
-            _renderView.center.x = _parentView.frame.width/2
-        }else{
-            let ratio = size.height / size.width
-            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.width, height: _parentView.frame.width * ratio)
-            _renderView.center.y = _parentView.frame.height/2
-        }
+        
+        print("isLandScape : \(isLandScape)")
+
+        _renderView.frame = _parentView.bounds
+//        if(isLandScape){
+//            let ratio = size.width / size.height
+//            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.height * ratio, height: _parentView.frame.height)
+//            _renderView.center.x = _parentView.frame.width/2
+//        }else{
+//            let ratio = size.height / size.width
+//            _renderView.frame = CGRect(x: 0, y: 0, width: _parentView.frame.width, height: _parentView.frame.width)
+//            _renderView.center.y = _parentView.frame.height/2
+//        }
+        print("_renderView: \(_renderView.bounds.width), \(_renderView.bounds.height)")
     }
 }
 

@@ -118,17 +118,25 @@ def makeRelations(request):# 보호자가 관계추가/makerelations
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
 
+
 @csrf_exempt
 @login_required
-def insertSearch(request):# 목적지검색 최근기록에 삽입 /routeSearch
+def insertSearch(request):  # 목적지검색 최근기록에 삽입 /routeSearch
     if request.method == 'POST':
         form = HistoryForm(request.POST)
         if form.is_valid():
+            arrival = form.cleaned_data['arrival']
+            
+            # 동일한 arrival 값을 가진 기존 기록 삭제
+            History.objects.filter(user_id=request.user.id, arrival=arrival).delete()
+            
+            # 새로운 기록 저장
             history = form.save(commit=False)  # Don't save to the database yet
             history.user_id = request.user.id  # Set the current user's ID
             history.latitude = form.cleaned_data.get('latitude', '')
             history.longitude = form.cleaned_data.get('longitude', '')
             history.save()  # Now save to the database
+            
             return JsonResponse({'success': True, 'message': 'History saved successfully.'})
         else:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)

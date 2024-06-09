@@ -67,7 +67,7 @@ class BoundingBoxView {
                 options: .truncatesLastVisibleLine,
                 attributes: attributes, context: nil)
         let textSize = CGSize(width: textRect.width + 12, height: textRect.height)  // Add padding to the text size
-        let textOrigin = CGPoint(x: frame.origin.x - 2, y: frame.origin.y - textSize.height - 2)  // Position above the bounding box
+        let textOrigin = CGPoint(x: frame.origin.x + 2, y: frame.origin.y + textSize.height/2 - 10)  // Position above the bounding box
         textLayer.frame = CGRect(origin: textOrigin, size: textSize)  // Set the text layer frame
     }
     
