@@ -14,7 +14,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.urls import path, re_path
 
-from camapp.consumers import MyConsumer, YLConsumer
+from camapp.consumers import YLConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
@@ -24,17 +24,9 @@ django.setup()
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": URLRouter([
-        path('yl/ws/', MyConsumer.as_asgi()),
-        # path('yl/ws/sock/', YLConsumer.as_asgi()),
         re_path(r'yl/ws/sock/(?P<room_name>\w+)/$', YLConsumer.as_asgi())
     ])
-    # "websocket": AuthMiddlewareStack({
-    #     URLRouter(
-    #         path('yl/ws/', MyConsumer.as_asgi()),
-    #         # path('yl/ws/sock/', YLConsumer.as_asgi()),
-    #         re_path(r'yl/ws/sock/(?P<room_name>\w+)/$', YLConsumer.as_asgi())
-    #     )
-    # })
+
 })
 
 """

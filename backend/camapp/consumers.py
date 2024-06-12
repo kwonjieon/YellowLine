@@ -1,23 +1,6 @@
 import json
-import io
-import tempfile
 
-import cv2
-import numpy as np
-import torch
-import os
-
-import sys
-
-from PIL import Image
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.generic.websocket import WebsocketConsumer
-
-from torchvision import transforms
-
-from camapp.yolov7.learning import outimage
-
-# from camapp.yolov7.hubconf import custom
 
 """
 Consumer == views라고 생각하면 됩니다.
@@ -27,48 +10,6 @@ Consumer == views라고 생각하면 됩니다.
 MYConsumer : 이미지'만' 양방향 전송 (bytes_data) 
 YLConsumer : signaling 을 위한 전송 (text_data) 
 """
-
-
-class MyConsumer(WebsocketConsumer):
-    def connect(self):
-        current_dir = os.getcwd()
-        yolov7_path = os.path.join(current_dir, "camapp/yolov7")
-        sys.path.append(yolov7_path)
-        self.accept()
-
-    def disconnect(self, code):
-        pass
-
-    def receive(self, text_data=None, bytes_data=None):
-        if bytes_data:
-            if not isinstance(bytes_data, bytes):
-                raise TypeError(f"Expected 'content' to be bytes, received: {type(bytes_data)}")
-            # print(type(bytes_data)) #class<'bytes'>
-            #    <class '_io.BytesIO'>
-            
-            # data_io = io.BytesIO(bytes_data)
-
-            #    bytes to numpy array : <class 'numpy.ndarray'>
-            decoded = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), -1)
-            #    이미지 처리 완료
-            outimage(decoded)
-
-            #    numpy array to 'class bytes'
-            _, encode_data = cv2.imencode('.jpg', decoded)
-            #    'class bytes', ndarray
-            print(type(encode_data.tobytes()), type(encode_data))
-            self.send(bytes_data=encode_data.tobytes())
-        else:
-            self.send(text_data=text_data)
-
-
-connected_users = {'YLParent01': set(['YLUser03'])}
-
-
-def findParents(clientId):
-    print(f'child id is {str(clientId)}')
-    return "YLParent01"
-
 
 class YLConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -102,8 +43,7 @@ class YLConsumer(AsyncWebsocketConsumer):
             print(len(bytes_data))
             self.send(bytes_data=bytes_data)
         else:
-        # if text_data:
-            print(f'text data is {text_data}')
+        #     print(f'text data is {text_data}')
             self.send(text_data=text_data)
             text_data_json = json.loads(text_data)
             message = text_data_json
@@ -119,7 +59,7 @@ class YLConsumer(AsyncWebsocketConsumer):
 
     # group sending을 위한 method
     async def chat_message(self, event):
-        print("chat_message is running!")
+        # print("chat_message is running!")
         message = event['message']
 
         if self.channel_name != event['sender_name']:
@@ -135,5 +75,6 @@ class YLConsumer(AsyncWebsocketConsumer):
 https://clouddevs.com/django/real-time-analytics/
 https://channels.readthedocs.io/en/latest/topics/consumers.html channels docs
 https://github.com/stasel/WebRTC-iOS/blob/main/signaling/Swift webrtc ios demo 
+
 
 """
