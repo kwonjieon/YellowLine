@@ -81,11 +81,6 @@ class CameraSession: NSObject {
             if success {
                 setUpBoundingBoxViews()
                 self.filtRect = makeRectFilter(localView!.bounds.width, localView!.bounds.height, 0.07)
-                // Add the video preview into the UI.
-//                if let previewLayer = self.previewLayer {
-//                    localView!.layer.addSublayer(previewLayer)
-//                    self.previewLayer!.frame = self.localView!.bounds  // resize preview layer
-//                }
                 
                 // Add the bounding box layers to the UI, on top of the video preview.
                 for box in self.boundingBoxViews {
@@ -100,11 +95,10 @@ class CameraSession: NSObject {
     }
     
     func setup(completion: @escaping (Bool) -> Void) {
-//        mlModel = try! ylyolov8s(configuration: MLModelConfiguration()).model
-        mlModel = try! yolov8sv3(configuration: MLModelConfiguration()).model
-        
+        mlModel = Config.urls.mlModel
+        // midas trigger
         if useMidas {
-            midasModel = try! MiDaS(configuration: MLModelConfiguration())
+            midasModel = Config.urls.midasModel
         }
 
         yoloDetector = try! VNCoreMLModel(for: mlModel!)
@@ -317,11 +311,7 @@ class CameraSession: NSObject {
             depthCIImage = CIImage(cvPixelBuffer: pixelBuffer)
             let uiImage = UIImage(ciImage: depthCIImage!)
             let handler = VNImageRequestHandler(ciImage: originalCIImage!)
-//            let handler = VNImageRequestHandler(cgImage: resizedCGImage!)
             do {
-//                DispatchQueue.main.async {
-//                    self.midasView!.image = uiImage
-//                }
                 try handler.perform([visionRequest])
             } catch  {
                 print(error)
@@ -338,7 +328,6 @@ class CameraSession: NSObject {
         // Invoke a VNRequestHandler with that image
         if currentBuffer == nil {
             currentBuffer = cvImageBuffer
-//            self.semaphore.wait()
             let ciContext = CIContext()
             let ciImage = CIImage(cvImageBuffer: cvImageBuffer!)
                 .oriented(forExifOrientation: 6)
@@ -351,9 +340,11 @@ class CameraSession: NSObject {
             lazy var handler = VNImageRequestHandler(ciImage: originalCIImage!)
             if UIDevice.current.orientation != .faceUp {  // stop if placed down on a table
                 do {
+                    // use midas trigger
                     if useMidas {
                         try midasHandler.perform([self.midasVisionRequest])
                     } else {
+                        // do not use midas
                         try handler.perform([visionRequest])
 
                     }
@@ -361,7 +352,6 @@ class CameraSession: NSObject {
                     print(error)
                 }
             }
-//            self.semaphore.signal()
             currentBuffer = nil
         } // if end
     } // predict end
@@ -370,10 +360,8 @@ class CameraSession: NSObject {
         DispatchQueue.main.async {
             if let results = request.results as? [VNRecognizedObjectObservation] {
                 self.show(predictions: results)
-                print("is.")
             } else {
                 self.show(predictions: [])
-                print("not.")
             }
             // TTS 실행.
             if !self.closeObjects.isEmpty {
@@ -383,8 +371,9 @@ class CameraSession: NSObject {
             } else {
                 TTSModelModule.ttsModule.objectCounts = 0
             }
-            print(self.closeObjects)
-            print("---------------------------------------------")
+            // debug prints
+//            print(self.closeObjects)
+//            print("---------------------------------------------")
             self.closeObjects.removeAll()
             
             // 빨간불을 기다리는 동안은 안내가 한번만 나오게 설정
@@ -438,7 +427,7 @@ class CameraSession: NSObject {
 
     // 가까운 거리 판별 사각형
     var filtRect : CGRect?
-    var closeObjects : Set<String> = []// 탐지 물체들 넣는 객체
+    var closeObjects : Set<String> = [] // 탐지 물체들 넣는 객체
     var exceptObjects : Set<String> = ["crosswalk_yl", "red_yl", "green_yl"]
     
     var lights: (red : Bool, green : Bool) = (false, false)
@@ -497,7 +486,6 @@ class CameraSession: NSObject {
                     rect.size.height /= ratio
                 }
                 rect = VNImageRectForNormalizedRect(rect, Int(width), Int(height))
-                //                    depthValue = 0.0
 
                 var midX = rect.midX
                 var midY = rect.midY
@@ -505,13 +493,12 @@ class CameraSession: NSObject {
                 if midX >= width { midX = width }
                 if midY < 0 { midY = 0 }
                 if midY >= height { midY = height }
-//
                 var depthValue: Float?
                 let midasX = Int(midX / width * 256)
                 let midasY = Int(midY / height * 256)
                 
 
-//                    // 마이다스 이미지버퍼 상대적 좌표 지정
+//              마이다스 이미지버퍼 상대적 좌표 지정
                 if useMidas {
                     if self.depthCIImage != nil {
                         let bf = (self.depthPixelBuffer)!
@@ -534,18 +521,13 @@ class CameraSession: NSObject {
                 
                 // filter boundary visualizing...
                 /*
+                 // draw points
                     let redSquare = UIView()
                     redSquare.backgroundColor = UIColor(cgColor: CGColor(red: 63, green: 151, blue: 106, alpha: 0.35)) // 배경을 빨간색으로 설정
                     redSquare.frame = filtRect!
                     localView?.addSubview(redSquare)
                 */
 //                    print("bestClass is : \(bestClass)")
-                
-
-                
-                if bestClass == "red_yl" || bestClass == "green_yl" {
-//                    delegate?.didRedOrGreen(bestClass)
-                }
                 
                 if bestClass == "red_yl" {
                     lights.green = false
@@ -571,7 +553,7 @@ class CameraSession: NSObject {
                                              color: colors[bestClass] ?? UIColor.white,
                                              alpha: CGFloat((confidence - 0.2) / (1.0 - 0.2) * 0.9))  // alpha 0 (transparent) to 1 (opaque) for conf threshold 0.2 to 1.0)
 
-                }
+                } // if end...
             } else {
                 boundingBoxViews[i].hide()
             } // if prediction end...
@@ -589,18 +571,6 @@ class CameraSession: NSObject {
     }
     
     private func makeRectFilter(_ w : CGFloat, _ h: CGFloat, _ ofs: CGFloat) -> CGRect {
-        /**
-         })
-         let ofs = 0.07
-         let widthLen = width * (1 - ofs)
-         let heightLen = height * (ofs)
-         let x = width * (ofs / 2)
-         let y = height * (0.97 - ofs)
-         */
-//        let widthLen = w * (1 - ofs)
-//        let heightLen = h * ofs
-//        let x = w * (ofs / 2)
-//        let y = h * (0.97 - ofs)
         
         let ofs = 0.2
         let widthLen = w * (1 - ofs) - 170
